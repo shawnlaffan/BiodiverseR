@@ -5,7 +5,6 @@
 #'
 #' @param test_str string
 #'
-#' @return
 #' @export
 #' @examples
 #' create_service("test")

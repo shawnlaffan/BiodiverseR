@@ -15,7 +15,7 @@ Description: BiodiverseR provides an interface to the Biodiverse.
     based on taxonomic, phylogenetic, trait and matrix-based 
     (e.g. genetic distance) relationships, as well as related environmental 
     and temporal variations. More information for the Biodiverse tool is 
-    available on its Github page: https://github.com/shawnlaffan/biodiverse
+    available on its Github page: https://github.com/shawnlaffan/biodiverse.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true

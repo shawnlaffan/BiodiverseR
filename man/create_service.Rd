@@ -9,9 +9,6 @@ create_service(test_str)
 \arguments{
 \item{test_str}{string}
 }
-\value{
-
-}
 \description{
 Create a service which allows us to access functionalities of the Biodiverse
 tool.
