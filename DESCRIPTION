@@ -1,0 +1,28 @@
+Package: BiodiverseR
+Title: Provides an interface to Biodiverse tool
+Version: 0.0.0.9000
+Authors@R: c(
+    person(given = "Shawn",
+           family = "Laffan",
+           role = c("aut", "cre"),
+           email = "shawn.laffan@unsw.edu.au"),
+    person(given = "Jakub",
+           family = "Tomczyk",
+           role = c("aut"),
+           email = "jstomczyk@gmail.com"))
+Description: BiodiverseR provides an interface to the Biodiverse. 
+    Biodiverse is a tool for the spatial analysis of diversity using indices 
+    based on taxonomic, phylogenetic, trait and matrix-based 
+    (e.g. genetic distance) relationships, as well as related environmental 
+    and temporal variations. More information for the Biodiverse tool is 
+    available on its Github page: https://github.com/shawnlaffan/biodiverse.
+License: GPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    fs
