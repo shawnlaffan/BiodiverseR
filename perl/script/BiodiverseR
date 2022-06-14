@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Mojo::File qw(curfile);
+use lib curfile->dirname->sibling('lib')->to_string;
+use Mojolicious::Commands;
+
+#  temporary - we need Biodiverse to be installed or in PERL5LIB
+use lib curfile->dirname->dirname->dirname->dirname->child('biodiverse/lib')->to_string;
+#say STDERR curfile->dirname->dirname->dirname->dirname->child('biodiverse/lib')->to_string;
+
+# Start command line interface for application
+Mojolicious::Commands->start_app('BiodiverseR');
