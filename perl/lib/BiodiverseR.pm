@@ -65,7 +65,7 @@ p $bd_data;
       $bd->add_elements_collated_simple_aa($bd_data, $csv_object, 1);
     };
     croak $@ if $@;
-say STDERR 'aaaargh';
+#say STDERR 'aaaargh';
 #p $bd;
     my $tree;
     if ($analysis_params->{tree}) {
@@ -91,7 +91,7 @@ say STDERR 'aaaargh';
       calculations => $calculations,
     );
     my $table = $sp->to_table (list => $result_list);
-    $c->render(text => $table);
+    $c->render(json => $table);
     p $table;
   });
 
