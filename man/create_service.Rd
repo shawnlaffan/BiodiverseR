@@ -4,15 +4,15 @@
 \alias{create_service}
 \title{Create service}
 \usage{
-create_service(test_str)
+create_service(path_net_str, path_service_str)
 }
 \arguments{
-\item{test_str}{string}
+\item{path_net_str}{string, path_service_str string}
 }
 \description{
 Create a service which allows us to access functionalities of the Biodiverse
 tool.
 }
 \examples{
-create_service("test")
+create_service("C:\\\\Windows\\\\Microsoft.NET\\\\Framework64\\\\v4.0.30319", "path")
 }
