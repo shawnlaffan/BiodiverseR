@@ -63,8 +63,33 @@ $t_msg_suffix = 'result_list=calc_elements_used, calculations=calc_elements_used
 $t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
   ->status_is(200, "status, $t_msg_suffix")
   ->json_is ('' => $exp, "json results, $t_msg_suffix");
-  
 
+
+#### EXPECTED FAILURES
+
+$oneshot_data->{analysis_config}{calculations}
+  = {'calc_elements_used' => 0};
+$t_msg_suffix = 'calculations not an array ref';
+$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+  ->status_is(500, "status 500, $t_msg_suffix");
+  
+$oneshot_data->{analysis_config}{calculations}
+  = ['calc_elements_used'];
+$oneshot_data->{analysis_config}{result_list}
+  = ['EL_COUNT_ALL'];
+$t_msg_suffix = 'result_list is a ref';
+$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+  ->status_is(500, "status 500, $t_msg_suffix");
+
+$oneshot_data->{analysis_config}{calculations}
+  = ['calc_elements_used'];
+$oneshot_data->{analysis_config}{result_list}
+  = 'EL_COUNT_ALL';
+$oneshot_data->{analysis_config}{spatial_conditions}
+  = {'sp_self_only()' => ''};
+$t_msg_suffix = 'spatial_conditions ref is not an array';
+$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+  ->status_is(500, "status 500, $t_msg_suffix");
 
 #p $c;
 
