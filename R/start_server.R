@@ -10,13 +10,16 @@
 #' @param port integer
 #' @param use_exe boolean
 #'
-#' @export start_server
+#' @export
 #' @examples
 #' start_server(port=3001, use_exe=TRUE)
 
 start_server = function(port=3001, use_exe=FALSE){
 
-  library("processx")
+  process = NULL  #  silence some check warnings
+
+  #  this should not be here - it should be loaded already
+  # library("processx")
 
   #  this runs the perl version - need to find a way to locate it relative to the package
   #  currently we need an env var to locate everything...
@@ -34,7 +37,7 @@ start_server = function(port=3001, use_exe=FALSE){
     message (cmd)
     #  no perl pfx, let the shebang line do its work
     #  need to also send stdout and stderr to a log file
-    server_process = process$new(server_path, "daemon")
+    process_object = process$new(server_path, "daemon")
   },
   error=function(cond){
     message(cond)
@@ -42,7 +45,7 @@ start_server = function(port=3001, use_exe=FALSE){
   })
 
 
-  config = list (port = port, use_exe = use_exe, process = server_process)
+  config = list (port = port, use_exe = use_exe, process_object = process_object)
 
   return(config)
 }
