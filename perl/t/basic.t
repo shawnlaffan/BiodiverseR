@@ -7,6 +7,7 @@ use Data::Printer;
 my $t = Test::Mojo->new('BiodiverseR');
 $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
 
+#  plenty repetition below - could do with a refactor
 
 my $gp_lb = {
   '50:50'   => {label1 => 1, label2 => 1},
@@ -20,17 +21,54 @@ my $oneshot_data = {
 };
 
 my $exp = [
-    ["ELEMENT","Axis_0","Axis_1","ENDC_CWE","ENDC_RICHNESS","ENDC_SINGLE","ENDC_WE"],
-    ["150:150","150","150",0.5,2,1.0,1],
-    ["50:50","50","50",0.5,2,1.0,1]
+    [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE/],
+    ['150:150', 150, 150, 0.5, 2, 1.0, 1],
+    ['50:50', 50, 50, 0.5, 2, 1.0, 1],
 ];
-my $c = $t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
-  ->status_is(200)
-  ->json_is ($exp);
+my $t_msg_suffix = 'default config';
+$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+  ->status_is(200, "status, $t_msg_suffix")
+  ->json_is ('' => $exp, "json results, $t_msg_suffix");
+
+$oneshot_data->{analysis_config}{spatial_conditions}
+  = ['sp_self_only()'];
+$t_msg_suffix = 'spatial conditions set';
+$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+  ->status_is(200, "status, $t_msg_suffix")
+  ->json_is ('' => $exp, "json results, $t_msg_suffix");
+
+$oneshot_data->{analysis_config}{calculations}
+  = ['calc_richness'];
+$exp = [
+  [qw /ELEMENT Axis_0 Axis_1 RICHNESS_ALL RICHNESS_SET1/],
+  ['150:150', 150, 150, 2, 2],
+  ['50:50', 50, 50, 2, 2],
+];
+$t_msg_suffix = 'calculation set';
+$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+  ->status_is(200, "status, $t_msg_suffix")
+  ->json_is ('' => $exp, "json results, $t_msg_suffix");
+
+
+$oneshot_data->{analysis_config}{calculations}
+  = ['calc_elements_used'];
+$oneshot_data->{analysis_config}{result_list}
+  = 'EL_COUNT_ALL';
+$exp =  [
+  [qw /ELEMENT Axis_0 Axis_1/],
+  ["150:150", 150, 150],
+  ["50:50", 50, 50],
+];
+$t_msg_suffix = 'result_list=calc_elements_used, calculations=calc_elements_used';
+$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+  ->status_is(200, "status, $t_msg_suffix")
+  ->json_is ('' => $exp, "json results, $t_msg_suffix");
+  
+
 
 #p $c;
 
-#  this needs a server to be running - need to work out how to get at it from tests
+#  this needs a server to be running
 
 #diag 'Running Mojo UA code';
 #
