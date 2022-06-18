@@ -5,6 +5,8 @@ use Mojo::Base 'Mojolicious', -signatures;
 use Mojo::File qw(curfile);
 use lib curfile->dirname->dirname->dirname->dirname->child('biodiverse/lib')->to_string;
 
+use Ref::Util qw /is_ref is_arrayref/;
+use Carp qw /croak/;
 
 use BiodiverseR::Data;
 use Biodiverse::BaseData;
@@ -43,11 +45,31 @@ sub startup ($self) {
   $r->get('/')->to('Example#welcome');
 
   #  pass some data, get a result.  Or the broken pieces. 
-  $r->post ('/analysis_spatial_oneshot' => sub {
-        my $c = shift;
+  $r->post ('/analysis_spatial_oneshot' => sub ($c) {
     my $analysis_params = $c->req->json;
 use Data::Printer;
 p $analysis_params;
+    #  need to be params
+    my $a_cfg = $analysis_params->{analysis_config} // {};
+    my $spatial_conditions
+      = $analysis_params->{analysis_config}{spatial_conditions} // ['sp_self_only()'];
+    if (is_ref($spatial_conditions) && !is_arrayref($spatial_conditions)) {
+      croak 'reftype of spatial_conditions must be array';
+    }
+    elsif (!is_ref($spatial_conditions)) {
+      $spatial_conditions = [$spatial_conditions];
+    }
+    my $calculations = $analysis_params->{analysis_config}{calculations} // ['calc_endemism_central'];
+    if (is_ref($calculations) && !is_arrayref($calculations)) {
+      croak 'reftype of spatial_conditions must be array';
+    }
+    elsif (!is_ref($calculations)) {
+      $spatial_conditions = [$spatial_conditions];
+    }
+    my $result_list  = $analysis_params->{analysis_config}{result_list} // 'SPATIAL_RESULTS';
+    croak 'result_list cannot be a reference'
+      if is_ref($result_list);
+
     my $bd_params = $analysis_params->{bd}{params};
     my $bd_data   = $analysis_params->{bd}{data};
     my $bd = Biodiverse::BaseData->new(
@@ -80,10 +102,6 @@ p $bd_data;
 #p $bd->get_groups_ref;
 #p $tree;
 
-    #  need to be params
-    my $spatial_conditions = ['sp_self_only()'];  
-    my $calculations = ['calc_endemism_central'];
-    my $result_list  = 'SPATIAL_RESULTS';
     
     my $sp = $bd->add_spatial_output(name => 'ooyah');
     $sp->run_analysis (
