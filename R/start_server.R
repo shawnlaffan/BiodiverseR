@@ -14,35 +14,46 @@
 #' @examples
 #' start_server(port=3001, use_exe=TRUE)
 
-start_server = function(port=3001, use_exe=FALSE){
+start_server = function(port=0, use_exe=FALSE){
 
   process = NULL  #  silence some check warnings
 
-  #  this should not be here - it should be loaded already
-  # library("processx")
+  if (port ==0) {
+    port = randomPort(min = 1024L, max = 49151L, host = "127.0.0.1", n = 20)
+  }
+  server_url = sprintf ("http://*:%d", port)
 
   #  this runs the perl version - need to find a way to locate it relative to the package
   #  currently we need an env var to locate everything...
   #  maybe this: https://stackoverflow.com/questions/42492572/how-to-find-location-of-package
-  server_path = file.path(Sys.getenv('BiodiverseR_base'), 'perl', 'script', 'BiodiverseR')
+  server_path = file.path(Sys.getenv('BiodiverseR_base'), 'inst', 'perl', 'script', 'BiodiverseR')
   message (sprintf("server_path is %s", server_path))
   if (!file.exists(server_path)) {
     message ("Cannot find server_path")
+    stop()
   }
 
   res = tryCatch ({
-    #  need explicit perl call on windows
-    # https://processx.r-lib.org/reference/process.html
-    cmd = sprintf ("perl %s daemon", server_path)
-    message (cmd)
-    #  no perl pfx, let the shebang line do its work
-    #  need to also send stdout and stderr to a log file
-    process_object = process$new(server_path, "daemon")
-  },
-  error=function(cond){
-    message(cond)
-    stop()
-  })
+      #  need explicit perl call on windows
+      # https://processx.r-lib.org/reference/process.html
+      cmd = sprintf ("perl %s daemon -l %s", server_path, server_url)
+      message (cmd)
+      #  no perl pfx on unix, let the shebang line do its work
+      #  need to also send stdout and stderr to a log file
+      message (paste (server_path, "daemon", "-l", server_url))
+
+      #process_object = process$new(server_path, c("daemon", "-l", server_url))
+      process_object = processx::process$new(server_path, c("daemon"))
+
+    },
+    error=function(err){
+      message("we gotsed an error")
+      message (str(err))
+      message (err$call)
+      print(paste("MY_ERROR:  ",err))
+      stop()
+    }
+  )
 
 
   config = list (port = port, use_exe = use_exe, process_object = process_object)
