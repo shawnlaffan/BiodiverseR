@@ -21,6 +21,16 @@ str = list (
 
 write (toJSON (str), "somefile.json")
 
+
+df = data.frame (
+  labels = c("a", "b", "c"),
+  x = c(1:3),
+  y = c(1:3),
+  samples = c(1:3)
+)
+write (toJSON (as.list(df)), "somedf.json")
+
+
 source ("R/run_oneshot.R")
 config = start_service()
 

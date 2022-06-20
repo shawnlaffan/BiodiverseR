@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 # BiodiverseR    
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/shawnlaffan/Biodiverse-R/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/shawnlaffan/Biodiverse-R/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 Provides and interface to functionalities available in the Biodiverse. Biodiverse 
