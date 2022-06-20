@@ -47,8 +47,8 @@ sub startup ($self) {
   #  pass some data, get a result.  Or the broken pieces. 
   $r->post ('/analysis_spatial_oneshot' => sub ($c) {
     my $analysis_params = $c->req->json;
-use Data::Printer;
-p $analysis_params;
+#use Data::Printer;
+#p $analysis_params;
     #  need to be params
     my $a_cfg = $analysis_params->{analysis_config} // {};
     my $spatial_conditions
@@ -82,7 +82,7 @@ p $analysis_params;
       quote_char => $bd->get_param('QUOTES'),
       sep_char   => $bd->get_param('JOIN_CHAR')
     );
-p $bd_data;
+#p $bd_data;
     eval {
       $bd->add_elements_collated_simple_aa($bd_data, $csv_object, 1);
     };
