@@ -1,5 +1,7 @@
+devtools::load_all()
 library ("rjson")
-
+library("httpuv")  #  should be loaded?
+library("processx")
 
 sp_data = list (
   '50:50'   = list (label1 = 1, label2 = 1),
@@ -31,8 +33,8 @@ df = data.frame (
 write (toJSON (as.list(df)), "somedf.json")
 
 
-source ("R/run_oneshot.R")
-config = start_service()
+# source ("R/run_oneshot.R")
+config = start_server()
 
 # message (config)
 
