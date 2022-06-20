@@ -42,21 +42,16 @@ start_server = function(port=0, use_exe=FALSE){
       #  need to also send stdout and stderr to a log file
       message (paste (server_path, "daemon", "-l", server_url))
 
-      #process_object = process$new(server_path, c("daemon", "-l", server_url))
-      process_object = processx::process$new(server_path, c("daemon"))
-
+      process_object = processx::process$new(server_path, c("daemon", "-l", server_url))
     },
     error=function(err){
-      message("we gotsed an error")
-      message (str(err))
-      message (err$call)
-      print(paste("MY_ERROR:  ",err))
+      print(paste("Server call resulted in an error:  ", err))
       stop()
     }
   )
 
 
-  config = list (port = port, use_exe = use_exe, process_object = process_object)
+  config = list (port = port, using_exe = use_exe, process_object = process_object)
 
   return(config)
 }
