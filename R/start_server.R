@@ -18,10 +18,11 @@ start_server = function(port=0, use_exe=FALSE){
 
   process = NULL  #  silence some check warnings
 
+  host = "127.0.0.1"
   if (port ==0) {
-    port = randomPort(min = 1024L, max = 49151L, host = "127.0.0.1", n = 20)
+    port = randomPort(min = 1024L, max = 49151L, host = host, n = 20)
   }
-  server_url = sprintf ("http://*:%d", port)
+  server_url = sprintf ("http://%s:%d", host, port)
 
   #  this runs the perl version - need to find a way to locate it relative to the package
   #  currently we need an env var to locate everything...
@@ -42,7 +43,11 @@ start_server = function(port=0, use_exe=FALSE){
       #  need to also send stdout and stderr to a log file
       message (paste (server_path, "daemon", "-l", server_url))
 
-      process_object = processx::process$new(server_path, c("daemon", "-l", server_url))
+      process_object = processx::process$new(
+        server_path, c("daemon", "-l", server_url),
+        stdout = "",  #  dump log to stdout and stderr for debug
+        stderr = ""
+      )
     },
     error=function(err){
       print(paste("Server call resulted in an error:  ", err))
@@ -51,7 +56,36 @@ start_server = function(port=0, use_exe=FALSE){
   )
 
 
-  config = list (port = port, using_exe = use_exe, process_object = process_object)
+  config = list (
+    port = port,
+    using_exe = use_exe,
+    process_object = process_object,
+    server_url = server_url
+  )
+
+  server_running = 0
+  max_tries = 5
+  trycount = 1
+  while (server_running == 0 && trycount <= max_tries) {
+    Sys.sleep(1) #  give the server a chance to get going
+    response = tryCatch(
+      {
+        GET(url = server_url)
+        server_running = 1
+      },
+      error = function (c) {
+        message(
+          sprintf(
+            "Server still coming up, trying again in 1 second (attempt %d of %d)",
+            trycount, max_tries
+          )
+        )
+      },
+      finally = {
+        trycount = trycount + 1
+      }
+    )
+  }
 
   return(config)
 }
