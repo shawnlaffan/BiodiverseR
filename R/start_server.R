@@ -18,12 +18,6 @@ start_server = function(port=0, use_exe=FALSE){
 
   process = NULL  #  silence some check warnings
 
-  host = "127.0.0.1"
-  if (port ==0) {
-    port = randomPort(min = 1024L, max = 49151L, host = host, n = 20)
-  }
-  server_url = sprintf ("http://%s:%d", host, port)
-
   #  this runs the perl version - need to find a way to locate it relative to the package
   #  currently we need an env var to locate everything...
   #  maybe this: https://stackoverflow.com/questions/42492572/how-to-find-location-of-package
@@ -33,6 +27,12 @@ start_server = function(port=0, use_exe=FALSE){
     message ("Cannot find server_path")
     stop()
   }
+
+  host = "127.0.0.1"
+  if (port == 0) {
+    port = randomPort(min = 1024L, max = 49151L, host = host, n = 20)
+  }
+  server_url = sprintf ("http://%s:%d", host, port)
 
   res = tryCatch ({
       #  need explicit perl call on windows
