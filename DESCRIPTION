@@ -28,4 +28,5 @@ Config/testthat/edition: 3
 Imports: 
     fs,
     processx,
-    httpuv
+    httpuv,
+    httr
