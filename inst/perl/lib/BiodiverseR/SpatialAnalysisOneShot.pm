@@ -51,16 +51,38 @@ sub run_analysis ($self, $analysis_params) {
       CELL_SIZES => $bd_params->{cellsizes},
     );
 
-    #  needs to be a more general call
-    my $csv_object = $bd->get_csv_object(
-      quote_char => $bd->get_param('QUOTES'),
-      sep_char   => $bd->get_param('JOIN_CHAR')
-    );
-
-    eval {
-      $bd->add_elements_collated_simple_aa($bd_data, $csv_object, 1);
-    };
-    croak $@ if $@;
+    if ($bd_data) {
+        #  needs to be a more general call
+        my $csv_object = $bd->get_csv_object(
+          quote_char => $bd->get_param('QUOTES'),
+          sep_char   => $bd->get_param('JOIN_CHAR')
+        );
+        eval {
+          $bd->add_elements_collated_simple_aa($bd_data, $csv_object, 1);
+        };
+        croak $@ if $@;
+    }
+    my $raster_files = $analysis_params->{bd}{raster_files};
+    if ($raster_files) {  #  need to import some rasters
+        if (!is_ref($raster_files)) {
+            $raster_files = [$raster_files];
+        }
+        my %in_options_hash = (
+            labels_as_bands   => 1,
+            raster_origin_e   => ($bd_params->{cellorigins}[0] // 0),
+            raster_origin_n   => ($bd_params->{cellorigins}[1] // 0),
+            raster_cellsize_e => $bd_params->{cellsizes}[0],
+            raster_cellsize_n => $bd_params->{cellsizes}[1],
+        );
+        my $success = eval {
+            $bd->import_data_raster (
+                input_files => $raster_files,
+                %in_options_hash,
+                labels_as_bands => ($bd_params->{labels_as_bands} // 1),
+            );
+        };
+        croak $@ if $@;
+    }
 
     my $tree;
     if ($analysis_params->{tree}) {
@@ -76,6 +98,8 @@ sub run_analysis ($self, $analysis_params) {
       calculations => $calculations,
     );
     my $table = $sp->to_table (list => $result_list);
+#use Data::Dumper qw /Dumper/;
+#say STDERR Dumper $table;
     
     #  need to transpose the table for json that is closer to what R wants as a list
     return $table;
