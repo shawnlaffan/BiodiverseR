@@ -60,10 +60,13 @@ $log->debug("Called startup");
 
 $log->debug("parameters are:");
 $log->debug(np ($analysis_params));
+
     my $oneshot = BiodiverseR::SpatialAnalysisOneShot->new;
     my $table1 = $oneshot->run_analysis($analysis_params);
+
 $log->debug("Table is:");
 $log->debug(np ($table1));
+
     return $c->render(json => $table1);
   });
 

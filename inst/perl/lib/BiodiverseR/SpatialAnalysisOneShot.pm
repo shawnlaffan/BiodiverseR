@@ -69,12 +69,6 @@ sub run_analysis ($self, $analysis_params) {
       my @results = $readnex->get_tree_array;
       $tree = shift @results;
     }
-      
-    #$c->data->{basedata} = $bd;
-    #$c->data->{tree}     = $tree;
-#p $bd->get_groups_ref;
-#p $tree;
-
     
     my $sp = $bd->add_spatial_output(name => 'ooyah');
     $sp->run_analysis (
