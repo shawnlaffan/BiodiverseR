@@ -17,11 +17,15 @@
 start_server = function(port=0, use_exe=FALSE){
 
   process = NULL  #  silence some check warnings
+  bd_base_dir = Sys.getenv("Biodiverse_base")
+  if (bd_base_dir == "") {
+    stop ("Env var Biodiverse_base not set")
+  }
 
   #  this runs the perl version - need to find a way to locate it relative to the package
   #  currently we need an env var to locate everything...
   #  maybe this: https://stackoverflow.com/questions/42492572/how-to-find-location-of-package
-  server_path = file.path(Sys.getenv('BiodiverseR_base'), 'inst', 'perl', 'script', 'BiodiverseR')
+  server_path = file.path(bd_base_dir, 'inst', 'perl', 'script', 'BiodiverseR')
   message (sprintf("server_path is %s", server_path))
   if (!file.exists(server_path)) {
     message ("Cannot find server_path")
@@ -89,3 +93,4 @@ start_server = function(port=0, use_exe=FALSE){
 
   return(config)
 }
+q
