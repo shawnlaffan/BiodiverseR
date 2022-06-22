@@ -34,7 +34,7 @@ start_server = function(port=0, use_exe=FALSE){
 
   host = "127.0.0.1"
   if (port == 0) {
-    port = randomPort(min = 1024L, max = 49151L, host = host, n = 20)
+    port = httpuv::randomPort(min = 1024L, max = 49151L, host = host, n = 20)
   }
   server_url = sprintf ("http://%s:%d", host, port)
 
@@ -74,7 +74,7 @@ start_server = function(port=0, use_exe=FALSE){
     Sys.sleep(1) #  give the server a chance to get going
     response = tryCatch(
       {
-        GET(url = server_url)
+        httr::GET(url = server_url)
         server_running = 1
       },
       error = function (c) {
