@@ -2,8 +2,8 @@ package BiodiverseR;
 use Mojo::Base 'Mojolicious', -signatures;
 
 #  temporary - we need Biodiverse to be installed or in PERL5LIB
-use Mojo::File qw(curfile);
-use lib curfile->dirname->dirname->dirname->dirname->child('biodiverse/lib')->to_string;
+#use Mojo::File qw(curfile);
+#use lib curfile->dirname->dirname->dirname->dirname->child('biodiverse/lib')->to_string;
 
 use Ref::Util qw /is_ref is_arrayref/;
 use Carp qw /croak/;
@@ -14,6 +14,7 @@ use Biodiverse::BaseData;
 use Biodiverse::ReadNexus;
 use Biodiverse::Spatial;
 
+#  should use Mojo::File
 use Path::Tiny qw /path/;
 use Data::Printer qw /p np/;
 
@@ -42,6 +43,11 @@ $log->debug("Called startup");
 
   $self->helper(data => sub {state $data = BiodiverseR::Data->new});
 
+  my $renderer = Mojolicious::Renderer->new;
+  if ($ENV{PAR_INC}) {
+    push @{$renderer->paths}, path ($ENV{PAR_INC}, 'templates');
+  }
+  
   # Configure the application
   #$self->secrets($config->{secrets});
   $self->secrets(rand());
@@ -53,7 +59,7 @@ $log->debug("Called startup");
 
   # Normal route to controller
   $r->get('/')->to('Example#welcome');
-
+  
   #  pass some data, get a result.  Or the broken pieces. 
   $r->post ('/analysis_spatial_oneshot' => sub ($c) {
     my $analysis_params = $c->req->json;
