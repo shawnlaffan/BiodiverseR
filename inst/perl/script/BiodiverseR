@@ -5,7 +5,8 @@ use warnings;
 use Carp;
 
 use Mojo::File qw(curfile);
-use if !$ENV{PAR_0}, 'lib', curfile->dirname->sibling('lib')->to_string;
+#  messy but otherwise the exe files don't work from arbitrary locations
+use if !$ENV{PAR_0}, 'lib', eval {curfile->dirname->sibling('lib')->to_string};
 use Mojolicious::Commands;
 
 #  temporary - we need Biodiverse to be installed or in PERL5LIB
