@@ -1,6 +1,6 @@
 #  Build a Biodiverse related executable
 
-use 5.010;
+use 5.020;
 use strict;
 use warnings;
 use English qw { -no_match_vars };
@@ -23,13 +23,7 @@ use Path::Class;
 use Cwd;
 use File::Basename;
 use File::Find::Rule;
-
 use FindBin qw /$Bin/;
-
-use 5.020;
-use warnings;
-use strict;
-use Carp;
 
 use Data::Dump       qw/ dd /;
 use File::Which      qw( which );
@@ -117,8 +111,11 @@ push @rest_of_pp_args, ('-M', 'Biodiverse::**');  #  no Biodiverse.pm yet
 
 #push @rest_of_pp_args, map {; '-M' => $_."::"} ('Object::InsideOut');
 
+#  hard coded relative path...
+my @add_files = ('--addfile', path($script)->parent->sibling('templates'));
+push @rest_of_pp_args, @add_files;
 
-my $output_binary_fullpath = Path::Class::file ($out_folder, $output_binary)->absolute;
+my $output_binary_fullpath = path ($out_folder, $output_binary)->absolute;
 
 $ENV{BDV_PP_BUILDING}              = 1;
 $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
@@ -126,7 +123,7 @@ $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
 my @cmd = (
     ($on_windows ? 'pp_autolink' : 'pp_autolink.pl'),
     ($verbose ? '-v' : ()),
-    '-u',
+    ($OLD_PERL_VERSION < 5.032 ? '-u' : ()),
     '-B',
     '-z',
     9,
