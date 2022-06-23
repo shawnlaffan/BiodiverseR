@@ -13,6 +13,8 @@ BEGIN {
     eval 'use Win32::Exe' if $OSNAME eq 'MSWin32';
 }
 
+my $on_windows = $OSNAME eq 'MSWin32';
+
 use App::PP::Autolink 2.04;
 
 use Config;
@@ -101,12 +103,19 @@ if ($OSNAME eq 'MSWin32') {
 my @aliens = qw /
     Alien::gdal       Alien::geos::af
     Alien::proj       Alien::sqlite
-    Alien::libtiff    Alien::curl
+    Alien::libtiff    
     Alien::spatialite Alien::freexl
 /;
+if ($on_windows) {  #  need to check for this
+    push @aliens, 'Alien::curl';  
+}
 push @rest_of_pp_args, map {; '-M' => $_."::"} @aliens;
-#push @rest_of_pp_args, map {; '-M' => $_."::"} ('Math::Random::MT::Auto');
-push @rest_of_pp_args, map {; '-M' => $_."::"} ('Object::InsideOut');
+push @rest_of_pp_args,
+  map {; '-M' => $_."::"}
+  (qw /Math::Random::MT::Auto FFI::Platypus/);
+push @rest_of_pp_args, ('-M', 'Biodiverse::**');  #  no Biodiverse.pm yet
+
+#push @rest_of_pp_args, map {; '-M' => $_."::"} ('Object::InsideOut');
 
 
 my $output_binary_fullpath = Path::Class::file ($out_folder, $output_binary)->absolute;
@@ -115,7 +124,7 @@ $ENV{BDV_PP_BUILDING}              = 1;
 $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
 
 my @cmd = (
-    'pp_autolink',
+    ($on_windows ? 'pp_autolink' : 'pp_autolink.pl'),
     ($verbose ? '-v' : ()),
     '-u',
     '-B',
