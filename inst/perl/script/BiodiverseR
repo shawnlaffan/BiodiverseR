@@ -12,10 +12,6 @@ use Mojolicious::Commands;
 #  load up some dependencies when packing an executable
 use if $ENV{BDV_PP_BUILDING}, 'BiodiverseR::PPDeps';
 
-#  temporary - we need Biodiverse to be installed or in PERL5LIB
-#  use lib curfile->dirname->dirname->dirname->dirname->child('biodiverse/lib')->to_string;
-#say STDERR curfile->dirname->dirname->dirname->dirname->child('biodiverse/lib')->to_string;
-
 # Start command line interface for application
 Mojolicious::Commands->start_app('BiodiverseR');
 
