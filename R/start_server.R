@@ -25,7 +25,15 @@ start_server = function(port=0, use_exe=FALSE){
   #  this runs the perl version - need to find a way to locate it relative to the package
   #  currently we need an env var to locate everything...
   #  maybe this: https://stackoverflow.com/questions/42492572/how-to-find-location-of-package
-  server_path = file.path(bd_base_dir, 'inst', 'perl', 'script', 'BiodiverseR')
+  if (use_exe) {
+    #  non-windows won't have exe extension
+    server_path = file.path(bd_base_dir, 'inst', 'perl', "BiodiverseR")
+    if (Sys.info()[['sysname']] == "Windows") {
+      server_path = sprintf("%s.exe", server_path)
+    }
+  } else {
+    server_path = file.path(bd_base_dir, 'inst', 'perl', 'script', 'BiodiverseR')
+  }
   message (sprintf("server_path is %s", server_path))
   if (!file.exists(server_path)) {
     message ("Cannot find server_path")
@@ -41,7 +49,7 @@ start_server = function(port=0, use_exe=FALSE){
   res = tryCatch ({
       #  need explicit perl call on windows
       # https://processx.r-lib.org/reference/process.html
-      cmd = sprintf ("perl %s daemon -l %s", server_path, server_url)
+      cmd = sprintf ("Command: %s daemon -l %s", server_path, server_url)
       message (cmd)
       #  no perl pfx on unix, let the shebang line do its work
       #  need to also send stdout and stderr to a log file
@@ -54,7 +62,7 @@ start_server = function(port=0, use_exe=FALSE){
       )
     },
     error=function(err){
-      print(paste("Server call resulted in an error:  ", err))
+      message(paste("Server call resulted in an error:  ", err))
       stop()
     }
   )
@@ -89,6 +97,10 @@ start_server = function(port=0, use_exe=FALSE){
         trycount = trycount + 1
       }
     )
+  }
+  if (server_running == 0) {
+    message ("server did not start in time")
+    stop ()
   }
 
   return(config)

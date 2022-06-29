@@ -118,9 +118,9 @@ call_bd_server = function (p = params_str_as_json) {
   return (response)
 }
 
-call_bd_server_w_rasters = function (p = params_str_rasters_as_json) {
+call_bd_server_w_rasters = function (p = params_str_rasters_as_json, use_exe=FALSE) {
   # source ("R/run_oneshot.R")
-  config = start_server()
+  config = start_server(use_exe = use_exe)
 
   # message (config)
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-use Mojo::File qw(curfile);
+use Mojo::File qw(curfile path);
 #  messy but otherwise the exe files don't work from arbitrary locations
 use if !$ENV{PAR_0}, 'lib', eval {curfile->dirname->sibling('lib')->to_string};
 use Mojolicious::Commands;
