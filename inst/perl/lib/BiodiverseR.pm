@@ -75,37 +75,6 @@ $log->debug(np ($table));
 
     return $c->render(json => $table);
   });
-
-#  $r->post ('/basedata' => sub {
-#    my $c = shift;
-#    my $hash = $c->req->json;
-#use Data::Printer;
-#p $hash;
-#    my $params = $hash->{params};
-#    my $data   = $hash->{data};
-#    my $bd = Biodiverse::BaseData->new(
-#      NAME       => ($params->{name} // 'BiodiverseR'),
-#      CELL_SIZES => $params->{cellsizes},
-#    );
-#    $c->data->{basedata} = $bd;
-#    $c->render(json => $bd);
-#p $bd;
-#    #$c->render(json => {});
-#    #my $description = $bd->describe;
-#    #Mojo::Log->log($description);
-#    #$c->render(json => {description => $description});
-#  #} => 'index');
-#  });
-
-#  $r->get ('/basedata' => sub {
-#    my $c = shift;
-#    my $bd = $c->data->{basedata};
-#    $c->render(json => $bd);
-#p $bd;
-#    #$c->render(json => {});
-#  #} => 'index');
-#  });
-
   
 }
 
