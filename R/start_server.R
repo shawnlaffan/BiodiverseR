@@ -17,9 +17,9 @@
 start_server = function(port=0, use_exe=FALSE){
 
   process = NULL  #  silence some check warnings
-  bd_base_dir = Sys.getenv("Biodiverse_base")
+  bd_base_dir = Sys.getenv("Biodiverse_basepath")
   if (bd_base_dir == "") {
-    stop ("Env var Biodiverse_base not set")
+    message ("Env var Biodiverse_basepath not set, assuming ", getwd())
   }
 
   #  this runs the perl version - need to find a way to locate it relative to the package
@@ -105,4 +105,4 @@ start_server = function(port=0, use_exe=FALSE){
 
   return(config)
 }
-q
+

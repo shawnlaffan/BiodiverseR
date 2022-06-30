@@ -29,7 +29,30 @@ available at its [Github page](https://github.com/shawnlaffan/biodiverse).
 
 ## Installation
 
-You can install BiodiverseR like so:
+This currently requires a working perl interpreter in your path.
+(Future versions will provide self contained executables).
+
+On Windows perl interpreter  can be obtained through the [Strawberry perl project](https://strawberryperl.com/releases.html).
+Most unix-derived systems provide a perl interpreter but it is best to avoid this and use
+a system like [perlbrew](https://perlbrew.pl/).  Be sure to also install the cpanm utility (see
+perlbrew site for details).  
+
+Once you have a perl installed and in your path you can install the perl dependencies using
+cpanm at the command line.  Make sure to update this code to use the correct path separator
+on Windows.
+
+``` perl
+cpanm https://github.com/shawnlaffan/biodiverse.git
+cd inst/perl
+cpanm --installdeps .
+```
+
+Note that the above will take a while if you do not already have the GDAL development
+package installed on your system.  This is because it will compile its own version if
+it is unable to find one on the system (and maybe this is not such a bad thing as then
+it will be isolated from system changes).
+
+You can install the R code like so:
 
 ``` r
 devtools::install_github("shawnlaffan/BiodiverseR")
@@ -37,10 +60,19 @@ devtools::install_github("shawnlaffan/BiodiverseR")
   
 ## Quick demo
 
-Checking that the Biodiverse tool can be accessed:
+Checking that the Biodiverse service can be accessed:
 
 ```{r}
-library(BiodiverseR)
-cs = create_service("test")
-#check_service(cs)
+#  An ugly and temporary hack so we can find the relevant perl code.
+#  Set this to wherever you have downloaded the package to.  
+Sys.setenv("Biodiverse_basepath" = getwd())
+
+#  library(BiodiverseR)
+devtools::load_all()  #  for during development 
+cs = start_server()
+cs$process_object$is_alive()
+
+#  cleanup
+rm(cs)
+gc()  #  server is not deleted until garbage collected
 ```
