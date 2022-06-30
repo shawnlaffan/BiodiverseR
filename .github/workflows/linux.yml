@@ -1,0 +1,89 @@
+name: linux
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+  PERL_MOD_DIR: /home/runner/perl5/lib/perl5
+
+jobs:
+  perl:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.32'
+
+      - name: update apt get
+        run: |
+          sudo apt-get update
+
+      - name: gdal stack
+        run: |
+          sudo apt-get --yes install libgdal-dev
+
+      - name: cmake for geos and proj
+        run: |
+          sudo apt-get --yes install cmake
+
+      - name: perl -V
+        run: perl -V
+
+      - name: Prepare for cache
+        run: |
+          perl -V > perlversion.txt
+          echo '20220630' >> perlversion.txt
+          ls -l perlversion.txt
+
+      - name: Cache CPAN modules
+        uses: actions/cache@v1
+        with:
+          path: ~/perl5
+          key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+
+      - name: Install Dynamic Dependencies
+        run: |
+          which -a cpanm
+          which -a perl
+          cpanm --notest local::lib
+          echo $(perl -Mlocal::lib=${HOME}/perl5)
+          eval "$(perl -Mlocal::lib=${HOME}/perl5)"
+          cpanm --installdeps FFI::Platypus
+          cpanm --notest FFI::Platypus
+          #cpanm --notest FFI::Platypus::Declare
+          cpanm --notest Alien::Build  
+          cpanm --installdeps --notest Alien::sqlite
+          cpanm -v Alien::sqlite
+          cpanm --installdeps --notest Alien::libtiff
+          cpanm -v Alien::libtiff
+          cpanm --installdeps --notest Alien::geos::af
+          cpanm -v Alien::geos::af
+          cpanm --installdeps --notest Alien::proj
+          cpanm -v Alien::proj
+          cpanm --installdeps --notest Alien::gdal
+          cpanm -v Alien::gdal
+          cpanm --notest --installdeps --no-man-pages PDL
+          cpanm --notest --no-man-pages PDL
+          cpanm --notest https://github.com/shawnlaffan/biodiverse.git
+          cd inst/perl
+          cpanm --installdeps .
+          cd -
+
+      - name: Run Perl Tests
+        run: |
+          echo $(perl -Mlocal::lib=${HOME}/perl5)
+          eval "$(perl -Mlocal::lib=${HOME}/perl5)"
+          cd inst/perl
+          prove -l -j4 t
+          cd -
