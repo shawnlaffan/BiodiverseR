@@ -6,6 +6,8 @@
 #'
 #' By default it will find an empty port, but you can select one if you so choose.
 #'
+#' This should not really be exported and is currently here for dev purposes
+#'
 #' @param port integer
 #' @param use_exe boolean
 #'
