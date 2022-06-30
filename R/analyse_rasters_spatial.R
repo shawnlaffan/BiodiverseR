@@ -15,7 +15,7 @@ analyse_rasters_spatial = function(
     ...){
 
   stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character"))
-  stopifnot(all(file.exists(rasters)))
+  stopifnot(all(file.exists(raster_files)))
   stopifnot("cellsizes argument must be a numeric vector" = any(class(cellsizes)=="numeric"))
   stopifnot("cellsizes must have exactly two axes" = length(cellsizes) == 2)
 
@@ -24,16 +24,18 @@ analyse_rasters_spatial = function(
   message ("server process is live? ", config$process_object$is_alive())
   stopifnot(config$process_object$is_alive())  #  need a better error
 
+  #  unique-ish name that is human readable
+  sp_output_name = paste ('BiodiversR_analyse_rasters_spatial', Sys.time())
   params = list (
     parameters = list (
-      spatial_conditions = 'sp_self_only()',
+      spatial_conditions = 'sp_self_only()',  #  limited options for now
       calculations = calculations,
       result_list = result_list
     ),
     bd = list (
       raster_files = raster_files,
       params = list (
-        name = paste ('BiodiversR_analyse_rasters_spatial', Sys.time()),  #  unique-ish name that is human readable
+        name = sp_output_name,
         cellsizes = cellsizes
       )
     )
@@ -58,14 +60,19 @@ analyse_rasters_spatial = function(
   #  convert list structure to a data frame
   #  maybe the server could give a more DF-like structure,
   #  but this is already an array
-  colnames = unlist(results[[1]])
+  header = unlist(results[[1]])
   results[[1]] = NULL  #  remove the header
-  m = t(matrix(data=unlist(results), ncol=length(results), nrow=length(colnames)))
+  m = t(matrix(data=unlist(results), ncol=length(results), nrow=length(header)))
   df = as.data.frame(m)
-  colnames(df) = h
-  if (colnames[1] == "ELEMENT") {
-    #  maybe this col can be removed from the df?
+  colnames(df) = header
+  if (header[1] == "ELEMENT") {
+    #  make the element names the row names, and remove from main table
     row.names(df) = df$ELEMENT
+    df[[1]] = NULL
+    #  the other data are numeric
+    for (c in colnames(df)) {
+      df[[c]] = as.numeric(df[[c]])
+    }
   }
 
   return (df)
