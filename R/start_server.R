@@ -55,10 +55,20 @@ start_server = function(port=0, use_exe=FALSE){
       message (cmd)
       #  no perl pfx on unix, let the shebang line do its work
       #  need to also send stdout and stderr to a log file
-      message (paste (server_path, "daemon", "-l", server_url))
+
+      if (Sys.info()[['sysname']] == "Windows") {
+        args = c(server_path, "daemon", "-l", server_url)
+        cmd = "perl"
+      }
+      else {
+        args = c("daemon", "-l", server_url)
+        cmd = server_path
+      }
+      message (paste (unlist (server_path, args)))
+
 
       process_object = processx::process$new(
-        server_path, c("daemon", "-l", server_url),
+        cmd, args,
         stdout = "",  #  dump log to stdout and stderr for debug
         stderr = ""
       )
@@ -78,7 +88,7 @@ start_server = function(port=0, use_exe=FALSE){
   )
 
   server_running = 0
-  max_tries = 5
+  max_tries = 10
   trycount = 1
   while (server_running == 0 && trycount <= max_tries) {
     Sys.sleep(1) #  give the server a chance to get going
