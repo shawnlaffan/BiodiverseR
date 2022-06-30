@@ -33,7 +33,7 @@ analyse_rasters_spatial = function(
     bd = list (
       raster_files = raster_files,
       params = list (
-        name = paste ('BiodiversR_analyse_rasters_spatial', Sys.time()),
+        name = paste ('BiodiversR_analyse_rasters_spatial', Sys.time()),  #  unique-ish name that is human readable
         cellsizes = cellsizes
       )
     )
@@ -55,6 +55,19 @@ analyse_rasters_spatial = function(
 
   results = httr::content(response, "parsed")
 
-  return (results)
+  #  convert list structure to a data frame
+  #  maybe the server could give a more DF-like structure,
+  #  but this is already an array
+  colnames = unlist(results[[1]])
+  results[[1]] = NULL  #  remove the header
+  m = t(matrix(data=unlist(results), ncol=length(results), nrow=length(colnames)))
+  df = as.data.frame(m)
+  colnames(df) = h
+  if (colnames[1] == "ELEMENT") {
+    #  maybe this col can be removed from the df?
+    row.names(df) = df$ELEMENT
+  }
+
+  return (df)
 }
 
