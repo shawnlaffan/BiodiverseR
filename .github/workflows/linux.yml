@@ -54,14 +54,13 @@ jobs:
 
       - name: Install Dynamic Dependencies
         run: |
+          # These are all picked up by the Biodiverse install
+          #  but it is useful to have the GDAL related stuff done verbosely
           which -a cpanm
           which -a perl
           cpanm --notest local::lib
           echo $(perl -Mlocal::lib=${HOME}/perl5)
           eval "$(perl -Mlocal::lib=${HOME}/perl5)"
-          cpanm --installdeps FFI::Platypus
-          cpanm --notest FFI::Platypus
-          #cpanm --notest FFI::Platypus::Declare
           cpanm --notest Alien::Build  
           cpanm --installdeps --notest Alien::sqlite
           cpanm -v Alien::sqlite
