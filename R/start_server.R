@@ -5,7 +5,6 @@
 #' or an explicit kill command is called on it.
 #'
 #' By default it will find an empty port, but you can select one if you so choose.
-#' (OK, this still have to be implemented...)
 #'
 #' @param port integer
 #' @param use_exe boolean
@@ -20,6 +19,7 @@ start_server = function(port=0, use_exe=FALSE){
   bd_base_dir = Sys.getenv("Biodiverse_basepath")
   if (bd_base_dir == "") {
     message ("Env var Biodiverse_basepath not set, assuming ", getwd())
+    bd_base_dir = getwd()
   }
 
   #  this runs the perl version - need to find a way to locate it relative to the package
