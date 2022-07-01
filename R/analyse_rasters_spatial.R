@@ -4,7 +4,6 @@
 #' @param raster_files character
 #' @param cellsizes numeric
 #' @param calculations character
-#' @param result_list character
 #' @param ... passed on to start_server call
 #'
 #' @export
@@ -13,8 +12,7 @@
 
 analyse_rasters_spatial = function(
     raster_files, cellsizes,
-    calculations=c('calc_endemism'),
-    result_list = 'SPATIAL_RESULTS',  #  should be plural and accept char vec
+    calculations=c('calc_richness'),
     ...){
 
   stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character"))
@@ -30,10 +28,9 @@ analyse_rasters_spatial = function(
   #  unique-ish name that is human readable
   sp_output_name = paste ('BiodiversR_analyse_rasters_spatial', Sys.time())
   params = list (
-    parameters = list (
+    analysis_config = list (
       spatial_conditions = 'sp_self_only()',  #  limited options for now
-      calculations = calculations,
-      result_list = result_list
+      calculations = calculations
     ),
     bd = list (
       raster_files = raster_files,
@@ -58,26 +55,34 @@ analyse_rasters_spatial = function(
   )
   httr::stop_for_status(response)
 
-  results = httr::content(response, "parsed")
+  call_results = httr::content(response, "parsed")
 
-  #  convert list structure to a data frame
-  #  maybe the server could give a more DF-like structure,
-  #  but this is already an array
-  header = unlist(results[[1]])
-  results[[1]] = NULL  #  remove the header
-  m = t(matrix(data=unlist(results), ncol=length(results), nrow=length(header)))
-  df = as.data.frame(m)
-  colnames(df) = header
-  if (header[1] == "ELEMENT") {
-    #  make the element names the row names, and remove from main table
-    row.names(df) = df$ELEMENT
-    df[[1]] = NULL
-    #  the other data are numeric
-    for (c in colnames(df)) {
-      df[[c]] = as.numeric(df[[c]])
+  # browser()
+
+  processed_results = list()
+  #  lapply?
+  for (list_name in names(call_results)) {
+    #  convert list structure to a data frame
+    #  maybe the server could give a more DF-like structure,
+    #  but this is already an array
+    results = call_results[[list_name]]  #  need to handle when it is not there
+    header = unlist(results[[1]])
+    results[[1]] = NULL  #  remove the header
+    df <- do.call(rbind, lapply(results, rbind)) %>% as.data.frame()
+    df[df == "NULL"] = NA
+    colnames(df) = header
+    if (header[1] == "ELEMENT") {
+      #  make the element names the row names, and remove from main table
+      row.names(df) = df$ELEMENT
+      df[[1]] = NULL
+      #  the other data are numeric
+      for (c in colnames(df)) {
+        df[[c]] = as.numeric(df[[c]])
+      }
     }
+    processed_results[[list_name]] = df
   }
 
-  return (df)
+  return (processed_results)
 }
 

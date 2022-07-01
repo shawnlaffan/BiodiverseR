@@ -33,7 +33,7 @@ sub run_analysis ($self, $analysis_params) {
     elsif (!is_ref($spatial_conditions)) {
       $spatial_conditions = [$spatial_conditions];
     }
-    my $calculations = $analysis_params->{analysis_config}{calculations} // ['calc_endemism_central'];
+    my $calculations = $analysis_params->{analysis_config}{calculations} // ['calc_richness'];
     if (is_ref($calculations) && !is_arrayref($calculations)) {
       croak 'reftype of spatial_conditions must be array';
     }
