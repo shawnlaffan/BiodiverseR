@@ -47,7 +47,7 @@ sub run_analysis ($self, $analysis_params) {
     croak 'result_list is no longer a valid argument - use result_lists instead'
       if defined $analysis_params->{analysis_config}{result_list};
     croak 'results_list is not a valid argument - use result_lists instead'
-      if defined $analysis_params->{analysis_config}{result_list};
+      if defined $analysis_params->{analysis_config}{results_list};
 
     my $bd_params = $analysis_params->{bd}{params};
     my $bd_data   = $analysis_params->{bd}{data};
@@ -102,12 +102,15 @@ sub run_analysis ($self, $analysis_params) {
       spatial_conditions => $spatial_conditions,
       calculations => $calculations,
     );
+#p $sp;
+p $result_lists;
     my %results;
     foreach my $listname (@$result_lists) {
+p $listname;
         my $table = $sp->to_table (list => $listname);
         $results{$listname} = $table;
     }
-#p %results;    
+p %results;    
     return \%results;
 }
 

@@ -56,7 +56,7 @@ $t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
 
 $oneshot_data->{analysis_config}{calculations}
   = ['calc_elements_used'];
-$oneshot_data->{analysis_config}{results_list}
+$oneshot_data->{analysis_config}{result_lists}
   = ['SPATIAL_RESULTS'];
 $exp = {
   SPATIAL_RESULTS => [
@@ -65,7 +65,31 @@ $exp = {
     ["50:50", 50, 50, 1, 1],
   ]
 };
-$t_msg_suffix = 'results_list=SPATIAL_RESULTS, calculations=calc_elements_used';
+$t_msg_suffix = 'result_lists=SPATIAL_RESULTS, calculations=calc_elements_used';
+$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+  ->status_is(200, "status, $t_msg_suffix")
+  ->json_is ('' => $exp, "json results, $t_msg_suffix");
+
+
+
+$oneshot_data->{analysis_config}{calculations}
+  = ['calc_elements_used', 'calc_element_lists_used'];
+$oneshot_data->{analysis_config}{result_lists}
+  = ['SPATIAL_RESULTS', 'EL_LIST_ALL'];
+$exp = {
+  SPATIAL_RESULTS => [
+    [qw /ELEMENT Axis_0 Axis_1 EL_COUNT_ALL EL_COUNT_SET1/],
+    ["150:150", 150, 150, 1, 1],
+    ["50:50", 50, 50, 1, 1],
+  ],
+  EL_LIST_ALL => [
+    [qw /ELEMENT Axis_0 Axis_1 EL_COUNT_ALL EL_COUNT_SET1/],
+    ["150:150", 150, 150, 1, 1],
+    ["50:50", 50, 50, 1, 1],
+  ]
+
+};
+$t_msg_suffix = 'results_list=SPATIAL_RESULTS,EL_LIST_SET1, calculations=calc_endemism,calc_element_lists_used';
 $t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
   ->status_is(200, "status, $t_msg_suffix")
   ->json_is ('' => $exp, "json results, $t_msg_suffix");
