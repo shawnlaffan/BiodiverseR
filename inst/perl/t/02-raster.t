@@ -18,6 +18,9 @@ my $oneshot_data = {
     params => {name => 'blognorb', cellsizes => [500,500]},
     raster_files => ["$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif"],
   },
+  analysis_config => {
+    calculations => ['calc_endemism_central'],
+  },
 };
 
 my $exp = {

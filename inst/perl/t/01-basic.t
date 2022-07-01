@@ -18,6 +18,9 @@ my $oneshot_data = {
     params => {name => 'blognorb', cellsizes => [100,100]},
     data   => $gp_lb,
   },
+  analysis_config => {
+    calculations => ['calc_endemism_central'],
+  },
 };
 
 my $exp = {
