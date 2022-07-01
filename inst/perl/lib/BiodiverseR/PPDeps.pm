@@ -21,7 +21,7 @@ $fh->close;
 require encoding;
 
 #  exercise the unicode regexp matching - needed for the spatial conditions
-use 5.016;
+#use 5.016;
 use feature 'unicode_strings';
 my $string = "sp_self_only () and \N{WHITE SMILING FACE}";
 $string =~ /\bsp_self_only\b/;
@@ -54,7 +54,7 @@ use PerlIO::gzip;  #  used by ParseODS
 
 #  GUI needs this for help,
 #  so don't trigger for engine-only
-eval 'use IO::Socket::SSL';
+#eval 'use IO::Socket::SSL';
 
 use FFI::Platypus;
 
