@@ -103,14 +103,14 @@ sub run_analysis ($self, $analysis_params) {
       calculations => $calculations,
     );
 #p $sp;
-p $result_lists;
+    my @list_names = $sp->get_hash_list_names_across_elements(no_private => 1);
+#p @list_names;
     my %results;
-    foreach my $listname (@$result_lists) {
-p $listname;
-        my $table = $sp->to_table (list => $listname);
+    foreach my $listname (@list_names) {
+        my $table = $sp->to_table (list => $listname, symmetric => 1);
         $results{$listname} = $table;
     }
-p %results;    
+#p %results;
     return \%results;
 }
 
