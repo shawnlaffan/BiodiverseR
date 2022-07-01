@@ -1,8 +1,11 @@
 #' Use the Biodiverse server to load a set of rasters and then analyse them
 #'
 #'
-#' @param rasters character
+#' @param raster_files character
 #' @param cellsizes numeric
+#' @param calculations character
+#' @param result_list character
+#' @param ... passed on to start_server call
 #'
 #' @export
 #' @examples
@@ -20,7 +23,7 @@ analyse_rasters_spatial = function(
   stopifnot("cellsizes must have exactly two axes" = length(cellsizes) == 2)
 
   config = start_server(...)
-  str (config)
+  utils::str (config)
   message ("server process is live? ", config$process_object$is_alive())
   stopifnot(config$process_object$is_alive())  #  need a better error
 

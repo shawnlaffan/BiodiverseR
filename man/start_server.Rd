@@ -18,7 +18,8 @@ or an explicit kill command is called on it.
 }
 \details{
 By default it will find an empty port, but you can select one if you so choose.
-(OK, this still have to be implemented...)
+
+This should not really be exported and is currently here for dev purposes
 }
 \examples{
 start_server(port=3001, use_exe=TRUE)

@@ -29,4 +29,5 @@ Imports:
     fs,
     processx,
     httpuv,
-    httr
+    httr,
+    rjson

@@ -5,3 +5,4 @@
 ^\.github$
 ^etc
 ^experiment.R$
+mojo_log.+.txt$
