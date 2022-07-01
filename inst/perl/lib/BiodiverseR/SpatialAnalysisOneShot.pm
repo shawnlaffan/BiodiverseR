@@ -40,9 +40,14 @@ sub run_analysis ($self, $analysis_params) {
     elsif (!is_ref($calculations)) {
       $spatial_conditions = [$spatial_conditions];
     }
-    my $result_list  = $analysis_params->{analysis_config}{result_list} // 'SPATIAL_RESULTS';
-    croak 'result_list cannot be a reference'
-      if is_ref($result_list);
+    my $result_lists  = $analysis_params->{analysis_config}{result_lists} // ['SPATIAL_RESULTS'];
+    croak 'result_lists must be an array reference'
+      if !is_arrayref($result_lists);
+    #  should objectify this stuff so the args are checked automatically
+    croak 'result_list is no longer a valid argument - use result_lists instead'
+      if defined $analysis_params->{analysis_config}{result_list};
+    croak 'results_list is not a valid argument - use result_lists instead'
+      if defined $analysis_params->{analysis_config}{result_list};
 
     my $bd_params = $analysis_params->{bd}{params};
     my $bd_data   = $analysis_params->{bd}{data};
@@ -97,12 +102,13 @@ sub run_analysis ($self, $analysis_params) {
       spatial_conditions => $spatial_conditions,
       calculations => $calculations,
     );
-    my $table = $sp->to_table (list => $result_list);
-#use Data::Dumper qw /Dumper/;
-#say STDERR Dumper $table;
-    
-    #  need to transpose the table for json that is closer to what R wants as a list
-    return $table;
+    my %results;
+    foreach my $listname (@$result_lists) {
+        my $table = $sp->to_table (list => $listname);
+        $results{$listname} = $table;
+    }
+#p %results;    
+    return \%results;
 }
 
 

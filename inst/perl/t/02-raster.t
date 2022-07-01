@@ -20,13 +20,15 @@ my $oneshot_data = {
   },
 };
 
-my $exp = [
+my $exp = {
+  SPATIAL_RESULTS => [
     [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE/],
     ['250:-250', '250', '-250', '0.25', 3, '0.75', '0.75'],
     ['250:250',  '250',  '250', '0.25', 3, '0.75', '0.75'],
     ['750:-250', '750', '-250', '0.25', 3, '0.75', '0.75'],
     ['750:250',  '750',  '250', '0.25', 3, '0.75', '0.75'],
-];
+  ]
+};
 my $t_msg_suffix = 'default config';
 $t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
   ->status_is(200, "status, $t_msg_suffix")
