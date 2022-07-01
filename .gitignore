@@ -45,3 +45,6 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+#  mojo logs
+mojo_log*.txt
