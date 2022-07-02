@@ -25,6 +25,9 @@ sub new {
 
 sub run_analysis ($self, $analysis_params) {
     my $a_cfg = $analysis_params->{analysis_config} // {};
+
+    #  rjson converts single item vectors to scalars
+    #  so need to handle both scalars and arrays
     my $spatial_conditions
       = $analysis_params->{analysis_config}{spatial_conditions} // ['sp_self_only()'];
     if (is_ref($spatial_conditions) && !is_arrayref($spatial_conditions)) {
@@ -33,14 +36,18 @@ sub run_analysis ($self, $analysis_params) {
     elsif (!is_ref($spatial_conditions)) {
       $spatial_conditions = [$spatial_conditions];
     }
-    my $calculations = $analysis_params->{analysis_config}{calculations} // ['calc_richness'];
+
+    my $calculations
+      = $analysis_params->{analysis_config}{calculations} // ['calc_richness'];
     if (is_ref($calculations) && !is_arrayref($calculations)) {
       croak 'reftype of spatial_conditions must be array';
     }
     elsif (!is_ref($calculations)) {
-      $spatial_conditions = [$spatial_conditions];
+      $calculations = [$calculations];
     }
-    my $result_lists  = $analysis_params->{analysis_config}{result_lists} // ['SPATIAL_RESULTS'];
+
+    my $result_lists
+      = $analysis_params->{analysis_config}{result_lists} // ['SPATIAL_RESULTS'];
     croak 'result_lists must be an array reference'
       if !is_arrayref($result_lists);
     #  should objectify this stuff so the args are checked automatically
