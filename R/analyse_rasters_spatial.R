@@ -57,6 +57,9 @@ analyse_rasters_spatial = function(
 
   call_results = httr::content(response, "parsed")
 
+  #  terminate the server - don't wait for garbage collection
+  config$server_object$kill()
+
   # browser()
 
   processed_results = list()
