@@ -67,7 +67,7 @@ start_server = function(port=0, use_exe=FALSE){
       message (paste (unlist (server_path, args)))
 
 
-      process_object = processx::process$new(
+      server_object = processx::process$new(
         cmd, args,
         stdout = "",  #  dump log to stdout and stderr for debug
         stderr = ""
@@ -83,7 +83,7 @@ start_server = function(port=0, use_exe=FALSE){
   config = list (
     port = port,
     using_exe = use_exe,
-    process_object = process_object,
+    server_object = server_object,
     server_url = server_url
   )
 

@@ -12,7 +12,7 @@
 
 analyse_rasters_spatial = function(
     raster_files, cellsizes,
-    calculations=c('calc_richness'),
+    calculations=c('calc_richness', 'calc_endemism_central'),
     ...){
 
   stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character"))
@@ -22,8 +22,8 @@ analyse_rasters_spatial = function(
 
   config = start_server(...)
   utils::str (config)
-  message ("server process is live? ", config$process_object$is_alive())
-  stopifnot(config$process_object$is_alive())  #  need a better error
+  message ("server process is live? ", config$server_object$is_alive())
+  stopifnot(config$server_object$is_alive())  #  need a better error
 
   #  unique-ish name that is human readable
   sp_output_name = paste ('BiodiversR_analyse_rasters_spatial', Sys.time())
@@ -60,8 +60,8 @@ analyse_rasters_spatial = function(
   # browser()
 
   processed_results = list()
-  #  lapply?
-  for (list_name in names(call_results)) {
+  #  lapply? - nah.  There will never be more than ten list elements
+  for (list_name in sort(names(call_results))) {
     #  convert list structure to a data frame
     #  maybe the server could give a more DF-like structure,
     #  but this is already an array
@@ -75,7 +75,7 @@ analyse_rasters_spatial = function(
       #  make the element names the row names, and remove from main table
       row.names(df) = df$ELEMENT
       df[[1]] = NULL
-      #  the other data are numeric
+      #  the other data are numeric for raster inputs
       for (c in colnames(df)) {
         df[[c]] = as.numeric(df[[c]])
       }
