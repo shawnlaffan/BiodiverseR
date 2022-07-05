@@ -4,12 +4,14 @@
 \alias{start_server}
 \title{Start the Biodiverse server}
 \usage{
-start_server(port = 0, use_exe = FALSE)
+start_server(port = 0, use_exe = FALSE, perl_path = NULL)
 }
 \arguments{
 \item{port}{integer}
 
 \item{use_exe}{boolean}
+
+\item{perl_path}{character}
 }
 \description{
 Starts a Biodiverse server.

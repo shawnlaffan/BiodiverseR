@@ -16,7 +16,7 @@
 #' @examples
 #' start_server(port=3001, use_exe=TRUE)
 
-start_server = function(port=0, use_exe=FALSE, perl_path=NULL){
+start_server = function(port=0, use_exe=FALSE, perl_path=""){
 
   process = NULL  #  silence some check warnings
   bd_base_dir = Sys.getenv("Biodiverse_basepath")
@@ -25,7 +25,8 @@ start_server = function(port=0, use_exe=FALSE, perl_path=NULL){
     bd_base_dir = getwd()
   }
 
-  path_extras = NULL
+  path_extras = ""
+  running_on_windows = Sys.info()[['sysname']] == "Windows"
 
   #  this runs the perl version - need to find a way to locate it relative to the package
   #  currently we need an env var to locate everything...
@@ -38,24 +39,22 @@ start_server = function(port=0, use_exe=FALSE, perl_path=NULL){
     }
   } else {
     server_path = file.path(bd_base_dir, 'inst', 'perl', 'script', 'BiodiverseR')
-    if (Sys.info()[['sysname']] == "Windows") {
-      if (!is.null(perl_path)) {
-        if (file_ext(perl_path) == "") {  #  append .exe
-          perl_path = sprintf ("%s.exe", perl_path)
-        }
-        stopifnot("perl_path does not exist"=file.exists(perl_path))
-        r = processx::run(perl_path, "-V")
-        on_strawberry = grep("uname.+strawberry", strsplit(unlist(r), "\n"))
-        if (on_strawberry > 0) {
-          #  need to add to the path
-          path_extras = normalizePath(c(
-            file.path(perl_path, '..'),
-            file.path(perl_path, '../../site/bin'),
-            file.path(perl_path, '../../../c/bin')
-          ))
-          path_extras = paste0(path_extras, collapse=";")
-          message ("Will prepend to path", path_extras)
-        }
+    if (running_on_windows && perl_path != "") {
+      if (tools::file_ext(perl_path) == "") {  #  append .exe
+        perl_path = sprintf ("%s.exe", perl_path)
+      }
+      stopifnot("perl_path does not exist"=file.exists(perl_path))
+      r = processx::run(perl_path, "-V")
+      on_strawberry = grep("uname.+strawberry", strsplit(unlist(r), "\n"))
+      if (on_strawberry > 0) {
+        #  need to add to the path
+        path_extras = normalizePath(c(
+          file.path(perl_path, '..'),
+          file.path(perl_path, '../../site/bin'),
+          file.path(perl_path, '../../../c/bin')
+        ))
+        path_extras = paste0(path_extras, collapse=";")
+        message ("Will prepend to path: ", path_extras)
       }
     }
   }
@@ -81,11 +80,10 @@ start_server = function(port=0, use_exe=FALSE, perl_path=NULL){
       #  no perl pfx on unix, let the shebang line do its work
       #  need to also send stdout and stderr to a log file
 
-
-      if (Sys.info()[['sysname']] == "Windows") {
+      if (running_on_windows) {
         args = c(server_path, "daemon", "-l", server_url)
         cmd = ifelse(is.null(perl_path), "perl", perl_path)
-        if (!is.null(path_extras)) {
+        if (path_extras != "") {
           Sys.setenv("PATH" = sprintf("%s;%s", path_extras, Sys.getenv("PATH")))
         }
       }
@@ -109,7 +107,7 @@ start_server = function(port=0, use_exe=FALSE, perl_path=NULL){
     }
   )
 
-  if (!is.null(path_extras)) {
+  if (path_extras != "") {
     Sys.setenv("PATH"=orig_path)
   }
 
