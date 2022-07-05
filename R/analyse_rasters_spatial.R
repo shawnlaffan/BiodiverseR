@@ -13,12 +13,17 @@
 analyse_rasters_spatial = function(
     raster_files, cellsizes,
     calculations=c('calc_richness', 'calc_endemism_central'),
+    tree=NULL,
     ...){
 
   stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character"))
   stopifnot(all(file.exists(raster_files)))
   stopifnot("cellsizes argument must be a numeric vector" = any(class(cellsizes)=="numeric"))
   stopifnot("cellsizes must have exactly two axes" = length(cellsizes) == 2)
+
+  if (!is.null(tree)) {
+    stopifnot("tree must be of class phylo or inherit from it" = inherits (tree, "phylo"))
+  }
 
   config = start_server(...)
   utils::str (config)
@@ -38,7 +43,8 @@ analyse_rasters_spatial = function(
         name = sp_output_name,
         cellsizes = cellsizes
       )
-    )
+    ),
+    tree = tree
   )
   params_as_json = rjson::toJSON(params)
 
