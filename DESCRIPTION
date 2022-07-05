@@ -30,4 +30,5 @@ Imports:
     processx,
     httpuv,
     httr,
-    rjson
+    rjson,
+    tools

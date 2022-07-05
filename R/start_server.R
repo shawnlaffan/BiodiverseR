@@ -10,12 +10,13 @@
 #'
 #' @param port integer
 #' @param use_exe boolean
+#' @param perl_path character
 #'
 #' @export
 #' @examples
 #' start_server(port=3001, use_exe=TRUE)
 
-start_server = function(port=0, use_exe=FALSE){
+start_server = function(port=0, use_exe=FALSE, perl_path=NULL){
 
   process = NULL  #  silence some check warnings
   bd_base_dir = Sys.getenv("Biodiverse_basepath")
@@ -23,6 +24,8 @@ start_server = function(port=0, use_exe=FALSE){
     message ("Env var Biodiverse_basepath not set, assuming ", getwd())
     bd_base_dir = getwd()
   }
+
+  path_extras = NULL
 
   #  this runs the perl version - need to find a way to locate it relative to the package
   #  currently we need an env var to locate everything...
@@ -35,6 +38,26 @@ start_server = function(port=0, use_exe=FALSE){
     }
   } else {
     server_path = file.path(bd_base_dir, 'inst', 'perl', 'script', 'BiodiverseR')
+    if (Sys.info()[['sysname']] == "Windows") {
+      if (!is.null(perl_path)) {
+        if (file_ext(perl_path) == "") {  #  append .exe
+          perl_path = sprintf ("%s.exe", perl_path)
+        }
+        stopifnot("perl_path does not exist"=file.exists(perl_path))
+        r = processx::run(perl_path, "-V")
+        on_strawberry = grep("uname.+strawberry", strsplit(unlist(r), "\n"))
+        if (on_strawberry > 0) {
+          #  need to add to the path
+          path_extras = normalizePath(c(
+            file.path(perl_path, '..'),
+            file.path(perl_path, '../../site/bin'),
+            file.path(perl_path, '../../../c/bin')
+          ))
+          path_extras = paste0(path_extras, collapse=";")
+          message ("Will prepend to path", path_extras)
+        }
+      }
+    }
   }
   message (sprintf("server_path is %s", server_path))
   if (!file.exists(server_path)) {
@@ -48,6 +71,8 @@ start_server = function(port=0, use_exe=FALSE){
   }
   server_url = sprintf ("http://%s:%d", host, port)
 
+  orig_path = Sys.getenv("PATH")
+
   res = tryCatch ({
       #  need explicit perl call on windows
       # https://processx.r-lib.org/reference/process.html
@@ -56,9 +81,13 @@ start_server = function(port=0, use_exe=FALSE){
       #  no perl pfx on unix, let the shebang line do its work
       #  need to also send stdout and stderr to a log file
 
+
       if (Sys.info()[['sysname']] == "Windows") {
         args = c(server_path, "daemon", "-l", server_url)
-        cmd = "perl"
+        cmd = ifelse(is.null(perl_path), "perl", perl_path)
+        if (!is.null(path_extras)) {
+          Sys.setenv("PATH" = sprintf("%s;%s", path_extras, Sys.getenv("PATH")))
+        }
       }
       else {
         args = c("daemon", "-l", server_url)
@@ -66,6 +95,7 @@ start_server = function(port=0, use_exe=FALSE){
       }
       message (paste (unlist (server_path, args)))
 
+      message (Sys.getenv("PATH"))
 
       server_object = processx::process$new(
         cmd, args,
@@ -79,6 +109,9 @@ start_server = function(port=0, use_exe=FALSE){
     }
   )
 
+  if (!is.null(path_extras)) {
+    Sys.setenv("PATH"=orig_path)
+  }
 
   config = list (
     port = port,
@@ -91,7 +124,7 @@ start_server = function(port=0, use_exe=FALSE){
   max_tries = 10
   trycount = 1
   while (server_running == 0 && trycount <= max_tries) {
-    Sys.sleep(1) #  give the server a chance to get going
+    Sys.sleep(1) #  give the server a chance to get going - there must be a better way such as checking the stderr of the process
     response = tryCatch(
       {
         httr::GET(url = server_url)
