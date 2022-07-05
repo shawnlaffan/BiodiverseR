@@ -4,6 +4,7 @@
 #' @param raster_files character
 #' @param cellsizes numeric
 #' @param calculations character
+#' @param tree class phylo
 #' @param ... passed on to start_server call
 #'
 #' @export
