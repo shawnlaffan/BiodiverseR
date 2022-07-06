@@ -65,14 +65,15 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
   }
 
   host = "127.0.0.1"
-  if (port == 0) {
+  if (gtools::invalid(port) || port <= 0) {
     port = httpuv::randomPort(min = 1024L, max = 49151L, host = host, n = 20)
   }
   server_url = sprintf ("http://%s:%d", host, port)
 
   orig_path = Sys.getenv("PATH")
 
-  res = tryCatch ({
+  res = tryCatch (
+    {
       #  need explicit perl call on windows
       # https://processx.r-lib.org/reference/process.html
       cmd = sprintf ("Command: %s daemon -l %s", server_path, server_url)
@@ -98,8 +99,27 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
       server_object = processx::process$new(
         cmd, args,
         stdout = "",  #  dump log to stdout and stderr for debug
-        stderr = ""
+        stderr = "|"
       )
+      poll_timer = 3000
+      poll = server_object$poll_io(poll_timer)
+      txt = server_object$read_error_lines()
+      message("TXT: ", txt)
+      tries = 1
+      regex = r"(Listening at "http://127\.0\.0\.1:(\d+))"
+      while (tries < 15 && !any(grepl(regex, txt, perl=TRUE))) {
+        txt = server_object$read_error_lines()
+        poll = server_object$poll_io(poll_timer)
+        if (invalid(txt) || txt == "") {
+          message ("Waiting for server to start")
+        }
+        else {
+          message (txt)
+        }
+        tries = tries + 1
+      }
+      # port = stringr::str_match(txt, regex)[2]
+      # message ("port is: ", port)
     },
     error=function(err){
       message(paste("Server call resulted in an error:  ", err))
@@ -118,11 +138,14 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
     server_url = server_url
   )
 
+  #  hopefully redundant now but leaving just in case
   server_running = 0
   max_tries = 10
   trycount = 1
   while (server_running == 0 && trycount <= max_tries) {
-    Sys.sleep(1) #  give the server a chance to get going - there must be a better way such as checking the stderr of the process
+    #  give the server a chance to get going -
+    #  there must be a better way such as checking the stderr of the process
+    Sys.sleep(1)
     response = tryCatch(
       {
         httr::GET(url = server_url)
