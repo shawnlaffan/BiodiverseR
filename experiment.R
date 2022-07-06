@@ -26,7 +26,7 @@ params_str = list (
   parameters = list (
     spatial_conditions = 'sp_self_only()',
     calculations = c ('calc_endemism', 'calc_richness'),
-    result_list = 'SPATIAL_RESULTS'
+    result_lists = c('SPATIAL_RESULTS')
   ),
   bd = list (data = sp_data, params = bd_params)
 )
@@ -38,7 +38,7 @@ params_str_rasters = list (
   parameters = list (
     spatial_conditions = 'sp_self_only()',
     calculations = c ('calc_endemism', 'calc_richness'),
-    result_list = 'SPATIAL_RESULTS'
+    result_lists = c('SPATIAL_RESULTS')
   ),
   bd = list (raster_files = raster_files, params = bd_params)
 )
