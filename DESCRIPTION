@@ -31,5 +31,4 @@ Imports:
     httpuv,
     httr,
     rjson,
-    tools,
-    gtools
+    tools

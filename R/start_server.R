@@ -72,7 +72,7 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
   }
 
   host = "127.0.0.1"
-  if (gtools::invalid(port) || !is.numeric(port) || port <= 0) {
+  if (!is.numeric(port) || port <= 0) {
     port = httpuv::randomPort(min = 1024L, max = 49151L, host = host, n = 20)
   }
   server_url = sprintf ("http://%s:%d", host, as.integer(port))
@@ -117,7 +117,7 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
       while (tries < 15 && !any(grepl(regex, txt, perl=TRUE))) {
         txt = server_object$read_error_lines()
         poll = server_object$poll_io(poll_timer)
-        if (gtools::invalid(txt) || txt == "") {
+        if (length(txt) == 0 || is.na(txt) || is.null(txt)) {
           message ("Waiting for server to start")
         }
         else {
