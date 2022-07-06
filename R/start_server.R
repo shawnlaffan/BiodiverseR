@@ -21,8 +21,9 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
   process = NULL  #  silence some check warnings
   bd_base_dir = Sys.getenv("Biodiverse_basepath")
   if (bd_base_dir == "") {
-    message ("Env var Biodiverse_basepath not set, assuming ", getwd())
-    bd_base_dir = getwd()
+    # bd_base_dir = getwd()
+    bd_base_dir = find.package("BiodiverseR")
+    message ("Env var Biodiverse_basepath not set, assuming ", bd_base_dir)
   }
 
   path_extras = ""
@@ -34,11 +35,17 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
   if (use_exe) {
     #  non-windows won't have exe extension
     server_path = file.path(bd_base_dir, 'inst', 'perl', "BiodiverseR")
+    if (!file.exists(server_path)) {  #  installed?
+      server_path = file.path(bd_base_dir, 'perl', "BiodiverseR")
+    }
     if (Sys.info()[['sysname']] == "Windows") {
       server_path = sprintf("%s.exe", server_path)
     }
   } else {
     server_path = file.path(bd_base_dir, 'inst', 'perl', 'script', 'BiodiverseR')
+    if (!file.exists(server_path)) {  #  installed? - needs a refactor
+      server_path = file.path(bd_base_dir, 'perl', 'script', "BiodiverseR")
+    }
     if (running_on_windows && perl_path != "") {
       if (tools::file_ext(perl_path) == "") {  #  append .exe
         perl_path = sprintf ("%s.exe", perl_path)
@@ -65,10 +72,10 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
   }
 
   host = "127.0.0.1"
-  if (gtools::invalid(port) || port <= 0) {
+  if (gtools::invalid(port) || !is.numeric(port) || port <= 0) {
     port = httpuv::randomPort(min = 1024L, max = 49151L, host = host, n = 20)
   }
-  server_url = sprintf ("http://%s:%d", host, port)
+  server_url = sprintf ("http://%s:%d", host, as.integer(port))
 
   orig_path = Sys.getenv("PATH")
 
@@ -94,7 +101,7 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
       }
       message (paste (unlist (server_path, args)))
 
-      message (Sys.getenv("PATH"))
+      # message (Sys.getenv("PATH"))
 
       server_object = processx::process$new(
         cmd, args,
@@ -110,7 +117,7 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
       while (tries < 15 && !any(grepl(regex, txt, perl=TRUE))) {
         txt = server_object$read_error_lines()
         poll = server_object$poll_io(poll_timer)
-        if (invalid(txt) || txt == "") {
+        if (gtools::invalid(txt) || txt == "") {
           message ("Waiting for server to start")
         }
         else {
