@@ -9,7 +9,13 @@
 #'
 #' @export
 #' @examples
-#' analyse_rasters_spatial ()
+#' if(interactive()) {
+#'   analyse_rasters_spatial (
+#'     raster_files = c("r1.tif", "r2.tif"),
+#'     calculations = c("calc_endemism_central", "calc_richness", "calc_pd"),
+#'     tree = some_phylo_tree
+#'   )
+#' }
 
 analyse_rasters_spatial = function(
     raster_files, cellsizes,
@@ -78,7 +84,7 @@ analyse_rasters_spatial = function(
     results = call_results[[list_name]]  #  need to handle when it is not there
     header = unlist(results[[1]])
     results[[1]] = NULL  #  remove the header
-    df <- do.call(rbind, lapply(results, rbind)) %>% as.data.frame()
+    df <- do.call(rbind, lapply(results, rbind)) |> as.data.frame()
     df[df == "NULL"] = NA
     colnames(df) = header
     if (header[1] == "ELEMENT") {

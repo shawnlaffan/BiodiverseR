@@ -24,5 +24,7 @@ By default it will find an empty port, but you can select one if you so choose.
 This should not really be exported and is currently here for dev purposes
 }
 \examples{
-start_server(port=3001, use_exe=TRUE)
+if(interactive()) {
+  start_server(port=3001, use_exe=FALSE)
+}
 }

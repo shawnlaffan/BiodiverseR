@@ -14,7 +14,9 @@
 #'
 #' @export
 #' @examples
-#' start_server(port=3001, use_exe=TRUE)
+#' if(interactive()) {
+#'   start_server(port=3001, use_exe=FALSE)
+#' }
 
 start_server = function(port=0, use_exe=FALSE, perl_path=""){
 
