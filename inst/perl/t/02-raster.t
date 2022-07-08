@@ -7,7 +7,7 @@ use Test::More;
 use Test::Mojo;
 use Data::Printer;
 
-my $data_dir = curfile->dirname->child('data')->to_string;
+my $data_dir = curfile->dirname->dirname->sibling('data')->to_string;
 
 my $t = Test::Mojo->new('BiodiverseR');
 $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
