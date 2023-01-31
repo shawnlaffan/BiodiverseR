@@ -102,11 +102,9 @@ sub run_analysis ($self, $analysis_params) {
             $shapefiles = [$shapefiles];
         }
         # p $bd_params;
-        my %in_options_hash = (
-            group_field_names => $bd_params->{group_field_names},
-            label_field_names => $bd_params->{label_field_names},
-            sample_count_col_names => $bd_params->{sample_count_col_names},
-        );
+        my %in_options_hash
+            = map {$_ => $bd_params->{$_}}
+              (qw /group_field_names label_field_names sample_count_col_names/);
         #  add croaks for missing field names groups and labels
         # p %in_options_hash;
         my $success = eval {
