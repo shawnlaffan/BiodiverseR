@@ -74,10 +74,12 @@ sub run_analysis ($self, $analysis_params) {
         };
         croak $@ if $@;
     }
-    my $raster_files = $analysis_params->{bd}{raster_files};
-    if ($raster_files) {  #  need to import some rasters
-        if (!is_ref($raster_files)) {
-            $raster_files = [$raster_files];
+    #  need to import some rasters
+    if (my $params = $analysis_params->{raster_params}) {
+        # p $params;
+        my $files = $params->{files} // croak 'raster_params must include an array of files';
+        if (!is_ref($files)) {
+            $files = [$files];
         }
         my %in_options_hash = (
             labels_as_bands   => 1,
@@ -88,12 +90,81 @@ sub run_analysis ($self, $analysis_params) {
         );
         my $success = eval {
             $bd->import_data_raster (
-                input_files => $raster_files,
+                input_files => $files,
                 %in_options_hash,
                 labels_as_bands => ($bd_params->{labels_as_bands} // 1),
             );
         };
         croak $@ if $@;
+    }
+
+    #  some shapefiles
+    if (my $params = $analysis_params->{shapefile_params}) {
+        # p $params;
+        my $files = $params->{files} // croak 'shapefile_params must include an array of files';
+        if (!is_ref($files)) {
+            $files = [$files];
+        }
+        # p $bd_params;
+        my %in_options_hash
+            = map {$_ => $params->{$_}}
+              (qw /group_field_names label_field_names sample_count_col_names/);
+        #  add croaks for missing field names groups and labels
+        # p %in_options_hash;
+        my $success = eval {
+            $bd->import_data_shapefile (
+                input_files => $files,
+                %in_options_hash,
+            );
+        };
+        my $e = $@;
+        croak $e if $e;
+    }
+    #  some delimited text files
+    # p $analysis_params;
+    if (my $params = $analysis_params->{delimited_text_params}) {
+        # p $params;
+        my $files = $params->{files} // croak 'delimited_text_params must include an array of files';
+        if (!is_ref($files)) {
+            $files = [$files];
+        }
+        my %in_options_hash
+            = map {$_ => $params->{$_}}
+            (qw /group_columns label_columns sample_count_columns/);
+
+        #  add croaks for missing field names groups and labels
+        my $success = eval {
+            $bd->import_data (
+                input_files => $files,
+                %in_options_hash,
+            );
+        };
+        my $e = $@;
+        croak $e if $e;
+    }
+    #  some spreadsheets
+    if (my $params = $analysis_params->{spreadsheet_params}) {
+        # p $files;
+        my $files = $params->{files} // croak 'spreadsheet_params must include an array of files';
+        if (!is_ref($files)) {
+            $files = [$files];
+        }
+        # p $bd_params;
+        my %in_options_hash
+            = map {$_ => $params->{$_}}
+            (qw /group_field_names label_field_names sample_count_col_names/);
+
+        #  add croaks for missing field names groups and labels
+        # p %in_options_hash;
+        my $success = eval {
+            $bd->import_data_spreadsheet (
+                input_files => $files,
+                %in_options_hash,
+            );
+        };
+        my $e = $@;
+        # p $e;
+        croak $e if $e;
     }
 
     my $tree;
@@ -120,7 +191,7 @@ sub run_analysis ($self, $analysis_params) {
         my $table = $sp->to_table (list => $listname, symmetric => 1);
         $results{$listname} = $table;
     }
-#p %results;
+# p %results;
     return \%results;
 }
 
