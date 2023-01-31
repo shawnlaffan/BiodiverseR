@@ -90,5 +90,26 @@ my %common_args = (
         ->json_is('' => $exp, "json results, $t_msg_suffix");
 }
 
+{
+    my $oneshot_data = {
+        bd => {
+            params     => {
+                name                   => 'blognorb',
+                cellsizes              => [ 500, 500 ],
+                group_field_names      => [ qw/X Y/ ],
+                label_field_names      => [ 'label' ],
+                sample_count_col_names => [ 'count' ]
+            },
+            spreadsheet_files => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
+        },
+        %common_args,
+    };
+
+    my $t_msg_suffix = 'default config, spreadsheets';
+    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+        ->status_is(200, "status, $t_msg_suffix")
+        ->json_is('' => $exp, "json results, $t_msg_suffix");
+}
+
 
 done_testing();

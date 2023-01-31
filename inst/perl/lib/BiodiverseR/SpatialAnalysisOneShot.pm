@@ -139,6 +139,29 @@ sub run_analysis ($self, $analysis_params) {
         # p $e;
         croak $e if $e;
     }
+    #  some spreadsheets
+    if (my $files = $analysis_params->{bd}{spreadsheet_files}) {
+        # p $files;
+        if (!is_ref($files)) {
+            $files = [$files];
+        }
+        # p $bd_params;
+        my %in_options_hash
+            = map {$_ => $bd_params->{$_}}
+            (qw /group_field_names label_field_names sample_count_col_names/);
+
+        #  add croaks for missing field names groups and labels
+        # p %in_options_hash;
+        my $success = eval {
+            $bd->import_data_spreadsheet (
+                input_files => $files,
+                %in_options_hash,
+            );
+        };
+        my $e = $@;
+        # p $e;
+        croak $e if $e;
+    }
 
     my $tree;
     if ($analysis_params->{tree}) {
