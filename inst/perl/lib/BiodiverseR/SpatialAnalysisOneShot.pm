@@ -95,6 +95,32 @@ sub run_analysis ($self, $analysis_params) {
         };
         croak $@ if $@;
     }
+    if (my $shapefiles = $analysis_params->{bd}{shapefiles}) {  #  need to import some shapefiles
+        # p $shapefiles;
+        if (!is_ref($shapefiles)) {
+            $shapefiles = [$shapefiles];
+        }
+        # p $bd_params;
+        my %in_options_hash = (
+            group_field_names => $bd_params->{group_field_names},
+            label_field_names => $bd_params->{label_field_names},
+            sample_count_col_names => $bd_params->{sample_count_col_names},
+        );
+        #  add croaks for missing field names groups and labels
+        # p %in_options_hash;
+        my $success = eval {
+            $bd->import_data_shapefile (
+                input_files => $shapefiles,
+                %in_options_hash,
+            );
+        };
+        my $e = $@;
+        # p $e if $e;
+        # p $success;
+        # p $bd;
+        croak $e if $e;
+
+    }
 
     my $tree;
     if ($analysis_params->{tree}) {
@@ -120,7 +146,7 @@ sub run_analysis ($self, $analysis_params) {
         my $table = $sp->to_table (list => $listname, symmetric => 1);
         $results{$listname} = $table;
     }
-#p %results;
+p %results;
     return \%results;
 }
 
