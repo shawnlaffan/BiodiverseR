@@ -100,11 +100,13 @@ my %common_args = (
             params     => {
                 name                   => 'blognorb',
                 cellsizes              => [ 500, 500 ],
-                group_field_names      => [ qw/X Y/ ],
-                label_field_names      => [ 'label' ],
-                sample_count_col_names => [ 'count' ]
             },
-            spreadsheet_files => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
+        },
+        spreadsheet_params => {
+            files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
+            group_field_names      => [ qw/X Y/ ],
+            label_field_names      => [ 'label' ],
+            sample_count_col_names => [ 'count' ]
         },
         %common_args,
     };

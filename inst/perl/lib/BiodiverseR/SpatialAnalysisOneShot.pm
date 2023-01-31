@@ -144,14 +144,15 @@ sub run_analysis ($self, $analysis_params) {
         croak $e if $e;
     }
     #  some spreadsheets
-    if (my $files = $analysis_params->{bd}{spreadsheet_files}) {
+    if (my $params = $analysis_params->{spreadsheet_params}) {
         # p $files;
+        my $files = $params->{files} // croak 'spreadsheet_params must include an array of files';
         if (!is_ref($files)) {
             $files = [$files];
         }
         # p $bd_params;
         my %in_options_hash
-            = map {$_ => $bd_params->{$_}}
+            = map {$_ => $params->{$_}}
             (qw /group_field_names label_field_names sample_count_col_names/);
 
         #  add croaks for missing field names groups and labels
