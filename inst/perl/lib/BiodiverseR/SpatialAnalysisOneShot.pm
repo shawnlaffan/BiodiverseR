@@ -75,9 +75,11 @@ sub run_analysis ($self, $analysis_params) {
         croak $@ if $@;
     }
     #  need to import some rasters
-    if (my $raster_files = $analysis_params->{bd}{raster_files}) {
-        if (!is_ref($raster_files)) {
-            $raster_files = [$raster_files];
+    if (my $params = $analysis_params->{raster_params}) {
+        # p $params;
+        my $files = $params->{files} // croak 'raster_params must include an array of files';
+        if (!is_ref($files)) {
+            $files = [$files];
         }
         my %in_options_hash = (
             labels_as_bands   => 1,
@@ -88,7 +90,7 @@ sub run_analysis ($self, $analysis_params) {
         );
         my $success = eval {
             $bd->import_data_raster (
-                input_files => $raster_files,
+                input_files => $files,
                 %in_options_hash,
                 labels_as_bands => ($bd_params->{labels_as_bands} // 1),
             );

@@ -37,7 +37,9 @@ my %common_args = (
     my $oneshot_data_raster = {
         bd => {
             params       => { name => 'blognorb', cellsizes => [ 500, 500 ] },
-            raster_files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ],
+        },
+        raster_params => {
+            files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
         },
         %common_args,
     };
