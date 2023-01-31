@@ -56,11 +56,13 @@ my %common_args = (
             params     => {
                 name                   => 'blognorb',
                 cellsizes              => [ 500, 500 ],
-                group_field_names      => [ qw/:shape_x :shape_y/ ],
-                label_field_names      => [ 'label' ],
-                sample_count_col_names => [ 'count' ]
             },
-            shapefiles => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
+        },
+        shapefile_params => {
+            files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
+            group_field_names      => [ qw/:shape_x :shape_y/ ],
+            label_field_names      => [ 'label' ],
+            sample_count_col_names => [ 'count' ]
         },
         %common_args,
     };

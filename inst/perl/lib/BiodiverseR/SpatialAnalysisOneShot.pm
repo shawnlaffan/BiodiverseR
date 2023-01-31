@@ -97,21 +97,23 @@ sub run_analysis ($self, $analysis_params) {
         };
         croak $@ if $@;
     }
+
     #  some shapefiles
-    if (my $shapefiles = $analysis_params->{bd}{shapefiles}) {
-        # p $shapefiles;
-        if (!is_ref($shapefiles)) {
-            $shapefiles = [$shapefiles];
+    if (my $params = $analysis_params->{shapefile_params}) {
+        # p $params;
+        my $files = $params->{files} // croak 'shapefile_params must include an array of files';
+        if (!is_ref($files)) {
+            $files = [$files];
         }
         # p $bd_params;
         my %in_options_hash
-            = map {$_ => $bd_params->{$_}}
+            = map {$_ => $params->{$_}}
               (qw /group_field_names label_field_names sample_count_col_names/);
         #  add croaks for missing field names groups and labels
         # p %in_options_hash;
         my $success = eval {
             $bd->import_data_shapefile (
-                input_files => $shapefiles,
+                input_files => $files,
                 %in_options_hash,
             );
         };
