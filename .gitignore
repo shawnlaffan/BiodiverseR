@@ -48,3 +48,8 @@ vignettes/*.pdf
 
 #  mojo logs
 mojo_log*.txt
+
+
+#  intellij files
+.idea
+*.iml
