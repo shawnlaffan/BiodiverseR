@@ -42,7 +42,7 @@ my %common_args = (
         %common_args,
     };
 
-    my $t_msg_suffix = 'default config';
+    my $t_msg_suffix = 'default config, raster files';
     $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data_raster)
         ->status_is(200, "status, $t_msg_suffix")
         ->json_is('' => $exp, "json results, $t_msg_suffix");
@@ -56,14 +56,35 @@ my %common_args = (
                 cellsizes              => [ 500, 500 ],
                 group_field_names      => [ qw/:shape_x :shape_y/ ],
                 label_field_names      => [ 'label' ],
-                sample_count_col_names => => [ 'count' ]
+                sample_count_col_names => [ 'count' ]
             },
             shapefiles => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
         },
         %common_args,
     };
 
-    my $t_msg_suffix = 'default config';
+    my $t_msg_suffix = 'default config, shapefiles';
+    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+        ->status_is(200, "status, $t_msg_suffix")
+        ->json_is('' => $exp, "json results, $t_msg_suffix");
+}
+
+{
+    my $oneshot_data = {
+        bd => {
+            params     => {
+                name                 => 'blognorb',
+                cellsizes            => [ 500, 500 ],
+                group_columns        => [ 1, 2 ],
+                label_columns        => [ 4 ],
+                sample_count_columns => [ 3 ]
+            },
+            delimited_text_files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
+        },
+        %common_args,
+    };
+
+    my $t_msg_suffix = 'default config, delimited text files';
     $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
         ->status_is(200, "status, $t_msg_suffix")
         ->json_is('' => $exp, "json results, $t_msg_suffix");

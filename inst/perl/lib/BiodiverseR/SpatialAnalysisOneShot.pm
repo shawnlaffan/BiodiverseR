@@ -74,8 +74,8 @@ sub run_analysis ($self, $analysis_params) {
         };
         croak $@ if $@;
     }
-    my $raster_files = $analysis_params->{bd}{raster_files};
-    if ($raster_files) {  #  need to import some rasters
+    #  need to import some rasters
+    if (my $raster_files = $analysis_params->{bd}{raster_files}) {
         if (!is_ref($raster_files)) {
             $raster_files = [$raster_files];
         }
@@ -95,7 +95,8 @@ sub run_analysis ($self, $analysis_params) {
         };
         croak $@ if $@;
     }
-    if (my $shapefiles = $analysis_params->{bd}{shapefiles}) {  #  need to import some shapefiles
+    #  some shapefiles
+    if (my $shapefiles = $analysis_params->{bd}{shapefiles}) {
         # p $shapefiles;
         if (!is_ref($shapefiles)) {
             $shapefiles = [$shapefiles];
@@ -115,11 +116,30 @@ sub run_analysis ($self, $analysis_params) {
             );
         };
         my $e = $@;
-        # p $e if $e;
-        # p $success;
-        # p $bd;
         croak $e if $e;
+    }
+    #  some delimited text files
+    if (my $files = $analysis_params->{bd}{delimited_text_files}) {
+        # p $files;
+        if (!is_ref($files)) {
+            $files = [$files];
+        }
+        # p $bd_params;
+        my %in_options_hash
+            = map {$_ => $bd_params->{$_}}
+            (qw /group_columns label_columns sample_count_columns/);
 
+        #  add croaks for missing field names groups and labels
+        # p %in_options_hash;
+        my $success = eval {
+            $bd->import_data (
+                input_files => $files,
+                %in_options_hash,
+            );
+        };
+        my $e = $@;
+        # p $e;
+        croak $e if $e;
     }
 
     my $tree;
