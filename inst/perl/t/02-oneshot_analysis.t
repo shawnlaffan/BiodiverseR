@@ -27,6 +27,9 @@ my $json_tree = '{"edge":[4,5,5,4,5,1,2,3],"edge.length":["NaN",1,1,2],"Nnode":2
 my $tree = JSON::MaybeXS::decode_json ($json_tree);
 
 my %common_args = (
+    bd => {
+        params       => { name => 'blognorb', cellsizes => [ 500, 500 ] },
+    },
     analysis_config => {
         calculations => [qw /calc_endemism_central calc_pd calc_redundancy/],
     },
@@ -35,9 +38,6 @@ my %common_args = (
 
 {
     my $oneshot_data_raster = {
-        bd => {
-            params       => { name => 'blognorb', cellsizes => [ 500, 500 ] },
-        },
         raster_params => {
             files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
         },
@@ -52,12 +52,6 @@ my %common_args = (
 
 {
     my $oneshot_data = {
-        bd => {
-            params     => {
-                name                   => 'blognorb',
-                cellsizes              => [ 500, 500 ],
-            },
-        },
         shapefile_params => {
             files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
             group_field_names      => [ qw/:shape_x :shape_y/ ],
@@ -75,12 +69,6 @@ my %common_args = (
 
 {
     my $oneshot_data = {
-        bd => {
-            params     => {
-                name      => 'blognorb',
-                cellsizes => [ 500, 500 ],
-            },
-        },
         delimited_text_params => {
             files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
             group_columns        => [ 1, 2 ],
@@ -98,12 +86,6 @@ my %common_args = (
 
 {
     my $oneshot_data = {
-        bd => {
-            params     => {
-                name                   => 'blognorb',
-                cellsizes              => [ 500, 500 ],
-            },
-        },
         spreadsheet_params => {
             files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
             group_field_names      => [ qw/X Y/ ],
