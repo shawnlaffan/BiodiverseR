@@ -18,7 +18,7 @@
 #'   start_server(port=3001, use_exe=FALSE)
 #' }
 
-start_server = function(port=0, use_exe=FALSE, perl_path=""){
+start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
   process = NULL  #  silence some check warnings
   bd_base_dir = Sys.getenv("Biodiverse_basepath")
@@ -101,7 +101,7 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
         args = c("daemon", "-l", server_url)
         cmd = server_path
       }
-      message (paste (unlist (server_path, args)))
+      message (paste (unlist (cmd, server_path, args)))
 
       # message (Sys.getenv("PATH"))
 
@@ -155,18 +155,17 @@ start_server = function(port=0, use_exe=FALSE, perl_path=""){
     #  give the server a chance to get going -
     #  there must be a better way such as checking the stderr of the process
     Sys.sleep(1)
-    response = tryCatch(
-      {
+    response = tryCatch({
         httr::GET(url = server_url)
         server_running = 1
       },
       error = function (c) {
-        message(
-          sprintf(
-            "Server still coming up, trying again in 1 second (attempt %d of %d)",
-            trycount, max_tries
-          )
-        )
+        # message(
+        #   sprintf(
+        #     "Server still coming up - trying again in 1 second (attempt %d of %d)",
+        #     trycount, max_tries
+        #   )
+        # )
       },
       finally = {
         trycount = trycount + 1
