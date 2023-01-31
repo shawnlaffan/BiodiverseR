@@ -146,7 +146,7 @@ sub run_analysis ($self, $analysis_params) {
         my $table = $sp->to_table (list => $listname, symmetric => 1);
         $results{$listname} = $table;
     }
-p %results;
+# p %results;
     return \%results;
 }
 
