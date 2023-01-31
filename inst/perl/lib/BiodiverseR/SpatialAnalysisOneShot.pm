@@ -121,18 +121,18 @@ sub run_analysis ($self, $analysis_params) {
         croak $e if $e;
     }
     #  some delimited text files
-    if (my $files = $analysis_params->{bd}{delimited_text_files}) {
-        # p $files;
+    # p $analysis_params;
+    if (my $params = $analysis_params->{delimited_text_params}) {
+        # p $params;
+        my $files = $params->{files} // croak 'delimited_text_params must include an array of files';
         if (!is_ref($files)) {
             $files = [$files];
         }
-        # p $bd_params;
         my %in_options_hash
-            = map {$_ => $bd_params->{$_}}
+            = map {$_ => $params->{$_}}
             (qw /group_columns label_columns sample_count_columns/);
 
         #  add croaks for missing field names groups and labels
-        # p %in_options_hash;
         my $success = eval {
             $bd->import_data (
                 input_files => $files,
@@ -140,7 +140,6 @@ sub run_analysis ($self, $analysis_params) {
             );
         };
         my $e = $@;
-        # p $e;
         croak $e if $e;
     }
     #  some spreadsheets

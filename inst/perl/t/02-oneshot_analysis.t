@@ -77,13 +77,15 @@ my %common_args = (
     my $oneshot_data = {
         bd => {
             params     => {
-                name                 => 'blognorb',
-                cellsizes            => [ 500, 500 ],
-                group_columns        => [ 1, 2 ],
-                label_columns        => [ 4 ],
-                sample_count_columns => [ 3 ]
+                name      => 'blognorb',
+                cellsizes => [ 500, 500 ],
             },
-            delimited_text_files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
+        },
+        delimited_text_params => {
+            files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
+            group_columns        => [ 1, 2 ],
+            label_columns        => [ 4 ],
+            sample_count_columns => [ 3 ],
         },
         %common_args,
     };
