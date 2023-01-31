@@ -26,54 +26,48 @@ my $exp = {
 my $json_tree = '{"edge":[4,5,5,4,5,1,2,3],"edge.length":["NaN",1,1,2],"Nnode":2,"tip.label":["r1","r2","r3"]}';
 my $tree = JSON::MaybeXS::decode_json ($json_tree);
 
-{
-my $oneshot_data_raster = {
-  bd => {
-    params => {name => 'blognorb', cellsizes => [500,500]},
-    raster_files => ["$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif"],
-  },
-  analysis_config => {
-    calculations => ['calc_endemism_central', 'calc_pd'],
-  },
-  tree => $tree,
-};
+my %common_args = (
+    analysis_config => {
+        calculations => ['calc_endemism_central', 'calc_pd'],
+    },
+    tree => $tree,
+);
 
-my $t_msg_suffix = 'default config';
-$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data_raster)
-  ->status_is(200, "status, $t_msg_suffix")
-  ->json_is ('' => $exp, "json results, $t_msg_suffix");
+{
+    my $oneshot_data_raster = {
+        bd => {
+            params       => { name => 'blognorb', cellsizes => [ 500, 500 ] },
+            raster_files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ],
+        },
+        %common_args,
+    };
+
+    my $t_msg_suffix = 'default config';
+    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data_raster)
+        ->status_is(200, "status, $t_msg_suffix")
+        ->json_is('' => $exp, "json results, $t_msg_suffix");
 }
 
 {
-  my $oneshot_data = {
-      bd              => {
-          params       => {
-              name                   => 'blognorb',
-              cellsizes              => [ 500, 500 ],
-              group_field_names      => [ qw/:shape_x :shape_y/ ],
-              label_field_names      => [ 'label' ],
-              sample_count_col_names => => ['count']
-          },
-          shapefiles => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-      },
-      analysis_config => {
-          calculations => [ 'calc_endemism_central', 'calc_pd' ],
-      },
-      tree            => $tree,
-  };
+    my $oneshot_data = {
+        bd => {
+            params     => {
+                name                   => 'blognorb',
+                cellsizes              => [ 500, 500 ],
+                group_field_names      => [ qw/:shape_x :shape_y/ ],
+                label_field_names      => [ 'label' ],
+                sample_count_col_names => => [ 'count' ]
+            },
+            shapefiles => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
+        },
+        %common_args,
+    };
 
-say STDERR '====';
-p $oneshot_data;
-p $exp;
-say STDERR '====';
-
-  my $t_msg_suffix = 'default config';
-  $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-      ->status_is(200, "status, $t_msg_suffix")
-      ->json_is('' => $exp, "json results, $t_msg_suffix");
+    my $t_msg_suffix = 'default config';
+    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+        ->status_is(200, "status, $t_msg_suffix")
+        ->json_is('' => $exp, "json results, $t_msg_suffix");
 }
-
-
 
 
 done_testing();
