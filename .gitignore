@@ -53,3 +53,6 @@ mojo_log*.txt
 #  intellij files
 .idea
 *.iml
+
+#  perl inline files
+**/.inline/
