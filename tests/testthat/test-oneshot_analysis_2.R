@@ -1,23 +1,6 @@
 
 #complete work in progess
 test_that("R side oneshot analysis works 2", {
-    # gp_lb <- list(
-    #     "50:50" = list(label1 = 1, label2 = 1),
-    #     "150:150" = list(label1 = 1, label2 = 1)
-    # )
-    #
-    # oneshot_data <- list(
-    #     bd = list(
-    #         params = list(name = "ironman", cellsizes = list(100, 100)),
-    #         data = gp_lb
-    #     ),
-    #     analysis_config = list(
-    #         calculations = list("calc_endemism_central")
-    #     )
-    # )
-    #
-    # #might not need to do this.
-    # as_json <- jsonlite::toJSON(oneshot_data)
 
     exp <- list(
         SPATIAL_RESULTS = data.frame( # nolint
