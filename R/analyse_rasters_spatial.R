@@ -24,6 +24,7 @@ analyse_rasters_spatial = function(
     ...){
 
   stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character"))
+  stopifnot(length(raster_files) > 0) # disable when we support other files
   stopifnot(all(file.exists(raster_files)))
   stopifnot("cellsizes argument must be a numeric vector" = any(class(cellsizes)=="numeric"))
   stopifnot("cellsizes must have exactly two axes" = length(cellsizes) == 2)
