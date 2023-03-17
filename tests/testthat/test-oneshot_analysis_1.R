@@ -16,7 +16,7 @@ test_that("R side oneshot analysis works", {
 #   as_json <- jsonlite::toJSON(oneshot_data)
 
     exp <- list(
-        SPATIAL_RESULTS = list( # nolint
+        SPATIAL_RESULTS = data.frame ( # nolint
             "ELEMENT" = c("150:150", "50:50"),
             "Axis_0" = c(150, 50),
             "Axis_1" = c(150, 50),
@@ -27,7 +27,7 @@ test_that("R side oneshot analysis works", {
         )
     )
 
-    
+
 
     expect_true(analyse_rasters_spatial(c("../../inst/extdata/r1.tif"), c(100, 100)) == exp) # nolint
     #current issue is I believe we are getting a null output.
