@@ -77,7 +77,7 @@ call_bd_server = function (p = params_str_as_json) {
   # message (config)
 
   str (config)
-  message ("server process is live? ", config$process_object$is_alive())
+  message ("server process is live? ", config$server_object$is_alive())
 
   server_url = config$server_url
 
@@ -97,7 +97,7 @@ call_bd_server = function (p = params_str_as_json) {
       message("Got an error")
     }
   )
-  # message (config$process_object$read_error_lines())
+  # message (config$server_object$read_error_lines())
   # message (str(response))
   # message (response)
 
@@ -125,7 +125,7 @@ call_bd_server_w_rasters = function (p = params_str_rasters_as_json, use_exe=FAL
   # message (config)
 
   str (config)
-  message ("server process is live? ", config$process_object$is_alive())
+  message ("server process is live? ", config$server_object$is_alive())
 
   server_url = config$server_url
 
@@ -145,7 +145,7 @@ call_bd_server_w_rasters = function (p = params_str_rasters_as_json, use_exe=FAL
       message("Got an error")
     }
   )
-  # message (config$process_object$read_error_lines())
+  # message (config$server_object$read_error_lines())
   # message (str(response))
   # message (response)
 
@@ -170,9 +170,9 @@ call_bd_server_w_rasters = function (p = params_str_rasters_as_json, use_exe=FAL
 # message ("sleep now, perchance to dream")
 # Sys.sleep (5)
 # # config$process$kill()
-# config$process_object = NA
+# config$server_object = NA
 # gc()
-# # message ("live? ", config$process_object$is_alive())
+# # message ("live? ", config$server_object$is_alive())
 #
 
 

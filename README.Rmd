@@ -70,7 +70,7 @@ Sys.setenv("Biodiverse_basepath" = getwd())
 #  library(BiodiverseR)
 devtools::load_all()  #  for during development 
 cs = start_server()
-cs$process_object$is_alive()
+cs$server_object$is_alive()
 
 #  cleanup
 rm(cs)
