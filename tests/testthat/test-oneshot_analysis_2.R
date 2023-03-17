@@ -1,10 +1,10 @@
-
+library("ape")
 #complete work in progess
 test_that("R side oneshot analysis works 2", {
 
     exp <- list(
         SPATIAL_RESULTS = data.frame( # nolint
-            "ELEMENT" = c("250:250", "250:750", "750:250", "750:750"),
+
             "Axis_0" = c(250, 250, 750, 750),
             "Axis_1" = c(250, 750, 250, 750),
             "ENDC_CWE" = c(0.25, 0.25, 0.25, 0.25),
@@ -19,13 +19,20 @@ test_that("R side oneshot analysis works 2", {
             "REDUNDANCY_SET1" = c(0.99992743983553, 0.999910222647833, 0.999909793426948, 0.999885974914481) # nolint
         )
     )
+    row.names(exp$SPATIAL_RESULTS) = c("250:250", "250:750", "750:250", "750:750")
 
     rasters = normalizePath(list.files (path = "../../inst/extdata", pattern = "r[123].tif$", full.names=TRUE))
+    tree = read.nexus ("../../inst/extdata/tree.nex")
 
     #  sanity check
     expect_equal (length(rasters), 3, label='we found three rasters')
 
-    result = analyse_rasters_spatial(raster_files=rasters, cellsizes=c(100, 100))
+    result = analyse_rasters_spatial(
+      raster_files=rasters,
+      cellsizes=c(500, 500),
+      tree=tree,
+      calculations=c("calc_endemism_central", "calc_pd", "calc_redundancy")
+    )
 
-    expect_true(result == exp) # nolint
+    expect_equal(result, exp) # nolint
 })

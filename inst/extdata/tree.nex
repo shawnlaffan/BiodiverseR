@@ -1,0 +1,6 @@
+#NEXUS
+[ID: 'anonymous from R phylo JSON data']
+begin trees;
+	Tree 'anonymous from R phylo JSON data' = ((r1:1,r2:1),r3:2);
+end;
+
