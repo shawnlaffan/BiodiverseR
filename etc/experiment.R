@@ -33,7 +33,7 @@ params_str = list (
 params_str_as_json = toJSON(params_str)
 
 
-raster_files = fs::path_abs(list.files(path="./inst/perl/t/data", pattern=".tif$", full.names=TRUE))
+raster_files = fs::path_abs(list.files(path="./inst/extdata/", pattern=".tif$", full.names=TRUE))
 params_str_rasters = list (
   parameters = list (
     spatial_conditions = 'sp_self_only()',
