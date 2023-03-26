@@ -24,6 +24,7 @@ analyse_rasters_spatial = function(
     ...){
 
   stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character"))
+  stopifnot(length(raster_files) > 0) # disable when we support other files
   stopifnot(all(file.exists(raster_files)))
   stopifnot("cellsizes argument must be a numeric vector" = any(class(cellsizes)=="numeric"))
   stopifnot("cellsizes must have exactly two axes" = length(cellsizes) == 2)
@@ -44,8 +45,10 @@ analyse_rasters_spatial = function(
       spatial_conditions = 'sp_self_only()',  #  limited options for now
       calculations = calculations
     ),
+    raster_params = list(
+      files = raster_files
+    ),
     bd = list (
-      raster_files = raster_files,
       params = list (
         name = sp_output_name,
         cellsizes = cellsizes
@@ -78,6 +81,7 @@ analyse_rasters_spatial = function(
   processed_results = list()
   #  lapply? - nah.  There will never be more than ten list elements
   for (list_name in sort(names(call_results))) {
+    message ("Processing ", list_name)
     #  convert list structure to a data frame
     #  maybe the server could give a more DF-like structure,
     #  but this is already an array
