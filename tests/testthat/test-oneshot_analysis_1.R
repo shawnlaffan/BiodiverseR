@@ -1,4 +1,4 @@
-test_that("R side oneshot analysis works", {
+test_that("Analyse rasters handles JSON", {
 #    gp_lb <- c(
 #        "50:50" = c(label1 = 1, label2 = 1),
 #       "150:150" = c(label1 = 1, label2 = 1)
@@ -15,9 +15,9 @@ test_that("R side oneshot analysis works", {
 #    )
 #   as_json <- jsonlite::toJSON(oneshot_data)
 
+
     exp <- list(
-        SPATIAL_RESULTS = data.frame ( # nolint
-            "ELEMENT" = c("150:150", "50:50"),
+        SPATIAL_RESULTS = data.frame(
             "Axis_0" = c(150, 50),
             "Axis_1" = c(150, 50),
             "ENDC_CWE" = c(0.5, 0.5),
@@ -26,9 +26,14 @@ test_that("R side oneshot analysis works", {
             "ENDC_WE" = c(1, 1)
         )
     )
+    row.names(exp$SPATIAL_RESULTS) <- c("150:150", "50:50")
 
+    #make it import the right one
+    results <- analyse_all_spatial(
+        c("data_test.json"),
+        c(100, 100),
+        calculations = c("calc_endemism_central")
+    )
 
-
-    expect_true(analyse_rasters_spatial(c("../../inst/extdata/r1.tif"), c(100, 100)) == exp) # nolint
-    #current issue is I believe we are getting a null output.
+    expect_equal(results, exp)
 })

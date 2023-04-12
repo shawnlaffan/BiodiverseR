@@ -92,15 +92,15 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
       if (running_on_windows) {
         args = c(server_path, "daemon", "-l", server_url)
-        cmd = ifelse(is.null(perl_path) || perl_path == "", "perl", perl_path)
+        cmd = ifelse(is.null(perl_path), "perl", perl_path)
         if (path_extras != "") {
           Sys.setenv("PATH" = sprintf("%s;%s", path_extras, Sys.getenv("PATH")))
         }
       }
       else {
-        args = c("daemon", "-l", server_url)
-        cmd = server_path
-      }
+        args = c(server_path, "daemon", "-l", server_url)
+        cmd = "perl"
+    }
       message (paste (unlist (cmd, server_path, args)))
 
       # message (Sys.getenv("PATH"))

@@ -1,5 +1,4 @@
 library("ape")
-#complete work in progess
 
 test_that("R side oneshot analysis works 2 no tree", {
 
@@ -16,18 +15,19 @@ test_that("R side oneshot analysis works 2 no tree", {
       "REDUNDANCY_SET1" = c(0.99992743983553, 0.999910222647833, 0.999909793426948, 0.999885974914481) # nolint
     )
   )
-  row.names(exp$SPATIAL_RESULTS) = c("250:250", "250:750", "750:250", "750:750")
+  row.names(exp$SPATIAL_RESULTS) <- c("250:250", "250:750", "750:250", "750:750") # nolint
 
-  rasters = normalizePath(list.files (path = "../../inst/extdata", pattern = "r[123].tif$", full.names=TRUE))
+  #get raster files
+  rasters = normalizePath(list.files (path = "../../inst/extdata", pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
   #  sanity check
-  expect_equal (length(rasters), 3, label='we found three rasters')
+  expect_equal(length(rasters), 3, label='we found three rasters')
 
-  result = analyse_rasters_spatial(
-    raster_files=rasters,
-    cellsizes=c(500, 500),
+  result <- analyse_rasters_spatial(
+    raster_files = rasters,
+    cellsizes = c(500, 500),
     # calc_pd should not be run as we have no tree
-    calculations=c("calc_endemism_central", "calc_pd", "calc_redundancy")
+    calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
   )
 
   expect_equal(result, exp) # nolint
