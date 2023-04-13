@@ -16,15 +16,16 @@
 #'   )
 #' }
 
-analyse_all_spatial = function(
-    raster_files, cellsizes,
+analyse_all_spatial <- function(
+    r_data, cellsizes,
     calculations = c("calc_richness", "calc_endemism_central"),
     tree = NULL,
     ...) {
 
-  stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character")) # nolint
+  #tests that are raster specific
+  #stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character")) # nolint
   #stopifnot(length(raster_files) > 0) # disable when we support other files # nolint
-  stopifnot(all(file.exists(raster_files))) # nolint
+  #stopifnot(all(file.exists(raster_files))) # nolint
   stopifnot("cellsizes argument must be a numeric vector" = any(class(cellsizes)=="numeric")) # nolint
   stopifnot("cellsizes must have exactly two axes" = length(cellsizes) == 2)
 
@@ -46,14 +47,15 @@ analyse_all_spatial = function(
       spatial_conditions = "sp_self_only()",  #  limited options for now
       calculations = calculations
     ),
-    raster_params = list(
-      files = raster_files
-    ),
+    #raster_params = list(
+    #  files = raster_files # nolint
+    #),
     bd = list(
       params = list(
         name = sp_output_name,
         cellsizes = cellsizes
-      )
+      ),
+      data = r_data
     ),
     tree = tree
   )
@@ -64,6 +66,7 @@ analyse_all_spatial = function(
 
   message(target_url)
   message("Posting data ", params_as_json)
+  message
   response <- httr::POST(
     url = target_url,
     body = params_as_json,

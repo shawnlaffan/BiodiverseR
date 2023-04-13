@@ -1,20 +1,18 @@
 test_that("Analyse rasters handles JSON", {
-#    gp_lb <- c(
-#        "50:50" = c(label1 = 1, label2 = 1),
-#       "150:150" = c(label1 = 1, label2 = 1)
-#   )
+   gp_lb <- list(
+       "50:50" = list(label1 = 1, label2 = 1), # nolint
+      "150:150" = list(label1 = 1, label2 = 1) # nolint
+  )
 
-#    oneshot_data <- c(
-#        bd = c(
-#            params = c(name = "ironman", cellsizes = c(100, 100)),
-#            data = gp_lb
-#        ),
-#        analysis_config = c(
-#            calculations = c("calc_endemism_central")
-#        )
-#    )
-#   as_json <- jsonlite::toJSON(oneshot_data)
-
+   oneshot_data <- list(
+       bd = list(
+           params = list(name = "ironman", cellsizes = list(100, 100)),
+           data = gp_lb
+       ),
+       analysis_config = list(
+           calculations = list("calc_endemism_central")
+       )
+   )
 
     exp <- list(
         SPATIAL_RESULTS = data.frame(
@@ -30,7 +28,7 @@ test_that("Analyse rasters handles JSON", {
 
     #make it import the right one
     results <- analyse_all_spatial(
-        c("data_test.json"),
+        oneshot_data,
         c(100, 100),
         calculations = c("calc_endemism_central")
     )
