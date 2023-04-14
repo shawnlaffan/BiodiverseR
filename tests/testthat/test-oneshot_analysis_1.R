@@ -4,16 +4,6 @@ test_that("Analyse rasters handles JSON", {
       "150:150" = list(label1 = 1, label2 = 1) # nolint
   )
 
-   oneshot_data <- list(
-       bd = list(
-           params = list(name = "ironman", cellsizes = list(100, 100)),
-           data = gp_lb
-       ),
-       analysis_config = list(
-           calculations = list("calc_endemism_central")
-       )
-   )
-
     exp <- list(
         SPATIAL_RESULTS = data.frame(
             "Axis_0" = c(150, 50),
@@ -26,9 +16,8 @@ test_that("Analyse rasters handles JSON", {
     )
     row.names(exp$SPATIAL_RESULTS) <- c("150:150", "50:50")
 
-    #make it import the right one
     results <- analyse_all_spatial(
-        oneshot_data,
+        gp_lb,
         c(100, 100),
         calculations = c("calc_endemism_central")
     )

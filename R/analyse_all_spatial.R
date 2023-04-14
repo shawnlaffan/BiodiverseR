@@ -47,9 +47,6 @@ analyse_all_spatial <- function(
       spatial_conditions = "sp_self_only()",  #  limited options for now
       calculations = calculations
     ),
-    #raster_params = list(
-    #  files = raster_files # nolint
-    #),
     bd = list(
       params = list(
         name = sp_output_name,
@@ -85,8 +82,7 @@ analyse_all_spatial <- function(
   #  convert list structure to a data frame
   #  maybe the server could give a more DF-like structure,
   #  but this is already an array
-  message("Examining the call results")
-  utils::str(call_results)
+
 
   for (list_name in sort(names(call_results))) {
     #Spatial results is the only result in our test case. Which contains a list of expected stuff # nolint
