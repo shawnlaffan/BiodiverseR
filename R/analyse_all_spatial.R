@@ -17,7 +17,9 @@
 #' }
 
 analyse_all_spatial <- function(
-    r_data, cellsizes,
+    raster_files = NULL,
+    r_data = NULL,
+    cellsizes,
     calculations = c("calc_richness", "calc_endemism_central"),
     tree = NULL,
     ...) {
@@ -46,6 +48,9 @@ analyse_all_spatial <- function(
     analysis_config = list(
       spatial_conditions = "sp_self_only()",  #  limited options for now
       calculations = calculations
+    ),
+    raster_params = list(
+      files = raster_files
     ),
     bd = list(
       params = list(

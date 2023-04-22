@@ -74,9 +74,12 @@ sub run_analysis ($self, $analysis_params) {
         };
         croak $@ if $@;
     }
-    #  need to import some rasters
-    if (my $params = $analysis_params->{raster_params}) {
-        # p $params;
+
+    
+
+    #need to check if files in the raster exist
+    if ($analysis_params->{raster_params}->{files}) {
+        my $params = $analysis_params->{raster_params};
         my $files = $params->{files} // croak 'raster_params must include an array of files';
         if (!is_ref($files)) {
             $files = [$files];

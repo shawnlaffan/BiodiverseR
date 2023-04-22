@@ -1,10 +1,11 @@
-test_that("Analyse rasters handles JSON", {
+test_that("Analyse rasters handles JSON and rasterfiles", {
    gp_lb <- list(
        "50:50" = list(label1 = 1, label2 = 1), # nolint
       "150:150" = list(label1 = 1, label2 = 1) # nolint
   )
 
     exp <- list(
+        #this data is currently random
         SPATIAL_RESULTS = data.frame(
             "Axis_0" = c(150, 50),
             "Axis_1" = c(150, 50),
@@ -16,7 +17,10 @@ test_that("Analyse rasters handles JSON", {
     )
     row.names(exp$SPATIAL_RESULTS) <- c("150:150", "50:50")
 
+    rasters = normalizePath(list.files (path = "../../inst/extdata", pattern = "r[123].tif$", full.names=TRUE)) # nolint
+
     results <- analyse_all_spatial(
+        raster_files = rasters,
         r_data = gp_lb,
         cellsizes = c(100, 100),
         calculations = c("calc_endemism_central")

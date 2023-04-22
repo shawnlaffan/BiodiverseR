@@ -61,11 +61,11 @@ test_that("R side oneshot analysis works 2 with tree", {
     #  sanity check
     expect_equal (length(rasters), 3, label='we found three rasters')
 
-    result = analyse_rasters_spatial(
+    result = analyse_all_spatial(
       raster_files=rasters,
       cellsizes=c(500, 500),
-      tree=tree,
-      calculations=c("calc_endemism_central", "calc_pd", "calc_redundancy")
+      calculations=c("calc_endemism_central", "calc_pd", "calc_redundancy"),
+      tree=tree
     )
 
     expect_equal(result, exp) # nolint
