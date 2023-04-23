@@ -146,7 +146,8 @@ sub run_analysis ($self, $analysis_params) {
         croak $e if $e;
     }
     #  some spreadsheets
-    if (my $params = $analysis_params->{spreadsheet_params}) {
+    if ($analysis_params->{spreadsheet_params}->{files}) {
+        my $params = $analysis_params->{spreadsheet_params};
         # p $files;
         my $files = $params->{files} // croak 'spreadsheet_params must include an array of files';
         if (!is_ref($files)) {

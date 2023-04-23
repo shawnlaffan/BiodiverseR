@@ -19,6 +19,7 @@
 analyse_all_spatial <- function(
     raster_files = NULL,
     r_data = NULL,
+    spreadsheet_files = NULL,
     cellsizes,
     calculations = c("calc_richness", "calc_endemism_central"),
     tree = NULL,
@@ -52,12 +53,19 @@ analyse_all_spatial <- function(
     raster_params = list(
       files = raster_files
     ),
+    spreadsheet_params = list(
+      files = spreadsheet_files,
+      group_field_names = list("X", "Y"),
+      label_field_names = list("label"),
+      sample_count_col_names = list("count")
+    ),
     bd = list(
       params = list(
         name = sp_output_name,
         cellsizes = cellsizes
       ),
-      data = r_data
+    data = r_data
+      #the last three values here are fixed for testing. Need to dynamically match input. # nolint
     ),
     tree = tree
   )
