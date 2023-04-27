@@ -20,16 +20,27 @@ analyse_all_spatial <- function(
     raster_files = NULL,
     r_data = NULL,
     spreadsheet_files = NULL,
+    delimited_text_files = NULL,
+    shapefiles = NULL,
+    spreadsheet_group_columns = NULL,
+    spreadsheet_label_columns = NULL,
+    spreadsheet_sample_count_columns = NULL, # nolint
+    shapefile_group_columns = NULL,
+    shapefile_label_columns = NULL,
+    shapefile_sample_count_columns = NULL,
+    delim_group_columns = NULL,
+    delim_label_columns = NULL,
+    delim_sample_count_columns = NULL,
     cellsizes,
     calculations = c("calc_richness", "calc_endemism_central"),
     tree = NULL,
     ...) {
 
-  #tests that are raster specific
+  #tests that were raster specific, and now removed
   #stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character")) # nolint
   #stopifnot(length(raster_files) > 0) # disable when we support other files # nolint
   #stopifnot(all(file.exists(raster_files))) # nolint
-  stopifnot("cellsizes argument must be a numeric vector" = any(class(cellsizes)=="numeric")) # nolint
+  stopifnot("cellsizes argument must be a numeric vector" = any(class(cellsizes) == "numeric")) # nolint
   stopifnot("cellsizes must have exactly two axes" = length(cellsizes) == 2)
 
   if (!is.null(tree)) {
@@ -38,8 +49,7 @@ analyse_all_spatial <- function(
 
   config <- start_server(...)
 
-  #print out config
-  #utils::str(config) I don't need this for my debugging currently
+  #prints out config, used for debugging
   message("server process is live? ", config$server_object$is_alive())
   stopifnot(config$server_object$is_alive())  #  need a better error
 
@@ -55,9 +65,21 @@ analyse_all_spatial <- function(
     ),
     spreadsheet_params = list(
       files = spreadsheet_files,
-      group_field_names = list("X", "Y"),
-      label_field_names = list("label"),
-      sample_count_col_names = list("count")
+      group_field_names = spreadsheet_group_columns,
+      label_field_names = spreadsheet_label_columns,
+      sample_count_col_names = spreadsheet_sample_count_columns
+    ),
+    delimited_text_params = list(
+      files = delimited_text_files,
+      group_columns = delim_group_columns,
+      label_columns = delim_label_columns,
+      sample_count_columns = delim_sample_count_columns
+    ),
+    shapefile_params = list(
+      files = shapefiles,
+      group_field_names = shapefile_group_columns,
+      label_field_names = shapefile_label_columns,
+      sample_count_col_names = shapefile_sample_count_columns
     ),
     bd = list(
       params = list(
@@ -65,7 +87,6 @@ analyse_all_spatial <- function(
         cellsizes = cellsizes
       ),
     data = r_data
-      #the last three values here are fixed for testing. Need to dynamically match input. # nolint
     ),
     tree = tree
   )
@@ -74,9 +95,10 @@ analyse_all_spatial <- function(
 
   target_url <- paste0(config$server_url, "/analysis_spatial_oneshot")
 
+  #more debugging
   message(target_url)
   message("Posting data ", params_as_json)
-  message
+
   response <- httr::POST(
     url = target_url,
     body = params_as_json,
@@ -95,8 +117,6 @@ analyse_all_spatial <- function(
   #  convert list structure to a data frame
   #  maybe the server could give a more DF-like structure,
   #  but this is already an array
-
-
   for (list_name in sort(names(call_results))) {
     #Spatial results is the only result in our test case. Which contains a list of expected stuff # nolint
     message("Processing ", list_name)

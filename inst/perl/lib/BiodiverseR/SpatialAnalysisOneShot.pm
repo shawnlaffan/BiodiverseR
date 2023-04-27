@@ -102,7 +102,8 @@ sub run_analysis ($self, $analysis_params) {
     }
 
     #  some shapefiles
-    if (my $params = $analysis_params->{shapefile_params}) {
+    if (my $params = $analysis_params->{shapefile_params}->{files}) {
+        my $params = $analysis_params->{shapefile_params};
         # p $params;
         my $files = $params->{files} // croak 'shapefile_params must include an array of files';
         if (!is_ref($files)) {
@@ -125,7 +126,8 @@ sub run_analysis ($self, $analysis_params) {
     }
     #  some delimited text files
     # p $analysis_params;
-    if (my $params = $analysis_params->{delimited_text_params}) {
+    if (my $params = $analysis_params->{delimited_text_params}->{files}) {
+        my $params = $analysis_params->{delimited_text_params};
         # p $params;
         my $files = $params->{files} // croak 'delimited_text_params must include an array of files';
         if (!is_ref($files)) {
