@@ -16,21 +16,26 @@
 #'   )
 #' }
 
+convert_to_params <- function(list) {
+  if (!is.null(list)) {
+    #Check if the first file passed in is a delimited text file
+    if (grepl(".csv", list[[1]][[1]])) {
+      #format for delimited text files
+      return(list(files = list[[1]], group_columns = list[[2]], label_columns = list[[3]], sample_count_columns = list[[4]])) # nolint
+    } else {
+      #format for shapefiles and spreadsheets
+      return(list(files = list[[1]], group_field_names = list[[2]], label_field_names = list[[3]], sample_count_col_names = list[[4]])) # nolint
+    }
+  }
+}
+
+#format for data is list(list(files), list(group_columns), list(label_columns), list(sample_count_columns)) # nolint
 analyse_all_spatial <- function(
     raster_files = NULL,
     r_data = NULL,
-    spreadsheet_files = NULL,
-    delimited_text_files = NULL,
-    shapefiles = NULL,
-    spreadsheet_group_columns = NULL,
-    spreadsheet_label_columns = NULL,
-    spreadsheet_sample_count_columns = NULL, # nolint
-    shapefile_group_columns = NULL,
-    shapefile_label_columns = NULL,
-    shapefile_sample_count_columns = NULL,
-    delim_group_columns = NULL,
-    delim_label_columns = NULL,
-    delim_sample_count_columns = NULL,
+    spreadsheets_data = NULL,
+    delimited_text_files_data = NULL,
+    shapefiles_data = NULL,
     cellsizes,
     calculations = c("calc_richness", "calc_endemism_central"),
     tree = NULL,
@@ -54,6 +59,29 @@ analyse_all_spatial <- function(
   stopifnot(config$server_object$is_alive())  #  need a better error
 
   #  unique-ish name that is human readable
+  #What origonal data looked like.
+      # delimited_text_params = list(
+    #   files = delimited_text_files,
+    #   group_columns = delim_group_columns,
+    #   label_columns = delim_label_columns,
+    #   sample_count_columns = delim_sample_count_columns
+    # ),
+
+  # spreadsheet_params = list(
+  #     files = spreadsheet_files,
+  #     group_field_names = spreadsheet_group_columns,
+  #     label_field_names = spreadsheet_label_columns,
+  #     sample_count_col_names = spreadsheet_sample_count_columns
+  #   ),
+  #delimited_text_params = testing_val,
+
+  # shapefile_params = list(
+  #     files = shapefiles,
+  #     group_field_names = shapefile_group_columns,
+  #     label_field_names = shapefile_label_columns,
+  #     sample_count_col_names = shapefile_sample_count_columns
+  #   ),
+
   sp_output_name <- paste("BiodiversR_analyse_rasters_spatial", Sys.time())
   params <- list(
     analysis_config = list(
@@ -63,24 +91,9 @@ analyse_all_spatial <- function(
     raster_params = list(
       files = raster_files
     ),
-    spreadsheet_params = list(
-      files = spreadsheet_files,
-      group_field_names = spreadsheet_group_columns,
-      label_field_names = spreadsheet_label_columns,
-      sample_count_col_names = spreadsheet_sample_count_columns
-    ),
-    delimited_text_params = list(
-      files = delimited_text_files,
-      group_columns = delim_group_columns,
-      label_columns = delim_label_columns,
-      sample_count_columns = delim_sample_count_columns
-    ),
-    shapefile_params = list(
-      files = shapefiles,
-      group_field_names = shapefile_group_columns,
-      label_field_names = shapefile_label_columns,
-      sample_count_col_names = shapefile_sample_count_columns
-    ),
+    spreadsheet_params = convert_to_params(spreadsheets_data),
+    delimited_text_params = convert_to_params(delimited_text_files_data),
+    shapefile_params = convert_to_params(shapefiles_data),
     bd = list(
       params = list(
         name = sp_output_name,
@@ -92,12 +105,7 @@ analyse_all_spatial <- function(
   )
   params_as_json <- rjson::toJSON(params)
 
-
   target_url <- paste0(config$server_url, "/analysis_spatial_oneshot")
-
-  #more debugging
-  message(target_url)
-  message("Posting data ", params_as_json)
 
   response <- httr::POST(
     url = target_url,
@@ -112,7 +120,6 @@ analyse_all_spatial <- function(
   config$server_object$kill()
 
   processed_results <- list()
-
   #apply? - nah.  There will never be more than ten list elements
   #  convert list structure to a data frame
   #  maybe the server could give a more DF-like structure,

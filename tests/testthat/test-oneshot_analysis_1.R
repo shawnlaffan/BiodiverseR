@@ -48,11 +48,8 @@ test_that("Oneshot analysis handles spreadsheets", {
   expect_equal(length(spreadsheets), 3, label = "we found three spreadsheets")
 
   result <- analyse_all_spatial(
-    spreadsheet_files = spreadsheets,
+    spreadsheets_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
     cellsizes = c(500, 500),
-    spreadsheet_group_columns = list("X", "Y"),
-    spreadsheet_label_columns = list("label"),
-    spreadsheet_sample_count_columns = list("count"),
     # calc_pd should not be run as we have no tree
     calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
   )
@@ -83,14 +80,12 @@ test_that("Oneshot analysis handles demilimited text files", {
   expect_equal(length(delim_files), 3, label = "we found three delimited text files") # nolint
 
   result <- analyse_all_spatial(
-    delimited_text_files = delim_files,
-    cellsizes = c(500, 500),
-    delim_group_columns = list(1, 2),
-    delim_label_columns = list(4),
-    delim_sample_count_columns = list(3),
+  delimited_text_files_data = list(delim_files, list(1, 2), list(4), list(3)),
+  cellsizes = c(500, 500),
     # calc_pd should not be run as we have no tree
-    calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
+  calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
   )
+
   expect_equal(result, exp)
 })
 
@@ -118,11 +113,8 @@ test_that("Oneshot analysis handles shapefiles", {
   expect_equal(length(shape_files), 3, label = "we found three shapefiles") # nolint
 
   result <- analyse_all_spatial(
-    shapefiles = shape_files,
+    shapefiles_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
     cellsizes = c(500, 500),
-    shapefile_group_columns = list(":shape_x", ":shape_y"),
-    shapefile_label_columns = list("label"),
-    shapefile_sample_count_columns = list("count"),
     # calc_pd should not be run as we have no tree
     calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
   )
