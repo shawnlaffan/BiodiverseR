@@ -1,5 +1,7 @@
 library("ape")
 
+file_path <- "../../inst/extdata"
+
 test_that("R side oneshot analysis works 2 no tree", {
 
   exp <- list(
@@ -18,7 +20,7 @@ test_that("R side oneshot analysis works 2 no tree", {
   row.names(exp$SPATIAL_RESULTS) <- c("250:250", "250:750", "750:250", "750:750") # nolint
 
   #get raster files
-  rasters = normalizePath(list.files (path = "../../inst/extdata", pattern = "r[123].tif$", full.names=TRUE)) # nolint
+  rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
   #  sanity check
   expect_equal(length(rasters), 3, label='we found three rasters')
@@ -55,8 +57,8 @@ test_that("R side oneshot analysis works 2 with tree", {
     )
     row.names(exp$SPATIAL_RESULTS) = c("250:250", "250:750", "750:250", "750:750")
 
-    rasters = normalizePath(list.files (path = "../../inst/extdata", pattern = "r[123].tif$", full.names=TRUE))
-    tree = read.nexus ("../../inst/extdata/tree.nex")
+    rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE))
+    tree <- read.nexus("../../inst/extdata/tree.nex")
 
     #  sanity check
     expect_equal (length(rasters), 3, label='we found three rasters')
@@ -69,4 +71,30 @@ test_that("R side oneshot analysis works 2 with tree", {
     )
 
     expect_equal(result, exp) # nolint
+})
+
+test_that("Analyse all files and tree", {
+   gp_lb <- list(
+        "50:50" = list(label1 = 1, label2 = 1), # nolint
+        "150:150" = list(label1 = 1, label2 = 1) # nolint
+  )
+
+    spreadsheets = normalizePath(list.files (path = file_path, pattern = "r[123].xlsx$", full.names=TRUE)) # nolint
+    delim_files = normalizePath(list.files (path = file_path, pattern = "r[123].csv$", full.names=TRUE)) # nolint
+    shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
+    rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
+
+    tree <- read.nexus("../../inst/extdata/tree.nex")
+    #since exp is random expect equal is false. Test for errors
+    expect_no_error(
+        analyse_all_spatial(
+            r_data = gp_lb,
+            raster_files = rasters,
+            spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
+            delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
+            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
+            cellsizes = c(100, 100),
+            calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
+            tree = tree
+        ), message = "analyse_all_spatial should not throw an error")
 })

@@ -33,9 +33,9 @@ convert_to_params <- function(list) {
 analyse_all_spatial <- function(
     raster_files = NULL,
     r_data = NULL,
-    spreadsheets_data = NULL,
-    delimited_text_files_data = NULL,
-    shapefiles_data = NULL,
+    spreadsheet_data = NULL,
+    delimited_text_file_data = NULL,
+    shapefile_data = NULL,
     cellsizes,
     calculations = c("calc_richness", "calc_endemism_central"),
     tree = NULL,
@@ -91,9 +91,9 @@ analyse_all_spatial <- function(
     raster_params = list(
       files = raster_files
     ),
-    spreadsheet_params = convert_to_params(spreadsheets_data),
-    delimited_text_params = convert_to_params(delimited_text_files_data),
-    shapefile_params = convert_to_params(shapefiles_data),
+    spreadsheet_params = convert_to_params(spreadsheet_data),
+    delimited_text_params = convert_to_params(delimited_text_file_data),
+    shapefile_params = convert_to_params(shapefile_data),
     bd = list(
       params = list(
         name = sp_output_name,

@@ -1,5 +1,7 @@
 library("ape")
 
+file_path <- "../../inst/extdata"
+
 test_that("Analyse rasters handles JSON", {
     gp_lb <- list(
        "50:50" = list(label1 = 1, label2 = 1), # nolint
@@ -42,13 +44,13 @@ test_that("Oneshot analysis handles spreadsheets", {
   row.names(exp$SPATIAL_RESULTS) <- c("250:250", "250:750", "750:250", "750:750") # nolint
 
   #get files
-  spreadsheets = normalizePath(list.files (path = "../../inst/extdata", pattern = "r[123].xlsx$", full.names=TRUE)) # nolint
+  spreadsheets = normalizePath(list.files (path = file_path, pattern = "r[123].xlsx$", full.names=TRUE)) # nolint
 
   #sanity check
   expect_equal(length(spreadsheets), 3, label = "we found three spreadsheets")
 
   result <- analyse_all_spatial(
-    spreadsheets_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
+    spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
     cellsizes = c(500, 500),
     # calc_pd should not be run as we have no tree
     calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
@@ -74,13 +76,13 @@ test_that("Oneshot analysis handles demilimited text files", {
   row.names(exp$SPATIAL_RESULTS) <- c("250:250", "250:750", "750:250", "750:750") # nolint
 
   #get files
-  delim_files = normalizePath(list.files (path = "../../inst/extdata", pattern = "r[123].csv$", full.names=TRUE)) # nolint
+  delim_files = normalizePath(list.files (path = file_path, pattern = "r[123].csv$", full.names=TRUE)) # nolint
 
   #  sanity check
   expect_equal(length(delim_files), 3, label = "we found three delimited text files") # nolint
 
   result <- analyse_all_spatial(
-  delimited_text_files_data = list(delim_files, list(1, 2), list(4), list(3)),
+  delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)),
   cellsizes = c(500, 500),
     # calc_pd should not be run as we have no tree
   calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
@@ -107,13 +109,13 @@ test_that("Oneshot analysis handles shapefiles", {
   row.names(exp$SPATIAL_RESULTS) <- c("250:250", "250:750", "750:250", "750:750") # nolint
 
   #get files
-  shape_files = normalizePath(list.files(path = "../../inst/extdata", pattern = "r[123].shp$", full.names=TRUE)) # nolint
+  shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
 
   #  sanity check
   expect_equal(length(shape_files), 3, label = "we found three shapefiles") # nolint
 
   result <- analyse_all_spatial(
-    shapefiles_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
+    shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
     cellsizes = c(500, 500),
     # calc_pd should not be run as we have no tree
     calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
