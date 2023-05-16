@@ -85,7 +85,8 @@ test_that("Analyse all files and tree", {
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
     tree <- read.nexus("../../inst/extdata/tree.nex")
-    #since exp is random expect equal is false. Test for errors
+    
+    #since exp is random expect equal is false. Tests for errors
     expect_no_error(
         analyse_all_spatial(
             r_data = gp_lb,

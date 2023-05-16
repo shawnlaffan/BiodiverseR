@@ -84,7 +84,6 @@ test_that("Oneshot analysis handles demilimited text files", {
   result <- analyse_all_spatial(
   delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)),
   cellsizes = c(500, 500),
-    # calc_pd should not be run as we have no tree
   calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
   )
 
@@ -117,7 +116,6 @@ test_that("Oneshot analysis handles shapefiles", {
   result <- analyse_all_spatial(
     shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
     cellsizes = c(500, 500),
-    # calc_pd should not be run as we have no tree
     calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy")
   )
   expect_equal(result, exp)

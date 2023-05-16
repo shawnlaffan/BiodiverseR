@@ -18,13 +18,13 @@
 
 convert_to_params <- function(list) {
   if (!is.null(list)) {
-    #Check if the first file passed in is a delimited text file
-    if (grepl(".csv", list[[1]][[1]])) {
-      #format for delimited text files
-      return(list(files = list[[1]], group_columns = list[[2]], label_columns = list[[3]], sample_count_columns = list[[4]])) # nolint
-    } else {
+    #Check if the first file passed in is a shapefile or spreadsheet
+    if (grepl(".shp", list[[1]][[1]]) || grepl(".xlsx", list[[1]][[1]]) || grepl(".xls", list[[1]][[1]]) || grepl(".ods", list[[1]][[1]]) || grepl(".sxc", list[[1]][[1]])) { #nolint
       #format for shapefiles and spreadsheets
       return(list(files = list[[1]], group_field_names = list[[2]], label_field_names = list[[3]], sample_count_col_names = list[[4]])) # nolint
+    } else {
+      #format for delimited text files
+      return(list(files = list[[1]], group_columns = list[[2]], label_columns = list[[3]], sample_count_columns = list[[4]])) # nolint
     }
   }
 }
@@ -41,10 +41,6 @@ analyse_all_spatial <- function(
     tree = NULL,
     ...) {
 
-  #tests that were raster specific, and now removed
-  #stopifnot("raster_files argument must be a character vector" = any(class(raster_files)=="character")) # nolint
-  #stopifnot(length(raster_files) > 0) # disable when we support other files # nolint
-  #stopifnot(all(file.exists(raster_files))) # nolint
   stopifnot("cellsizes argument must be a numeric vector" = any(class(cellsizes) == "numeric")) # nolint
   stopifnot("cellsizes must have exactly two axes" = length(cellsizes) == 2)
 
@@ -59,29 +55,6 @@ analyse_all_spatial <- function(
   stopifnot(config$server_object$is_alive())  #  need a better error
 
   #  unique-ish name that is human readable
-  #What origonal data looked like.
-      # delimited_text_params = list(
-    #   files = delimited_text_files,
-    #   group_columns = delim_group_columns,
-    #   label_columns = delim_label_columns,
-    #   sample_count_columns = delim_sample_count_columns
-    # ),
-
-  # spreadsheet_params = list(
-  #     files = spreadsheet_files,
-  #     group_field_names = spreadsheet_group_columns,
-  #     label_field_names = spreadsheet_label_columns,
-  #     sample_count_col_names = spreadsheet_sample_count_columns
-  #   ),
-  #delimited_text_params = testing_val,
-
-  # shapefile_params = list(
-  #     files = shapefiles,
-  #     group_field_names = shapefile_group_columns,
-  #     label_field_names = shapefile_label_columns,
-  #     sample_count_col_names = shapefile_sample_count_columns
-  #   ),
-
   sp_output_name <- paste("BiodiversR_analyse_rasters_spatial", Sys.time())
   params <- list(
     analysis_config = list(

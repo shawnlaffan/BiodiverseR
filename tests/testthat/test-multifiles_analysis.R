@@ -8,7 +8,7 @@ test_that("Analyse rasters handles JSON and rasterfiles", {
 
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
-    #since exp is random expect equal is false. Test for errors
+    #tests for no errors, not for correct output
     expect_no_error(
         analyse_all_spatial(
             raster_files = rasters,
@@ -27,7 +27,6 @@ test_that("Analyse rasters handles JSON, raster and spreadsheets", {
     spreadsheets = normalizePath(list.files (path = file_path, pattern = "r[123].xlsx$", full.names=TRUE)) # nolint
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
-    #since exp is random expect equal is false. Test for errors
     expect_no_error(
         analyse_all_spatial(
             r_data = gp_lb,
@@ -47,7 +46,6 @@ test_that("Analyse rasters handles JSON, raster and delim files", {
     delim_files = normalizePath(list.files (path = file_path, pattern = "r[123].csv$", full.names=TRUE)) # nolint
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
-    #since exp is random expect equal is false. Test for errors
     expect_no_error(
         analyse_all_spatial(
             r_data = gp_lb,
@@ -67,7 +65,6 @@ test_that("Analyse rasters handles JSON, raster and shapefiles", {
     shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
-    #since exp is random expect equal is false. Test for errors
     expect_no_error(
         analyse_all_spatial(
             r_data = gp_lb,
@@ -88,7 +85,6 @@ test_that("Analyse rasters handles spreadsheet, delim and shapefiles", {
     delim_files = normalizePath(list.files (path = file_path, pattern = "r[123].csv$", full.names=TRUE)) # nolint
     shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
 
-    #since exp is random expect equal is false. Test for errors
     expect_no_error(
         analyse_all_spatial(
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
@@ -109,7 +105,7 @@ test_that("Analyse all files", {
     delim_files = normalizePath(list.files (path = file_path, pattern = "r[123].csv$", full.names=TRUE)) # nolint
     shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
-    #since exp is random expect equal is false. Test for errors
+
     expect_no_error(
         analyse_all_spatial(
             r_data = gp_lb,
