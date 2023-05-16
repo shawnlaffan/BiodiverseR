@@ -18,8 +18,17 @@
 
 convert_to_params <- function(list) {
   if (!is.null(list)) {
+
     #Check if the first file passed in is a shapefile or spreadsheet
-    if (grepl(".shp", list[[1]][[1]]) || grepl(".xlsx", list[[1]][[1]]) || grepl(".xls", list[[1]][[1]]) || grepl(".ods", list[[1]][[1]]) || grepl(".sxc", list[[1]][[1]])) { #nolint
+    file_ends <- list(".shp", ".xlsx", ".xls", ".ods", ".sxc")
+    flag <- FALSE
+    for (i in seq(1, length(file_ends))) {
+      if (grepl(file_ends[i], list[[1]][[1]])) {
+        flag <- TRUE
+      }
+    }
+
+    if (flag) {
       #format for shapefiles and spreadsheets
       return(list(files = list[[1]], group_field_names = list[[2]], label_field_names = list[[3]], sample_count_col_names = list[[4]])) # nolint
     } else {
