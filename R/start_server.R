@@ -179,4 +179,3 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
   return(config)
 }
-

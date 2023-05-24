@@ -39,7 +39,7 @@ convert_to_params <- function(list) {
 }
 
 #format for data is list(list(files), list(group_columns), list(label_columns), list(sample_count_columns)) # nolint
-analyse_all_spatial <- function(
+analyse_oneshot_spatial <- function(
     raster_files = NULL,
     r_data = NULL,
     spreadsheet_data = NULL,

@@ -10,12 +10,12 @@ test_that("Analyse rasters handles JSON and rasterfiles", {
 
     #tests for no errors, not for correct output
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             raster_files = rasters,
             r_data = gp_lb,
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central")
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles JSON and spreadsheets", {
@@ -27,12 +27,12 @@ test_that("Analyse rasters handles JSON and spreadsheets", {
     spreadsheets = normalizePath(list.files (path = file_path, pattern = "r[123].xlsx$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             r_data = gp_lb,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles JSON and delim files", {
@@ -44,12 +44,12 @@ test_that("Analyse rasters handles JSON and delim files", {
     delim_files = normalizePath(list.files (path = file_path, pattern = "r[123].csv$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             r_data = gp_lb,
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles JSON and shapefiles", {
@@ -61,12 +61,12 @@ test_that("Analyse rasters handles JSON and shapefiles", {
     shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             r_data = gp_lb,
             shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles JSON, raster and spreadsheets", {
@@ -79,13 +79,13 @@ test_that("Analyse rasters handles JSON, raster and spreadsheets", {
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             r_data = gp_lb,
             raster_files = rasters,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles JSON, raster and delim files", {
@@ -98,13 +98,13 @@ test_that("Analyse rasters handles JSON, raster and delim files", {
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             r_data = gp_lb,
             raster_files = rasters,
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles JSON, raster and shapefiles", {
@@ -117,13 +117,13 @@ test_that("Analyse rasters handles JSON, raster and shapefiles", {
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             r_data = gp_lb,
             raster_files = rasters,
             shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles spreadsheet and shapefiles", {
@@ -132,12 +132,12 @@ test_that("Analyse rasters handles spreadsheet and shapefiles", {
     shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles delim and shapefiles", {
@@ -146,12 +146,12 @@ test_that("Analyse rasters handles delim and shapefiles", {
     shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
             shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles spreadsheet and delim", {
@@ -160,12 +160,12 @@ test_that("Analyse rasters handles spreadsheet and delim", {
     delim_files = normalizePath(list.files (path = file_path, pattern = "r[123].csv$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles spreadsheet, delim and shapefiles", {
@@ -175,13 +175,13 @@ test_that("Analyse rasters handles spreadsheet, delim and shapefiles", {
     shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
             shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles spreadsheet, delim, shape, JSON", {
@@ -195,14 +195,14 @@ test_that("Analyse rasters handles spreadsheet, delim, shape, JSON", {
     shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             r_data = gp_lb,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
             shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 test_that("Analyse rasters handles spreadsheet, delim, shape, raster", {
@@ -213,14 +213,14 @@ test_that("Analyse rasters handles spreadsheet, delim, shape, raster", {
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             raster_files = rasters,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
             shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
 
 
@@ -236,7 +236,7 @@ test_that("Analyse all files", {
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             r_data = gp_lb,
             raster_files = rasters,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
@@ -244,5 +244,5 @@ test_that("Analyse all files", {
             shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })

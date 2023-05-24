@@ -63,7 +63,7 @@ test_that("R side oneshot analysis works 2 with tree", {
     #  sanity check
     expect_equal (length(rasters), 3, label='we found three rasters')
 
-    result = analyse_all_spatial(
+    result = analyse_oneshot_spatial(
       raster_files=rasters,
       cellsizes=c(500, 500),
       calculations=c("calc_endemism_central", "calc_pd", "calc_redundancy"),
@@ -88,7 +88,7 @@ test_that("Analyse all files and tree", {
     
     #since exp is random expect equal is false. Tests for errors
     expect_no_error(
-        analyse_all_spatial(
+        analyse_oneshot_spatial(
             r_data = gp_lb,
             raster_files = rasters,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
@@ -97,5 +97,5 @@ test_that("Analyse all files and tree", {
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
             tree = tree
-        ), message = "analyse_all_spatial should not throw an error")
+        ), message = "analyse_oneshot_spatial should not throw an error")
 })
