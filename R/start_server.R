@@ -18,6 +18,18 @@
 #'   start_server(port=3001, use_exe=FALSE)
 #' }
 
+library("R6P")
+library("openssl")
+library("base64enc")
+library("NLP")
+
+api_key <- R6::R6Class("api_key", inherit = R6P::Singleton, public = list(
+    key = sha256(gsub("[\r\n]", "", as.String(rand_bytes(10))))
+    #add_1 = function(){self$count = self$count + 1; invisible(self)}
+))
+
+created_key <- api_key$new()
+
 start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
   process = NULL  #  silence some check warnings
@@ -144,7 +156,8 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     port = port,
     using_exe = use_exe,
     server_object = server_object,
-    server_url = server_url
+    server_url = server_url,
+    api_key = created_key$key
   )
 
   #  hopefully redundant now but leaving just in case
