@@ -79,87 +79,57 @@ JUST_GPLB_DATA: {
         ->json_is('' => $exp, "json results, $t_msg_suffix");
 }
 
-my $exp_two_ftypes = {
-    SPATIAL_RESULTS => [
-        [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/],
-        ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999963719917765', '0.999963719917765'],
-        ['250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999955111323917', '0.999955111323917'],
-        ['750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999954896713474', '0.999954896713474'],
-        ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999942987457241', '0.999942987457241'],
-    ]
-};
+#  Lots of repetition but easier this way.
+#  The differences are in the redundancy scores.
+my %exp = (
+    2 => [
+            [ qw/ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/ ],
+            [ '250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999963719917765', '0.999963719917765' ],
+            [ '250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999955111323917', '0.999955111323917' ],
+            [ '750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999954896713474', '0.999954896713474' ],
+            [ '750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999942987457241', '0.999942987457241' ],
+        ],
+    3 => [
+            [ qw/ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/ ],
+            [ '250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99997581327851', '0.99997581327851' ],
+            [ '250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999970074215944', '0.999970074215944' ],
+            [ '750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999969931142316', '0.999969931142316' ],
+            [ '750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99996199163816', '0.99996199163816' ],
+        ],
+    4 => [
+            [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/],
+            ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999981859958883', '0.999981859958883'],
+            ['250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999977555661958', '0.999977555661958'],
+            ['750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999977448356737', '0.999977448356737'],
+            ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99997149372862',  '0.99997149372862'],
+        ],
+);
 
-my $exp_three_ftypes = {
-    SPATIAL_RESULTS => [
-        [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/],
-        ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99997581327851',  '0.99997581327851'],
-        ['250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999970074215944', '0.999970074215944'],
-        ['750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999969931142316', '0.999969931142316'],
-        ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99996199163816',  '0.99996199163816'],
-    ]
-};
+#  We only need to assess 2, 3 and 4 of the file types
+#  Singles are already done in t/02-oneshot_analysis.t
+#  There is also no need to test all possible combinations
 
-my $exp_four_ftypes = {
-    SPATIAL_RESULTS => [
-        [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/],
-        ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999981859958883', '0.999981859958883'],
-        ['250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999977555661958', '0.999977555661958'],
-        ['750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999977448356737', '0.999977448356737'],
-        ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99997149372862',  '0.99997149372862'],
-    ]
-};
+foreach my $n (2..4) {
 
-#  we only need to assess 2, 3 and 4 of the file types
-#  singles are already done in t/02-oneshot_analysis.t
+    foreach my $i ($n-1 .. $#file_arg_keys) {
+        my @keys = @file_arg_keys[($i - $n + 1) .. $i];
+        my $ftypes = join ' ', @keys;
+        # diag "testing $ftypes";
+        my $oneshot_data = {
+            %file_type_args{@keys},
+            %common_args,
+        };
 
+        my $expected = {SPATIAL_RESULTS => $exp{$n}};
+        # diag $expected;
+        my $t_msg_suffix = "file types: $ftypes";
+        $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+            ->status_is(200, "status, $t_msg_suffix")
+            ->json_is('' => $expected, "numeric results, $t_msg_suffix");
+    }
 
-#  Two at a time, no need to test all possible combinations
-for my $i (1..$#file_arg_keys) {
-    my @keys = @file_arg_keys[$i-1, $i];
-    my $ftypes = join ' ', @keys;
-    # diag "testing $ftypes";
-    my $oneshot_data = {
-        %file_type_args{@keys},
-        %common_args,
-    };
-
-    my $t_msg_suffix = "file types: $ftypes";
-    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-        ->status_is(200, "status, $t_msg_suffix")
-        ->json_is('' => $exp_two_ftypes, "numeric results, $t_msg_suffix");
 }
 
 
-#  Three at a time
-for my $i (2..$#file_arg_keys) {
-    my @keys = @file_arg_keys[$i-2, $i-1, $i];
-    my $ftypes = join ' ', @keys;
-    # diag "testing $ftypes";
-    my $oneshot_data = {
-        %file_type_args{@keys},
-        %common_args,
-    };
-
-    my $t_msg_suffix = "file types: $ftypes";
-    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-        ->status_is(200, "status, $t_msg_suffix")
-        ->json_is('' => $exp_three_ftypes, "numeric results, $t_msg_suffix");
-}
-
-#  All four.  Keep the loop in case we add more types one day.
-for my $i (3..$#file_arg_keys) {
-    my @keys = @file_arg_keys[$i-3, $i-2, $i-1, $i];
-    my $ftypes = join ' ', @keys;
-    # diag "testing $ftypes";
-    my $oneshot_data = {
-        %file_type_args{@keys},
-        %common_args,
-    };
-
-    my $t_msg_suffix = "file types: $ftypes";
-    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-        ->status_is(200, "status, $t_msg_suffix")
-        ->json_is('' => $exp_four_ftypes, "numeric results, $t_msg_suffix");
-}
 
 done_testing();
