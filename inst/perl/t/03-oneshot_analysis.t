@@ -16,8 +16,10 @@ my $json_tree = '{"edge":[4,5,5,4,5,1,2,3],"edge.length":["NaN",1,1,2],"Nnode":2
 my $tree = JSON::MaybeXS::decode_json ($json_tree);
 
 my $gp_lb = {
-  '50:50'   => {label1 => 1, label2 => 1},
-  '150:150' => {label1 => 1, label2 => 1},
+    '250:250' => {qw /r1 13758 r2 13860 r3 13727/},
+    '250:750' => {qw /r1 11003 r2 11134 r3 11279/},
+    '750:250' => {qw /r1 10981 r2 11302 r3 10974/},
+    '750:750' => {qw /r1  8807 r2  8715 r3 8788/},
 };
 my %common_args = (
     bd => {
@@ -55,30 +57,6 @@ my %file_type_args = (
 
 my @file_arg_keys = sort keys %file_type_args;
 
-JUST_GPLB_DATA: {
-    my $oneshot_data = {
-        bd => {
-            params => {name => 'blognorb', cellsizes => [100,100]},
-            data   => $gp_lb,
-        },
-        analysis_config => {
-            calculations => ['calc_endemism_central'],
-        },
-    };
-    my $exp = {
-        SPATIAL_RESULTS => [
-            [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE/],
-            ['150:150', '150', '150', '0.5', 2, '1', '1', ],
-            ['50:50',    '50',  '50', '0.5', 2, '1', '1', ],
-        ]
-    };
-
-    my $t_msg_suffix = 'default config, gplb data only';
-    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-        ->status_is(200, "status, $t_msg_suffix")
-        ->json_is('' => $exp, "json results, $t_msg_suffix");
-}
-
 #  Lots of repetition but easier this way.
 #  The differences are in the redundancy scores.
 my %exp = (
@@ -104,6 +82,31 @@ my %exp = (
             ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99997149372862',  '0.99997149372862'],
         ],
 );
+
+#  should be part of the main loop
+JUST_GPLB_DATA: {
+    my $oneshot_data = {
+        %common_args,
+        bd => {
+            params => {name => 'blognorb', cellsizes => [100,100]},
+            data   => $gp_lb,
+        },
+    };
+    my $exp = {
+        SPATIAL_RESULTS => [
+            [ qw/ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/ ],
+            [ '250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99992743983553',  '0.99992743983553' ],
+            [ '250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999910222647833', '0.999910222647833' ],
+            [ '750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999909793426948', '0.999909793426948' ],
+            [ '750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999885974914481', '0.999885974914481' ],
+        ],
+    };
+
+    my $t_msg_suffix = 'default config, gplb data only';
+    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+        ->status_is(200, "status, $t_msg_suffix")
+        ->json_is('' => $exp, "json results, $t_msg_suffix");
+}
 
 #  We only need to assess 2, 3 and 4 of the file types
 #  Singles are already done in t/02-oneshot_analysis.t
