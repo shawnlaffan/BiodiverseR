@@ -89,16 +89,37 @@ my $exp_two_ftypes = {
     ]
 };
 
+my $exp_three_ftypes = {
+    SPATIAL_RESULTS => [
+        [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/],
+        ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99997581327851',  '0.99997581327851'],
+        ['250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999970074215944', '0.999970074215944'],
+        ['750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999969931142316', '0.999969931142316'],
+        ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99996199163816',  '0.99996199163816'],
+    ]
+};
+
+my $exp_four_ftypes = {
+    SPATIAL_RESULTS => [
+        [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/],
+        ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999981859958883', '0.999981859958883'],
+        ['250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999977555661958', '0.999977555661958'],
+        ['750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999977448356737', '0.999977448356737'],
+        ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99997149372862',  '0.99997149372862'],
+    ]
+};
+
 #  we only need to assess 2, 3 and 4 of the file types
 #  singles are already done in t/02-oneshot_analysis.t
 
 
-#  two at a time, no need to test all possible combinations
+#  Two at a time, no need to test all possible combinations
 for my $i (1..$#file_arg_keys) {
-    my $ftypes = join ' ', @file_arg_keys[$i-1, $i];
-    diag "testing $ftypes";
+    my @keys = @file_arg_keys[$i-1, $i];
+    my $ftypes = join ' ', @keys;
+    # diag "testing $ftypes";
     my $oneshot_data = {
-        %file_type_args{@file_arg_keys[$i-1, $i]},
+        %file_type_args{@keys},
         %common_args,
     };
 
@@ -108,381 +129,37 @@ for my $i (1..$#file_arg_keys) {
         ->json_is('' => $exp_two_ftypes, "numeric results, $t_msg_suffix");
 }
 
-{
-my $oneshot_data = {
-    delimited_text_params => {
-            files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-            group_columns        => [ 1, 2 ],
-            label_columns        => [ 4 ],
-            sample_count_columns => [ 3 ],
-        },
-    %common_args,
-};
 
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data = {
-    spreadsheet_params => {
-            files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-            group_field_names      => [ qw/X Y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-
-{
-my $oneshot_data = {
-    raster_params => {
-            files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-        },
-    spreadsheet_params => {
-            files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-            group_field_names      => [ qw/X Y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data = {
-    raster_params => {
-            files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-        },
-    shapefile_params => {
-            files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-            group_field_names      => [ qw/:shape_x :shape_y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data = {
-    raster_params => {
-            files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-        },
-    delimited_text_params => {
-            files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-            group_columns        => [ 1, 2 ],
-            label_columns        => [ 4 ],
-            sample_count_columns => [ 3 ],
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data = {
-    shapefile_params => {
-            files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-            group_field_names      => [ qw/:shape_x :shape_y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    delimited_text_params => {
-            files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-            group_columns        => [ 1, 2 ],
-            label_columns        => [ 4 ],
-            sample_count_columns => [ 3 ],
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data = {
-    spreadsheet_params => {
-            files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-            group_field_names      => [ qw/X Y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    delimited_text_params => {
-            files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-            group_columns        => [ 1, 2 ],
-            label_columns        => [ 4 ],
-            sample_count_columns => [ 3 ],
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data = {
-    spreadsheet_params => {
-            files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-            group_field_names      => [ qw/X Y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    shapefile_params => {
-            files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-            group_field_names      => [ qw/:shape_x :shape_y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-
-{
-my $oneshot_data = {
-    spreadsheet_params => {
-            files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-            group_field_names      => [ qw/X Y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    shapefile_params => {
-            files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-            group_field_names      => [ qw/:shape_x :shape_y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    raster_params => {
-            files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data = {
-    delimited_text_params => {
-            files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-            group_columns        => [ 1, 2 ],
-            label_columns        => [ 4 ],
-            sample_count_columns => [ 3 ],
-        },
-    shapefile_params => {
-            files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-            group_field_names      => [ qw/:shape_x :shape_y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    raster_params => {
-            files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data = {
-    delimited_text_params => {
-            files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-            group_columns        => [ 1, 2 ],
-            label_columns        => [ 4 ],
-            sample_count_columns => [ 3 ],
-        },
-    spreadsheet_params => {
-            files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-            group_field_names      => [ qw/X Y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-    raster_params => {
-            files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-        },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data = {
-delimited_text_params => {
-        files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-        group_columns        => [ 1, 2 ],
-        label_columns        => [ 4 ],
-        sample_count_columns => [ 3 ],
-    },
-spreadsheet_params => {
-        files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-        group_field_names      => [ qw/X Y/ ],
-        label_field_names      => [ 'label' ],
-        sample_count_col_names => [ 'count' ]
-    },
-%common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-    my $oneshot_data_raster = {
-        shapefile_params => {
-            files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-            group_field_names      => [ qw/:shape_x :shape_y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-        delimited_text_params => {
-            files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-            group_columns        => [ 1, 2 ],
-            label_columns        => [ 4 ],
-            sample_count_columns => [ 3 ],
-        },
-        spreadsheet_params => {
-            files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-            group_field_names      => [ qw/X Y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
+#  Three at a time
+for my $i (2..$#file_arg_keys) {
+    my @keys = @file_arg_keys[$i-2, $i-1, $i];
+    my $ftypes = join ' ', @keys;
+    # diag "testing $ftypes";
+    my $oneshot_data = {
+        %file_type_args{@keys},
         %common_args,
     };
 
-    my $t_msg_suffix = 'default config, raster files';
-    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data_raster)
-        ->status_is(200, "status, $t_msg_suffix");
+    my $t_msg_suffix = "file types: $ftypes";
+    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+        ->status_is(200, "status, $t_msg_suffix")
+        ->json_is('' => $exp_three_ftypes, "numeric results, $t_msg_suffix");
 }
 
-{
-    my $oneshot_data_raster = {
-        raster_params => {
-        files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-        },
-        shapefile_params => {
-            files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-            group_field_names      => [ qw/:shape_x :shape_y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
-        delimited_text_params => {
-            files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-            group_columns        => [ 1, 2 ],
-            label_columns        => [ 4 ],
-            sample_count_columns => [ 3 ],
-        },
-        spreadsheet_params => {
-            files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-            group_field_names      => [ qw/X Y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-        },
+#  All four.  Keep the loop in case we add more types one day.
+for my $i (3..$#file_arg_keys) {
+    my @keys = @file_arg_keys[$i-3, $i-2, $i-1, $i];
+    my $ftypes = join ' ', @keys;
+    # diag "testing $ftypes";
+    my $oneshot_data = {
+        %file_type_args{@keys},
         %common_args,
     };
 
-    my $t_msg_suffix = 'default config, raster files';
-    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data_raster)
-        ->status_is(200, "status, $t_msg_suffix");
-}
-
-
-{
-my $oneshot_data_raster = {
-    raster_params => {
-        files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-    },
-    shapefile_params => {
-        files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-        group_field_names      => [ qw/:shape_x :shape_y/ ],
-        label_field_names      => [ 'label' ],
-        sample_count_col_names => [ 'count' ]
-    },
-    delimited_text_params => {
-        files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-        group_columns        => [ 1, 2 ],
-        label_columns        => [ 4 ],
-        sample_count_columns => [ 3 ],
-    },
-    spreadsheet_params => {
-        files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-        group_field_names      => [ qw/X Y/ ],
-        label_field_names      => [ 'label' ],
-        sample_count_col_names => [ 'count' ]
-    },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data_raster)
-    ->status_is(200, "status, $t_msg_suffix");
-}
-
-{
-my $oneshot_data_raster = {
-    raster_params => {
-        files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-    },
-
-    shapefile_params => {
-        files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-        group_field_names      => [ qw/:shape_x :shape_y/ ],
-        label_field_names      => [ 'label' ],
-        sample_count_col_names => [ 'count' ]
-    },
-    delimited_text_params => {
-        files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
-        group_columns        => [ 1, 2 ],
-        label_columns        => [ 4 ],
-        sample_count_columns => [ 3 ],
-    },
-    spreadsheet_params => {
-        files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
-        group_field_names      => [ qw/X Y/ ],
-        label_field_names      => [ 'label' ],
-        sample_count_col_names => [ 'count' ]
-    },
-    %common_args,
-};
-
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data_raster)
-    ->status_is(200, "status, $t_msg_suffix");
+    my $t_msg_suffix = "file types: $ftypes";
+    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+        ->status_is(200, "status, $t_msg_suffix")
+        ->json_is('' => $exp_four_ftypes, "numeric results, $t_msg_suffix");
 }
 
 done_testing();
