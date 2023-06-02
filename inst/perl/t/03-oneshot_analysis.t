@@ -22,7 +22,6 @@ my $gp_lb = {
 my %common_args = (
     bd => {
         params       => { name => 'blognorb', cellsizes => [ 500, 500 ] },
-        data        => $gp_lb,
     },
     analysis_config => {
         calculations => [qw /calc_endemism_central calc_pd calc_redundancy/],
@@ -30,23 +29,53 @@ my %common_args = (
     tree => $tree,
 );
 
-{
-my $oneshot_data = {
-  raster_params => {
-            files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
-  },
-  bd => {
-    params => {name => 'blognorb', cellsizes => [100,100]},
-    data   => $gp_lb,
-  },
-  analysis_config => {
-    calculations => ['calc_endemism_central'],
-  },
-};
+my %file_type_args = (
+    raster_params => {
+        files => [ "$data_dir/r1.tif", "$data_dir/r2.tif", "$data_dir/r3.tif" ]
+    },
+    shapefile_params => {
+        files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
+        group_field_names      => [ qw/:shape_x :shape_y/ ],
+        label_field_names      => [ 'label' ],
+        sample_count_col_names => [ 'count' ]
+    },
+    delimited_text_params => {
+        files => [ "$data_dir/r1.csv", "$data_dir/r2.csv", "$data_dir/r3.csv" ],
+        group_columns        => [ 1, 2 ],
+        label_columns        => [ 4 ],
+        sample_count_columns => [ 3 ],
+    },
+    spreadsheet_params => {
+        files                  => [ "$data_dir/r1.xlsx", "$data_dir/r2.xlsx", "$data_dir/r3.xlsx" ],
+        group_field_names      => [ qw/X Y/ ],
+        label_field_names      => [ 'label' ],
+        sample_count_col_names => [ 'count' ]
+    },
+);
 
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
+
+{
+    my $oneshot_data = {
+        bd => {
+            params => {name => 'blognorb', cellsizes => [100,100]},
+            data   => $gp_lb,
+        },
+        analysis_config => {
+            calculations => ['calc_endemism_central'],
+        },
+    };
+    my $exp = {
+        SPATIAL_RESULTS => [
+            [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE/],
+            ['150:150', '150', '150', '0.5', 2, '1', '1', ],
+            ['50:50',    '50',  '50', '0.5', 2, '1', '1', ],
+        ]
+    };
+
+    my $t_msg_suffix = 'default config, raster files';
+    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+        ->status_is(200, "status, $t_msg_suffix")
+        ->json_is('' => $exp, "json results, $t_msg_suffix");
 }
 
 
