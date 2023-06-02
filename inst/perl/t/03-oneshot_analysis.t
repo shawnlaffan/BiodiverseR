@@ -53,8 +53,9 @@ my %file_type_args = (
     },
 );
 
+my @file_arg_keys = sort keys %file_type_args;
 
-{
+JUST_GPLB_DATA: {
     my $oneshot_data = {
         bd => {
             params => {name => 'blognorb', cellsizes => [100,100]},
@@ -72,27 +73,39 @@ my %file_type_args = (
         ]
     };
 
-    my $t_msg_suffix = 'default config, raster files';
+    my $t_msg_suffix = 'default config, gplb data only';
     $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
         ->status_is(200, "status, $t_msg_suffix")
         ->json_is('' => $exp, "json results, $t_msg_suffix");
 }
 
-
-{
-my $oneshot_data = {
-    shapefile_params => {
-            files => [ "$data_dir/r1.shp", "$data_dir/r2.shp", "$data_dir/r3.shp" ],
-            group_field_names      => [ qw/:shape_x :shape_y/ ],
-            label_field_names      => [ 'label' ],
-            sample_count_col_names => [ 'count' ]
-    },
-    %common_args,
+my $exp_two_ftypes = {
+    SPATIAL_RESULTS => [
+        [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/],
+        ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999963719917765', '0.999963719917765'],
+        ['250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999955111323917', '0.999955111323917'],
+        ['750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999954896713474', '0.999954896713474'],
+        ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999942987457241', '0.999942987457241'],
+    ]
 };
 
-my $t_msg_suffix = 'default config, raster files';
-$t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
-    ->status_is(200, "status, $t_msg_suffix");
+#  we only need to assess 2, 3 and 4 of the file types
+#  singles are already done in t/02-oneshot_analysis.t
+
+
+#  two at a time, no need to test all possible combinations
+for my $i (1..$#file_arg_keys) {
+    my $ftypes = join ' ', @file_arg_keys[$i-1, $i];
+    diag "testing $ftypes";
+    my $oneshot_data = {
+        %file_type_args{@file_arg_keys[$i-1, $i]},
+        %common_args,
+    };
+
+    my $t_msg_suffix = "file types: $ftypes";
+    $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+        ->status_is(200, "status, $t_msg_suffix")
+        ->json_is('' => $exp_two_ftypes, "numeric results, $t_msg_suffix");
 }
 
 {
