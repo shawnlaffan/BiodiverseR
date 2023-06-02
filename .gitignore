@@ -56,3 +56,6 @@ mojo_log*.txt
 
 #  perl inline files
 **/.inline/
+
+#  arcgis sidecar files
+*.aux.xml
