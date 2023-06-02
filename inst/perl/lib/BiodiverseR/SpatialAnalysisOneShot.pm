@@ -78,7 +78,7 @@ sub run_analysis ($self, $analysis_params) {
     
 
     #need to check if files in the raster exist
-    if ($analysis_params->{raster_params}->{files}) {
+    if ($analysis_params->{raster_params}{files}) {
         my $params = $analysis_params->{raster_params};
         my $files = $params->{files} // croak 'raster_params must include an array of files';
         if (!is_ref($files)) {
@@ -102,7 +102,7 @@ sub run_analysis ($self, $analysis_params) {
     }
 
     #  some shapefiles
-    if (my $params = $analysis_params->{shapefile_params}->{files}) {
+    if ($analysis_params->{shapefile_params}{files}) {
         my $params = $analysis_params->{shapefile_params};
         # p $params;
         my $files = $params->{files} // croak 'shapefile_params must include an array of files';
@@ -126,7 +126,7 @@ sub run_analysis ($self, $analysis_params) {
     }
     #  some delimited text files
     # p $analysis_params;
-    if (my $params = $analysis_params->{delimited_text_params}->{files}) {
+    if ($analysis_params->{delimited_text_params}{files}) {
         my $params = $analysis_params->{delimited_text_params};
         # p $params;
         my $files = $params->{files} // croak 'delimited_text_params must include an array of files';
@@ -148,7 +148,7 @@ sub run_analysis ($self, $analysis_params) {
         croak $e if $e;
     }
     #  some spreadsheets
-    if ($analysis_params->{spreadsheet_params}->{files}) {
+    if ($analysis_params->{spreadsheet_params}{files}) {
         my $params = $analysis_params->{spreadsheet_params};
         # p $files;
         my $files = $params->{files} // croak 'spreadsheet_params must include an array of files';
