@@ -9,20 +9,12 @@
                 ]
             },
             "data": {
-                "50:50": {
-                    "label1": 1,
-                    "label2": 1
-                },
-                "150:150": {
-                    "label1": 1,
-                    "label2": 1
-                }
+                "50:50": {"label1": 1, "label2": 1}, 
+                "150:150": {"label1": 1,"label2": 1}
             }
         },
         "analysis_config": {
-            "calculations": [
-                "calc_endemism_central"
-            ]
+            "calculations": ["calc_endemism_central"]
         }
     }
 }

@@ -77,7 +77,7 @@ analyse_rasters_spatial = function(
   config$server_object$kill()
 
   # browser()
-
+  
   processed_results = list()
   #  lapply? - nah.  There will never be more than ten list elements
   for (list_name in sort(names(call_results))) {

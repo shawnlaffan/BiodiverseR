@@ -15,7 +15,7 @@ $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
 my $exp = {
     SPATIAL_RESULTS => [
         [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/],
-        ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99992743983553', '0.99992743983553'],
+        ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99992743983553',  '0.99992743983553'],
         ['250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999910222647833', '0.999910222647833'],
         ['750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999909793426948', '0.999909793426948'],
         ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999885974914481', '0.999885974914481'],
@@ -25,13 +25,13 @@ my $exp = {
 #  plenty repetition below - could do with a refactor
 my $json_tree = '{"edge":[4,5,5,4,5,1,2,3],"edge.length":["NaN",1,1,2],"Nnode":2,"tip.label":["r1","r2","r3"]}';
 my $tree = JSON::MaybeXS::decode_json ($json_tree);
-
+# p $tree;
 my %common_args = (
-    bd => {
-        params       => { name => 'blognorb', cellsizes => [ 500, 500 ] },
+    bd              => {
+        params => { name => 'blognorb', cellsizes => [ 500, 500 ] },
     },
     analysis_config => {
-        calculations => [qw /calc_endemism_central calc_pd calc_redundancy/],
+        calculations => [ qw/calc_endemism_central calc_pd calc_redundancy/ ],
     },
     tree => $tree,
 );
@@ -48,6 +48,8 @@ my %common_args = (
     $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data_raster)
         ->status_is(200, "status, $t_msg_suffix")
         ->json_is('' => $exp, "json results, $t_msg_suffix");
+
+    # p $t->tx->res->json;
 }
 
 {
@@ -82,6 +84,7 @@ my %common_args = (
     $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
         ->status_is(200, "status, $t_msg_suffix")
         ->json_is('' => $exp, "json results, $t_msg_suffix");
+    # p $t->tx->res->json;
 }
 
 {

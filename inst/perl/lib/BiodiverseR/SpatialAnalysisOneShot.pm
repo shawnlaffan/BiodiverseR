@@ -64,6 +64,8 @@ sub run_analysis ($self, $analysis_params) {
     );
 
     if ($bd_data) {
+        # say STDERR "Loading bd_data";
+        # p $bd_data;
         #  needs to be a more general call
         my $csv_object = $bd->get_csv_object(
           quote_char => $bd->get_param('QUOTES'),
@@ -72,11 +74,20 @@ sub run_analysis ($self, $analysis_params) {
         eval {
           $bd->add_elements_collated_simple_aa($bd_data, $csv_object, 1);
         };
-        croak $@ if $@;
+        my $e = $@;
+        # say STDERR "Error is '$e'";
+        my $lb = $bd->get_labels_ref;
+        # p $lb;
+        croak $e if $e;
+        # say STDERR "LOADED GPLB DATA";
+        # _dump_sample_counts ($bd);
     }
-    #  need to import some rasters
-    if (my $params = $analysis_params->{raster_params}) {
-        # p $params;
+
+    
+
+    #need to check if files in the raster exist
+    if ($analysis_params->{raster_params}{files}) {
+        my $params = $analysis_params->{raster_params};
         my $files = $params->{files} // croak 'raster_params must include an array of files';
         if (!is_ref($files)) {
             $files = [$files];
@@ -96,10 +107,13 @@ sub run_analysis ($self, $analysis_params) {
             );
         };
         croak $@ if $@;
+        # say STDERR "LOADED RASTER DATA";
+        # _dump_sample_counts ($bd);
     }
 
     #  some shapefiles
-    if (my $params = $analysis_params->{shapefile_params}) {
+    if ($analysis_params->{shapefile_params}{files}) {
+        my $params = $analysis_params->{shapefile_params};
         # p $params;
         my $files = $params->{files} // croak 'shapefile_params must include an array of files';
         if (!is_ref($files)) {
@@ -119,10 +133,14 @@ sub run_analysis ($self, $analysis_params) {
         };
         my $e = $@;
         croak $e if $e;
+        # say STDERR "LOADED SHAPEFILE DATA";
+        # _dump_sample_counts ($bd);
     }
     #  some delimited text files
     # p $analysis_params;
-    if (my $params = $analysis_params->{delimited_text_params}) {
+    if ($analysis_params->{delimited_text_params}{files}) {
+        # say STDERR "LOADING CSV DATA";
+        my $params = $analysis_params->{delimited_text_params};
         # p $params;
         my $files = $params->{files} // croak 'delimited_text_params must include an array of files';
         if (!is_ref($files)) {
@@ -140,10 +158,14 @@ sub run_analysis ($self, $analysis_params) {
             );
         };
         my $e = $@;
+        say STDERR $e if $e;
         croak $e if $e;
+        # say STDERR "LOADED CSV DATA";
+        # _dump_sample_counts ($bd);
     }
     #  some spreadsheets
-    if (my $params = $analysis_params->{spreadsheet_params}) {
+    if ($analysis_params->{spreadsheet_params}{files}) {
+        my $params = $analysis_params->{spreadsheet_params};
         # p $files;
         my $files = $params->{files} // croak 'spreadsheet_params must include an array of files';
         if (!is_ref($files)) {
@@ -165,6 +187,8 @@ sub run_analysis ($self, $analysis_params) {
         my $e = $@;
         # p $e;
         croak $e if $e;
+        # say STDERR "LOADED SPREADSHEET DATA";
+        # _dump_sample_counts ($bd);
     }
 
     my $tree;
@@ -195,6 +219,17 @@ sub run_analysis ($self, $analysis_params) {
     return \%results;
 }
 
+sub _dump_sample_counts ($bd) {
+    my @label_names = sort $bd->get_labels;
+    use Data::Printer;
+    # p @label_names;
+    my %sample_counts;
+    foreach my $label (@label_names) {
+        $sample_counts{$label} = $bd->get_label_sample_count (label => $label);
+    }
+    p %sample_counts;
+
+}
 
 1;
 
