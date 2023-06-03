@@ -64,6 +64,8 @@ sub run_analysis ($self, $analysis_params) {
     );
 
     if ($bd_data) {
+        # say STDERR "Loading bd_data";
+        # p $bd_data;
         #  needs to be a more general call
         my $csv_object = $bd->get_csv_object(
           quote_char => $bd->get_param('QUOTES'),
@@ -72,7 +74,13 @@ sub run_analysis ($self, $analysis_params) {
         eval {
           $bd->add_elements_collated_simple_aa($bd_data, $csv_object, 1);
         };
-        croak $@ if $@;
+        my $e = $@;
+        # say STDERR "Error is '$e'";
+        my $lb = $bd->get_labels_ref;
+        # p $lb;
+        croak $e if $e;
+        # say STDERR "LOADED GPLB DATA";
+        # _dump_sample_counts ($bd);
     }
 
     
@@ -99,6 +107,8 @@ sub run_analysis ($self, $analysis_params) {
             );
         };
         croak $@ if $@;
+        # say STDERR "LOADED RASTER DATA";
+        # _dump_sample_counts ($bd);
     }
 
     #  some shapefiles
@@ -123,10 +133,13 @@ sub run_analysis ($self, $analysis_params) {
         };
         my $e = $@;
         croak $e if $e;
+        # say STDERR "LOADED SHAPEFILE DATA";
+        # _dump_sample_counts ($bd);
     }
     #  some delimited text files
     # p $analysis_params;
     if ($analysis_params->{delimited_text_params}{files}) {
+        # say STDERR "LOADING CSV DATA";
         my $params = $analysis_params->{delimited_text_params};
         # p $params;
         my $files = $params->{files} // croak 'delimited_text_params must include an array of files';
@@ -145,7 +158,10 @@ sub run_analysis ($self, $analysis_params) {
             );
         };
         my $e = $@;
+        say STDERR $e if $e;
         croak $e if $e;
+        # say STDERR "LOADED CSV DATA";
+        # _dump_sample_counts ($bd);
     }
     #  some spreadsheets
     if ($analysis_params->{spreadsheet_params}{files}) {
@@ -171,6 +187,8 @@ sub run_analysis ($self, $analysis_params) {
         my $e = $@;
         # p $e;
         croak $e if $e;
+        # say STDERR "LOADED SPREADSHEET DATA";
+        # _dump_sample_counts ($bd);
     }
 
     my $tree;
@@ -201,6 +219,17 @@ sub run_analysis ($self, $analysis_params) {
     return \%results;
 }
 
+sub _dump_sample_counts ($bd) {
+    my @label_names = sort $bd->get_labels;
+    use Data::Printer;
+    # p @label_names;
+    my %sample_counts;
+    foreach my $label (@label_names) {
+        $sample_counts{$label} = $bd->get_label_sample_count (label => $label);
+    }
+    p %sample_counts;
+
+}
 
 1;
 
