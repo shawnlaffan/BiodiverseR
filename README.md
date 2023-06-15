@@ -26,15 +26,21 @@ This currently requires a working perl interpreter in your path.
 (Future versions will provide self contained executables).
 
 On Windows a perl interpreter can be obtained through the [Strawberry perl project](https://strawberryperl.com/releases.html).
+
 Most unix-derived systems provide a perl interpreter but it is best to avoid this and use
 a system like [perlbrew](https://perlbrew.pl/).  Be sure to also install the cpanm utility (see
 perlbrew site for details).  
 
-Once you have a perl installed and in your path you can install the perl dependencies using
+If you are using a UNIX derived system (e.g. Linux, MacOS, solaris, a BSD variant) 
+you should install packages for GDAL.  The exact command varies with your system 
+but on Macs we have tested with the Homebrew system.  Windows has binaries for GDAL
+but we have not tested these so we build our own in the next step.
+
+Once you have a perl installed and in your path and the requisite packages you can install the perl dependencies using
 cpanm at the command line.  (Make sure to update the below code to use the correct path separator
 on Windows).
 
-``` bash
+```bash
 cpanm https://github.com/shawnlaffan/biodiverse.git
 cd inst/perl
 cpanm --installdeps .
@@ -48,7 +54,9 @@ it will be isolated from system changes).
 You can install the R code like so:
 
 ``` r
-devtools::install_github("shawnlaffan/BiodiverseR")
+install.packages("devtools")
+install.packages("remotes")
+remotes::install_github("shawnlaffan/BiodiverseR")
 ```
   
 ## Quick demo
