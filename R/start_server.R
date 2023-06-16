@@ -18,14 +18,16 @@
 #'   start_server(port=3001, use_exe=FALSE)
 #' }
 
-library("R6P")
+#libraries used to generate the api key
 library("openssl")
-library("base64enc")
 library("NLP")
 
 api_key <- R6::R6Class("api_key", inherit = R6P::Singleton, public = list(
     key = sha256(gsub("[\r\n]", "", as.String(rand_bytes(10))))
-    #add_1 = function(){self$count = self$count + 1; invisible(self)}
+
+    #key_2 = sha256(as.String(sample(1:1000000, 1) + as.numeric(gsub("[[:punct:][:blank:]]", "", as.String(Sys.time()))))) # nolint
+    #key 1 is 10 random bytes (generated in a cyrpographically secure way), turned into a hash readable form and then hashed
+    #key 2 is a random number between 1 and 1000000 thats not cyrpographically secure, added to the current time, turned into a hash readable form and then hashed
 ))
 
 created_key <- api_key$new()

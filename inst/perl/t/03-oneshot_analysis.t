@@ -317,17 +317,6 @@ $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
     ->status_is(200, "status, $t_msg_suffix");
 }
 
-my %common_args = (
-    bd => {
-        params       => { name => 'blognorb', cellsizes => [ 500, 500 ] },
-        data        => $gp_lb,
-    },
-    analysis_config => {
-        calculations => [qw /calc_endemism_central calc_pd calc_redundancy/],
-    },
-    tree => $tree,
-);
-
 {
 my $oneshot_data = {
 delimited_text_params => {
@@ -349,17 +338,6 @@ my $t_msg_suffix = 'default config, raster files';
 $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
     ->status_is(200, "status, $t_msg_suffix");
 }
-
-my %common_args = (
-    bd => {
-        params       => { name => 'blognorb', cellsizes => [ 500, 500 ] },
-        data        => $gp_lb,
-    },
-    analysis_config => {
-        calculations => [qw /calc_endemism_central calc_pd calc_redundancy/],
-    },
-    tree => $tree,
-);
 
 {
     my $oneshot_data_raster = {
@@ -429,17 +407,6 @@ my %common_args = (
     $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data_raster)
         ->status_is(200, "status, $t_msg_suffix");
 }
-
-
-my %common_args = (
-    bd => {
-        params       => { name => 'blognorb', cellsizes => [ 500, 500 ] },
-    },
-    analysis_config => {
-        calculations => [qw /calc_endemism_central calc_pd calc_redundancy/],
-    },
-    tree => $tree,
-);
 
 {
 my $oneshot_data_raster = {
