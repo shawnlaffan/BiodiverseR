@@ -18,6 +18,16 @@
 #'   start_server(port=3001, use_exe=FALSE)
 #' }
 
+api_key <- R6::R6Class("api_key", inherit = R6P::Singleton, public = list(
+    key = as.String(sha256(gsub("[\r\n]", "", as.String(rand_bytes(10)))))
+
+    #key_2 = sha256(as.String(sample(1:1000000, 1) + as.numeric(gsub("[[:punct:][:blank:]]", "", as.String(Sys.time()))))) # nolint
+    #key 1 is 10 random bytes (generated in a cyrpographically secure way), turned into a hash readable form and then hashed
+    #key 2 is a random number between 1 and 1000000 thats not cyrpographically secure, added to the current time, turned into a hash readable form and then hashed
+))
+
+key_holder <- api_key$new()
+
 start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
   process = NULL  #  silence some check warnings
@@ -144,7 +154,8 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     port = port,
     using_exe = use_exe,
     server_object = server_object,
-    server_url = server_url
+    server_url = server_url,
+    api_key = key_holder$key
   )
 
   #  hopefully redundant now but leaving just in case
@@ -176,6 +187,18 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     message ("server did not start in time")
     stop ()
   }
+
+  #pass api key
+  target_url <- paste0(config$server_url, "/api_key")
+  key_as_json <- rjson::toJSON(key_holder$key)
+  response <- httr::POST(
+    url = target_url,
+    body = key_as_json,
+    encode = "json",
+  )
+  message("Please work:")
+  message(key_holder$key)
+  message(response)
 
   return(config)
 }
