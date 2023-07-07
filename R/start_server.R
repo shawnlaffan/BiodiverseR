@@ -18,6 +18,9 @@
 #'   start_server(port=3001, use_exe=FALSE)
 #' }
 
+library("openssl")
+library("NLP")
+
 api_key <- R6::R6Class("api_key", inherit = R6P::Singleton, public = list(
     key = as.String(sha256(gsub("[\r\n]", "", as.String(rand_bytes(10)))))
 
