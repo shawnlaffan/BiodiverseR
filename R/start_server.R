@@ -199,7 +199,8 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     body = key_as_json,
     encode = "json",
   )
-  message("Please work:")
+
+  #debugging, these should print identically.
   message(key_holder$key)
   message(response)
 
