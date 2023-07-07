@@ -60,6 +60,13 @@ $log->debug("Called startup");
   # Normal route to controller
   $r->get('/')->to('Example#welcome');
   
+  $r->post ('/api_key' => sub ($c) {
+
+    my $api_key = $c->req->json;
+    #   ^ api key but in json.
+    return $c->render(json => $api_key);
+  });
+
   #  pass some data, get a result.  Or the broken pieces. 
   $r->post ('/analysis_spatial_oneshot' => sub ($c) {
     my $analysis_params = $c->req->json;
