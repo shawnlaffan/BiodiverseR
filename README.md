@@ -37,12 +37,12 @@ but on Macs we have tested with the Homebrew system.  Windows has binaries for G
 but we have not tested these so we build our own in the next step.
 
 Once you have a perl installed and in your path and the requisite packages you can install the perl dependencies using
-cpanm at the command line.  (Make sure to update the below code to use the correct path separator
-on Windows).
+cpanm at the command line.  Make sure to update the below code to use the correct path separator
+on Windows, as well as using the appropriate path for ```BiodiverseR/inst/perl``` if you are not at the top level of the git repo.
 
 ```bash
 cpanm https://github.com/shawnlaffan/biodiverse.git
-cd inst/perl
+cd BiodiverseR/inst/perl
 cpanm --installdeps .
 ```
 
