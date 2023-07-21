@@ -6,3 +6,5 @@
 ^etc
 ^experiment.R$
 mojo_log.+.txt$
+^\.idea
+^inst/perl/\.idea
