@@ -85,14 +85,14 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     {
       #  need explicit perl call on windows
       # https://processx.r-lib.org/reference/process.html
-      cmd = sprintf ("Command: %s daemon -l %s", server_path, server_url)
-      message (cmd)
+      cmd = ""
+      #message (sprintf ("Command: %s daemon -l %s", server_path, server_url))
       #  no perl pfx on unix, let the shebang line do its work
       #  need to also send stdout and stderr to a log file
-
       if (running_on_windows) {
+        message ("WE ARE RUNNING ON WINDOWS")
         args = c(server_path, "daemon", "-l", server_url)
-        cmd = ifelse(is.null(perl_path), "perl", perl_path)
+        cmd = ifelse(perl_path == "", "perl", perl_path)
         if (path_extras != "") {
           Sys.setenv("PATH" = sprintf("%s;%s", path_extras, Sys.getenv("PATH")))
         }
@@ -100,9 +100,8 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
       else {
         args = c(server_path, "daemon", "-l", server_url)
         cmd = "perl"
-    }
-      message (paste (unlist (cmd, server_path, args)))
-
+      }
+      message (sprintf ("Command: %s", paste (c(cmd, unlist(args)), collapse=" ")))
       # message (Sys.getenv("PATH"))
 
       server_object = processx::process$new(
