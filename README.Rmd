@@ -70,10 +70,17 @@ You can install the R code like so:
 ``` r
 devtools::install_github("shawnlaffan/BiodiverseR")
 ```
+
+However, it is currently best to work within the git repo.  
+
+```r
+devtools::load_all()
+```
   
 ## Quick demo
 
-Check that the Biodiverse service can be accessed:
+Check that the Biodiverse service can be accessed.  The analytical functions
+call this internally so this is just a check that the server can be started.
 
 ```{r}
 # It is critical that this be set to wherever you have downloaded the package 
