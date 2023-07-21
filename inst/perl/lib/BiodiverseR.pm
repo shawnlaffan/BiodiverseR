@@ -10,6 +10,8 @@ use Carp qw /croak/;
 
 use BiodiverseR::SpatialAnalysisOneShot;
 use BiodiverseR::Data;
+use BiodiverseR::IndicesMetadata;
+
 use Biodiverse::BaseData;
 use Biodiverse::ReadNexus;
 use Biodiverse::Spatial;
@@ -59,8 +61,13 @@ $log->debug("Called startup");
 
   # Normal route to controller
   $r->get('/')->to('Example#welcome');
-  
-  #  pass some data, get a result.  Or the broken pieces. 
+
+  $r->get('/calculations_metadata' => sub ($c) {
+      my $metadata = BiodiverseR::IndicesMetadata->get_indices_metadata();
+      return $c->render(json => $metadata);
+  });
+
+  #  pass some data, get a result.  Or the broken pieces.
   $r->post ('/analysis_spatial_oneshot' => sub ($c) {
     my $analysis_params = $c->req->json;
 
