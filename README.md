@@ -41,6 +41,11 @@ requires that you have git installed on your system and in the path.
 This code also assumes you have run a git clone of this repo and are at
 the top level of this repo.
 
+Do not run this code using the RStudio console, particularly on Windows.
+The rtools libraries can interfere with some of the perl module compilations,
+and the RStudioconsole adds these to the path.  If you are on Windows then 
+use a ```Cmd``` window.  
+
 ``` bash
 cpanm https://github.com/shawnlaffan/biodiverse.git
 cd inst/perl
