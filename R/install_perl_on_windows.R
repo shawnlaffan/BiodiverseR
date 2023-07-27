@@ -1,6 +1,9 @@
-library (fs)
-#library (httr)
-
+#' Install a version of strawberry perl to run the server
+#'
+#' @examples
+#' if(interactive()) {
+#'   install_strawberry_perl()
+#' }
 install_strawberry_perl = function () {
   appdata = Sys.getenv('APPDATA')
 
