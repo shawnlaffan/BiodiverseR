@@ -53,18 +53,6 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
         perl_path = sprintf ("%s.exe", perl_path)
       }
       stopifnot("perl_path does not exist"=file.exists(perl_path))
-      # r = processx::run(perl_path, "-V")
-      # on_strawberry = grep("uname.+strawberry", strsplit(unlist(r), "\n"))
-      # if (on_strawberry > 0) {
-      #   #  need to add to the path
-      #   path_extras = normalizePath(c(
-      #     file.path(perl_path, '..'),
-      #     file.path(perl_path, '../../site/bin'),
-      #     file.path(perl_path, '../../../c/bin')
-      #   ))
-      #   path_extras = paste0(path_extras, collapse=";")
-      #   message ("Will prepend to path: ", path_extras)
-      # }
     }
   }
   message (sprintf("server_path is %s", server_path))
@@ -92,14 +80,12 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
       if (running_on_windows) {
         message ("WE ARE RUNNING ON WINDOWS")
         args = c(server_path, "daemon", "-l", server_url)
+        #  version should not be hard coded in the path
         cmd = ifelse(
           perl_path == "",
-          fs::path (Sys.getenv("APPDATA"), "BiodiverseR/sp5380/perl/bin/perl"),  #  version should not be hard coded
+          fs::path (Sys.getenv("APPDATA"), "BiodiverseR/sp5380/perl/bin/perl"),
           perl_path
         )
-        # if (path_extras != "") {
-        #   Sys.setenv("PATH" = sprintf("%s;%s", path_extras, Sys.getenv("PATH")))
-        # }
       }
       else {
         args = c(server_path, "daemon", "-l", server_url)

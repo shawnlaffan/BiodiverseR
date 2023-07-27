@@ -38,7 +38,7 @@ install_strawberry_perl = function () {
       #paste(p, collapse=";")
       Sys.setenv(PERL_CPANM_HOME = path(extract_to, "data"))
       #system ("where cpanm")
-      system ("cpanm -v --notest Win32::LongPath")  #  symlink test issues
+      system ("cpanm -v --notest Win32::LongPath")  #  test issues under 5.38.0
       system ("cpanm -v https://github.com/shawnlaffan/biodiverse.git")
       setwd ("inst/perl")
       system ("cpanm -v --installdeps .")
