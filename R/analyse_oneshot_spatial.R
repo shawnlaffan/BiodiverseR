@@ -9,35 +9,12 @@
 #' @export
 #' @examples
 #' if(interactive()) {
-#'   analyse_rasters_spatial (
+#'   analyse_oneshot_spatial (
 #'     raster_files = c("r1.tif", "r2.tif"),
 #'     calculations = c("calc_endemism_central", "calc_richness", "calc_pd"),
 #'     tree = some_phylo_tree
 #'   )
 #' }
-
-convert_to_params <- function(list) {
-  if (!is.null(list)) {
-
-    #Check if the first file passed in is a shapefile or spreadsheet
-    file_ends <- list(".shp", ".xlsx", ".xls", ".ods", ".sxc")
-    flag <- FALSE
-    for (i in seq(1, length(file_ends))) {
-      if (grepl(file_ends[i], list[[1]][[1]])) {
-        flag <- TRUE
-      }
-    }
-
-    if (flag) {
-      #format for shapefiles and spreadsheets
-      return(list(files = list[[1]], group_field_names = list[[2]], label_field_names = list[[3]], sample_count_col_names = list[[4]])) # nolint
-    } else {
-      #format for delimited text files
-      return(list(files = list[[1]], group_columns = list[[2]], label_columns = list[[3]], sample_count_columns = list[[4]])) # nolint
-    }
-  }
-}
-
 #format for data is list(list(files), list(group_columns), list(label_columns), list(sample_count_columns)) # nolint
 analyse_oneshot_spatial <- function(
     raster_files = NULL,
@@ -132,4 +109,29 @@ analyse_oneshot_spatial <- function(
   #check if the processign happened before this function, using  utils::str (call_results)
 
   return(processed_results)
+}
+
+#' Doodle and fiddle to get some args in the right format
+#' @param list list
+#' @noRd
+convert_to_params <- function(list) {
+  if (!is.null(list)) {
+
+    #Check if the first file passed in is a shapefile or spreadsheet
+    file_ends <- list(".shp", ".xlsx", ".xls", ".ods", ".sxc")
+    flag <- FALSE
+    for (i in seq(1, length(file_ends))) {
+      if (grepl(file_ends[i], list[[1]][[1]])) {
+        flag <- TRUE
+      }
+    }
+
+    if (flag) {
+      #format for shapefiles and spreadsheets
+      return(list(files = list[[1]], group_field_names = list[[2]], label_field_names = list[[3]], sample_count_col_names = list[[4]])) # nolint
+    } else {
+      #format for delimited text files
+      return(list(files = list[[1]], group_columns = list[[2]], label_columns = list[[3]], sample_count_columns = list[[4]])) # nolint
+    }
+  }
 }
