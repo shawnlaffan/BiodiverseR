@@ -1,4 +1,5 @@
-file_path <- "../../inst/extdata"
+file_path <- system.file("extdata", package ="BiodiverseR")
+
 
 test_that("Analyse rasters handles JSON and rasterfiles", {
    gp_lb <- list(
@@ -134,7 +135,7 @@ test_that("Analyse rasters handles spreadsheet and shapefiles", {
     expect_no_error(
         analyse_oneshot_spatial(
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
-            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
+            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
         ), message = "analyse_oneshot_spatial should not throw an error")
@@ -148,7 +149,7 @@ test_that("Analyse rasters handles delim and shapefiles", {
     expect_no_error(
         analyse_oneshot_spatial(
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
-            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
+            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
         ), message = "analyse_oneshot_spatial should not throw an error")
@@ -178,7 +179,7 @@ test_that("Analyse rasters handles spreadsheet, delim and shapefiles", {
         analyse_oneshot_spatial(
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
-            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
+            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
         ), message = "analyse_oneshot_spatial should not throw an error")
@@ -199,7 +200,7 @@ test_that("Analyse rasters handles spreadsheet, delim, shape, JSON", {
             r_data = gp_lb,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
-            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
+            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
         ), message = "analyse_oneshot_spatial should not throw an error")
@@ -217,7 +218,7 @@ test_that("Analyse rasters handles spreadsheet, delim, shape, raster", {
             raster_files = rasters,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
-            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
+            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
         ), message = "analyse_oneshot_spatial should not throw an error")
@@ -241,7 +242,7 @@ test_that("Analyse all files", {
             raster_files = rasters,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
-            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
+            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
         ), message = "analyse_oneshot_spatial should not throw an error")

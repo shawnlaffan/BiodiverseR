@@ -1,6 +1,3 @@
-library("ape")
-
-file_path <- "../../inst/extdata"
 
 test_that("R side oneshot analysis works 2 no tree", {
 
@@ -19,7 +16,8 @@ test_that("R side oneshot analysis works 2 no tree", {
   )
   row.names(exp$SPATIAL_RESULTS) <- c("250:250", "250:750", "750:250", "750:750") # nolint
 
-  #get raster files
+  # get raster files
+  file_path <- system.file("extdata", package ="BiodiverseR")
   rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
   #  sanity check
@@ -57,8 +55,11 @@ test_that("R side oneshot analysis works 2 with tree", {
     )
     row.names(exp$SPATIAL_RESULTS) = c("250:250", "250:750", "750:250", "750:750")
 
+    file_path <- system.file("extdata", package ="BiodiverseR")
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE))
-    tree <- read.nexus("../../inst/extdata/tree.nex")
+    treefile = system.file("extdata/tree.nex", package ="BiodiverseR")
+    tree <- ape::read.nexus(treefile)
+
 
     #  sanity check
     expect_equal (length(rasters), 3, label='we found three rasters')
@@ -74,18 +75,20 @@ test_that("R side oneshot analysis works 2 with tree", {
 })
 
 test_that("Analyse all files and tree", {
-   gp_lb <- list(
-        "50:50" = list(label1 = 1, label2 = 1), # nolint
-        "150:150" = list(label1 = 1, label2 = 1) # nolint
-  )
+    file_path <- system.file("extdata", package ="BiodiverseR")
+    gp_lb <- list(
+      "50:50" = list(label1 = 1, label2 = 1), # nolint
+      "150:150" = list(label1 = 1, label2 = 1) # nolint
+    )
 
     spreadsheets = normalizePath(list.files (path = file_path, pattern = "r[123].xlsx$", full.names=TRUE)) # nolint
     delim_files = normalizePath(list.files (path = file_path, pattern = "r[123].csv$", full.names=TRUE)) # nolint
     shape_files = normalizePath(list.files(path = file_path, pattern = "r[123].shp$", full.names=TRUE)) # nolint
     rasters = normalizePath(list.files (path = file_path, pattern = "r[123].tif$", full.names=TRUE)) # nolint
 
-    tree <- read.nexus("../../inst/extdata/tree.nex")
-    
+    treefile = system.file("extdata/tree.nex", package ="BiodiverseR")
+    tree <- ape::read.nexus(treefile)
+
     #since exp is random expect equal is false. Tests for errors
     expect_no_error(
         analyse_oneshot_spatial(
@@ -93,7 +96,7 @@ test_that("Analyse all files and tree", {
             raster_files = rasters,
             spreadsheet_data = list(spreadsheets, list("X", "Y"), list("label"), list("count")), #nolint
             delimited_text_file_data = list(delim_files, list(1, 2), list(4), list(3)), #nolint
-            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint 
+            shapefile_data = list(shape_files, list(":shape_x", ":shape_y"), list("label"), list("count")), #nolint
             cellsizes = c(100, 100),
             calculations = c("calc_endemism_central", "calc_pd", "calc_redundancy"), #nolint
             tree = tree

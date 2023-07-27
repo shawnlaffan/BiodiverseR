@@ -1,6 +1,5 @@
-library("ape")
+file_path <- system.file("extdata", package ="BiodiverseR")
 
-file_path <- "../../inst/extdata"
 
 test_that("Analyse rasters handles JSON", {
     gp_lb <- list(
