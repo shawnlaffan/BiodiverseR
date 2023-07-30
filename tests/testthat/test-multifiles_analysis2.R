@@ -25,7 +25,7 @@ test_that("Analyse oneshot handles multiple input files", {
     )
   )
 
-  tree = read.nexus (fs::path(file_path, "tree.nex"))
+  tree = ape::read.nexus (fs::path(file_path, "tree.nex"))
 
   expected_sp_results = data.frame(
     Axis_0         = c(250, 250, 750, 750),
