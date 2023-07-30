@@ -27,9 +27,21 @@ Second, install the R package.
 This currently requires a working perl interpreter in your path. (Future
 versions will provide self contained executables).
 
+### Windows
+
 On Windows a perl interpreter can be obtained through the [Strawberry
-perl project](https://strawberryperl.com/releases.html). Most
-unix-derived systems provide a perl interpreter but it is best to avoid
+perl project](https://strawberryperl.com/releases.html), and there is
+a function to do this for you. Note that this will take a while and
+send large amounts of text to the console.  
+
+```
+devtools::load_all()
+BiodiverseR::install_strawberry_perl()
+```
+
+### Unix/Mac
+
+Most unix-derived systems provide a perl interpreter but it is best to avoid
 this and use a system like [perlbrew](https://perlbrew.pl/). Be sure to
 also install the cpanm utility (see perlbrew site for details).
 
@@ -40,11 +52,6 @@ requires that you have git installed on your system and in the path.
 
 This code also assumes you have run a git clone of this repo and are at
 the top level of this repo.
-
-Do not run this code using the RStudio console, particularly on Windows.
-The rtools libraries can interfere with some of the perl module compilations,
-and the RStudioconsole adds these to the path.  If you are on Windows then 
-use a ```Cmd``` window.  
 
 ``` bash
 cpanm https://github.com/shawnlaffan/biodiverse.git
@@ -62,6 +69,8 @@ If you want to see things as they happen then add the verbose flag to
 the cpanm calls (`cpanm --verbose ...`).
 
 2.  Install the R code
+
+(You might already have done this in one of the steps above).
 
 You can install the R code like so:
 
