@@ -19,9 +19,21 @@ install_strawberry_perl = function () {
     fs::dir_create(extract_to)
   }
 
+  oldtimeout = options()$timeout
   if (!fs::file_exists(sp_zip)) {
-    utils::download.file (sp_url, sp_zip)
-    utils::unzip (sp_zip, exdir = extract_to)
+    tryCatch ({
+      options (timeout = 180)
+      utils::download.file (sp_url, sp_zip)
+      utils::unzip (sp_zip, exdir = extract_to)
+      options(timeout = oldtimeout)
+    },
+    error=function(err){
+      message(paste("Issues downloading strawberry perl, possible timeout:  ", err))
+      unlink(sp_zip)
+      options(timeout = oldtimeout)
+      stop()
+    }
+    )
   }
 
   old_path = Sys.getenv('PATH')
