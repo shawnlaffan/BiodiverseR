@@ -19,9 +19,21 @@ install_strawberry_perl = function () {
     fs::dir_create(extract_to)
   }
 
+  oldtimeout = options()$timeout
   if (!fs::file_exists(sp_zip)) {
-    utils::download.file (sp_url, sp_zip)
-    utils::unzip (sp_zip, exdir = extract_to)
+    tryCatch ({
+      options (timeout = 180)
+      utils::download.file (sp_url, sp_zip)
+      utils::unzip (sp_zip, exdir = extract_to)
+      options(timeout = oldtimeout)
+    },
+    error=function(err){
+      message(paste("Issues downloading strawberry perl, possible timeout:  ", err))
+      unlink(sp_zip)
+      options(timeout = oldtimeout)
+      stop()
+    }
+    )
   }
 
   old_path = Sys.getenv('PATH')
@@ -42,8 +54,24 @@ install_strawberry_perl = function () {
       Sys.setenv(PERL_CPANM_HOME = fs::path(extract_to, "data"))
       #system ("where cpanm")
       system ("cpanm -v --notest Win32::LongPath")  #  test issues under 5.38.0
-      system ("cpanm -v https://github.com/shawnlaffan/biodiverse.git")
-      setwd ("inst/perl")
+      bd_git_path = fs::path(bd_path, "biodiverse_git")
+      if (!fs::dir_exists(bd_git_path)) {
+        system2 (
+          "git",
+          args = c(
+            "clone",
+            "--depth", "1",
+            "https://github.com/shawnlaffan/biodiverse.git",
+            bd_git_path
+          )
+        )
+      }
+      setwd (bd_git_path)
+      system ("git pull")  #  run regardless
+      system ("cpanm --verbose --installdeps .")
+      system ("cpanm --verbose .")
+      setwd(old_wd)
+      setwd (system.file("perl", package ="BiodiverseR"))
       system ("cpanm -v --installdeps .")
       Sys.setenv(PATH = old_path)
       setwd(old_wd)
