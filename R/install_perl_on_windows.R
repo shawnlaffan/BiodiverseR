@@ -69,7 +69,7 @@ install_strawberry_perl = function () {
       setwd (bd_git_path)
       system ("git pull")  #  run regardless
       system ("cpanm --verbose --installdeps .")
-      system ("cpanm --verbose --notests .") #  fails one test due to 5.38 changes
+      system ("cpanm --verbose .")
       setwd(old_wd)
       setwd (system.file("perl", package ="BiodiverseR"))
       system ("cpanm -v --installdeps .")
