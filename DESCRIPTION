@@ -33,5 +33,8 @@ Imports:
     httr,
     rjson,
     tools,
-    ape
+    ape, 
+    sf, 
+    raster,
+    dplyr
 
