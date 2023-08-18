@@ -35,6 +35,6 @@ Imports:
     tools,
     ape, 
     sf, 
-    raster,
+    terra,
     dplyr
 
