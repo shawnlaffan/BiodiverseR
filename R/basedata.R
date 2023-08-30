@@ -28,7 +28,7 @@ basedata = R6Class("basedata",
     cellsizes   = NULL,
     cellorigins = NULL,
     initialize = function(
-        name = date(),
+        name = paste("BiodiverseR::basedata", date()),
         cellsizes,
         cellorigins,
         port=0, use_exe=FALSE, perl_path=NA
