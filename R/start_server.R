@@ -27,6 +27,9 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     bd_base_dir = find.package("BiodiverseR")
     message ("Env var Biodiverse_basepath not set, assuming ", bd_base_dir)
   }
+  if (is.null(perl_path) || is.na(perl_path)) {
+    perl_path = ""
+  }
 
   path_extras = ""
   running_on_windows = Sys.info()[['sysname']] == "Windows"
