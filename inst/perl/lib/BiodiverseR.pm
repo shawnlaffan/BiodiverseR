@@ -103,7 +103,7 @@ $log->debug("Called startup");
         return $c->render(json => $result);
     });
 
-    $r->post ('/load_data' => sub ($c) {
+    $r->post ('/bd_load_data' => sub ($c) {
         my $analysis_params = $c->req->json;
 
         $log->debug("parameters are:");
@@ -119,19 +119,19 @@ $log->debug("Called startup");
         };
         croak "Cannot load data into basedata"
           if !$result;
-        my $bd = BiodiverseR::BaseData->get_basedata_ref;
-        say STDERR "LOADED, result is $result, group count is " . $bd->get_group_count;
+        # my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        # say STDERR "LOADED, result is $result, group count is " . $bd->get_group_count;
         #  should just return success or failure
         return $c->render(json => $result);
     });
 
-    $r->post ('/get_basedata_group_count' => sub ($c) {
+    $r->post ('/bd_get_group_count' => sub ($c) {
         my $bd = BiodiverseR::BaseData->get_basedata_ref;
         my $result = $bd ? $bd->get_group_count : undef;
         return $c->render(json => $result);
     });
 
-    $r->post ('/get_basedata_label_count' => sub ($c) {
+    $r->post ('/bd_get_label_count' => sub ($c) {
         my $bd = BiodiverseR::BaseData->get_basedata_ref;
         my $result = $bd ? $bd->get_label_count : undef;
         return $c->render(json => $result);

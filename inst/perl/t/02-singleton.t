@@ -85,14 +85,14 @@ foreach my $file_type (@file_arg_keys) {
         ->status_is(200, "status init, $t_msg_suffix")
         ->json_is('' => 1, "json results, $t_msg_suffix");
 
-    $t->post_ok('/load_data' => json => $data_params)
+    $t->post_ok('/bd_load_data' => json => $data_params)
         ->status_is(200, "status load data, $t_msg_suffix")
         ->json_is('' => 1, "json results, $t_msg_suffix");
 
-    $t->post_ok('/get_basedata_group_count')
+    $t->post_ok('/bd_get_group_count')
         ->status_is(200, "status gp count, $t_msg_suffix")
         ->json_is('' => 4, "group count, $t_msg_suffix");
-    $t->post_ok('/get_basedata_label_count')
+    $t->post_ok('/bd_get_label_count')
         ->status_is(200, "status lb count, $t_msg_suffix")
         ->json_is('' => 3, "label count, $t_msg_suffix");
 

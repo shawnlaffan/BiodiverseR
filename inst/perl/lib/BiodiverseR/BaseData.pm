@@ -87,7 +87,7 @@ sub load_data {
             );
         };
         croak $@ if $@;
-        say STDERR "LOADED RASTER DATA";
+        # say STDERR "LOADED RASTER DATA";
         #_dump_sample_counts ($bd);
     }
 
@@ -173,5 +173,7 @@ sub load_data {
 
     return 1;
 }
+
+
 
 1;
