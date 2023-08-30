@@ -92,10 +92,7 @@ $log->debug("Called startup");
         $log->debug(np ($analysis_params));
 
         my $result = eval {
-            BiodiverseR::BaseData->init_basedata (
-                #  hack for development
-                is_arrayref $analysis_params ? @$analysis_params : %$analysis_params,
-            );
+            BiodiverseR::BaseData->init_basedata ($analysis_params);
             1;
         } or die "Cannot initialise basedata";
 
@@ -111,10 +108,7 @@ $log->debug("Called startup");
         $log->debug("About to call load_data");
 
         my $result = eval {
-            BiodiverseR::BaseData->load_data (
-                #  hack for development
-                is_arrayref $analysis_params ? @$analysis_params : %$analysis_params,
-            );
+            BiodiverseR::BaseData->load_data ($analysis_params);
             1;
         };
         croak "Cannot load data into basedata"
@@ -145,7 +139,7 @@ $log->debug("Called startup");
 
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
-        $log->debug("About to call load_data");
+        $log->debug("About to call run_spatial_analysis");
 
         my $result = eval {
             BiodiverseR::BaseData->run_spatial_analysis ($analysis_params);

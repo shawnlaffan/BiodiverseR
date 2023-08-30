@@ -21,13 +21,12 @@ sub get_instance {
     return $instance;
 }
 
-sub init_basedata {
-    my ($class, %args) = @_;
+sub init_basedata ($class, $args) {
     my $self = $class->get_instance;
     my %params = (
-        NAME         => ($args{name} // 'BiodiverseR'),
-        CELL_SIZES   => $args{cellsizes},
-        CELL_ORIGINS => $args{cellorigins},
+        NAME         => ($args->{name} // ('BiodiverseR ' . localtime())),
+        CELL_SIZES   => $args->{cellsizes},
+        CELL_ORIGINS => $args->{cellorigins},
     );
 
     my $bd = Biodiverse::BaseData->new (%params);
@@ -41,11 +40,10 @@ sub get_basedata_ref {
 }
 
 
-sub load_data {
-    my ($class, %args) = @_;
+sub load_data ($class, $args) {
     my $bd = get_basedata_ref();
 
-    if (my $bd_data = $args{bd_params}) {
+    if (my $bd_data = $args->{bd_params}) {
         my $data = $bd_data->{data};
         # say STDERR "Loading bd_data";
         # p $bd_data;
@@ -67,8 +65,8 @@ sub load_data {
     }
 
     #need to check if files in the raster exist
-    if ($args{raster_params}{files}) {
-        my $params = $args{raster_params};
+    if ($args->{raster_params}{files}) {
+        my $params = $args->{raster_params};
         my $files = $params->{files} // croak 'raster_params must include an array of files';
         if (!is_ref($files)) {
             $files = [$files];
@@ -94,8 +92,8 @@ sub load_data {
     }
 
     #  some shapefiles
-    if ($args{shapefile_params}{files}) {
-        my $params = $args{shapefile_params};
+    if ($args->{shapefile_params}{files}) {
+        my $params = $args->{shapefile_params};
         # p $params;
         my $files = $params->{files} // croak 'shapefile_params must include an array of files';
         if (!is_ref($files)) {
@@ -120,9 +118,9 @@ sub load_data {
     }
     #  some delimited text files
     # p $analysis_params;
-    if ($args{delimited_text_params}{files}) {
+    if ($args->{delimited_text_params}{files}) {
         # say STDERR "LOADING CSV DATA";
-        my $params = $args{delimited_text_params};
+        my $params = $args->{delimited_text_params};
         # p $params;
         my $files = $params->{files} // croak 'delimited_text_params must include an array of files';
         if (!is_ref($files)) {
@@ -146,8 +144,8 @@ sub load_data {
         # _dump_sample_counts ($bd);
     }
     #  some spreadsheets
-    if ($args{spreadsheet_params}{files}) {
-        my $params = $args{spreadsheet_params};
+    if ($args->{spreadsheet_params}{files}) {
+        my $params = $args->{spreadsheet_params};
         # p $files;
         my $files = $params->{files} // croak 'spreadsheet_params must include an array of files';
         if (!is_ref($files)) {
