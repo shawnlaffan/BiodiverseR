@@ -34,9 +34,11 @@ basedata = R6Class("basedata",
         port=0, use_exe=FALSE, perl_path=NA
       ) {
       self$name = name
+
       checkmate::assert_vector(cellsizes, any.missing=FALSE, min.len=1)
       checkmate::assert_numeric(cellsizes)
       self$cellsizes = cellsizes
+
       if (missing(cellorigins)) {
         cellorigins = cellsizes * 0
       }
