@@ -11,6 +11,7 @@ use Carp qw /croak/;
 use BiodiverseR::SpatialAnalysisOneShot;
 use BiodiverseR::Data;
 use BiodiverseR::IndicesMetadata;
+use BiodiverseR::BaseData;
 
 use Biodiverse::BaseData;
 use Biodiverse::ReadNexus;
@@ -67,22 +68,77 @@ $log->debug("Called startup");
       return $c->render(json => $metadata);
   });
 
-  #  pass some data, get a result.  Or the broken pieces.
-  $r->post ('/analysis_spatial_oneshot' => sub ($c) {
-    my $analysis_params = $c->req->json;
+    #  pass some data, get a result.  Or the broken pieces.
+    $r->post ('/analysis_spatial_oneshot' => sub ($c) {
+        my $analysis_params = $c->req->json;
 
-$log->debug("parameters are:");
-$log->debug(np ($analysis_params));
+        $log->debug("parameters are:");
+        $log->debug(np ($analysis_params));
 
-    my $oneshot = BiodiverseR::SpatialAnalysisOneShot->new;
-    my $results = $oneshot->run_analysis($analysis_params);
+        my $oneshot = BiodiverseR::SpatialAnalysisOneShot->new;
+        my $results = $oneshot->run_analysis($analysis_params);
 
-$log->debug("Table is:");
-$log->debug(np ($results));
+        $log->debug("Table is:");
+        $log->debug(np ($results));
 
-    return $c->render(json => $results);
-  });
-  
+        return $c->render(json => $results);
+    });
+
+    #  initialise a basedata.
+    $r->post ('/init_basedata' => sub ($c) {
+        my $analysis_params = $c->req->json;
+
+        $log->debug("parameters are:");
+        $log->debug(np ($analysis_params));
+
+        my $result = eval {
+            BiodiverseR::BaseData->init_basedata (
+                #  hack for development
+                is_arrayref $analysis_params ? @$analysis_params : %$analysis_params,
+            );
+            1;
+        } or die "Cannot initialise basedata";
+
+        #  should just return success or failure
+        return $c->render(json => $result);
+    });
+
+    $r->post ('/load_data' => sub ($c) {
+        my $analysis_params = $c->req->json;
+
+        $log->debug("parameters are:");
+        $log->debug(np ($analysis_params));
+        $log->debug("About to call load_data");
+
+        my $result = eval {
+            BiodiverseR::BaseData->load_data (
+                #  hack for development
+                is_arrayref $analysis_params ? @$analysis_params : %$analysis_params,
+            );
+            1;
+        };
+        croak "Cannot load data into basedata"
+          if !$result;
+        my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        say STDERR "LOADED, result is $result, group count is " . $bd->get_group_count;
+        #  should just return success or failure
+        return $c->render(json => $result);
+    });
+
+    $r->post ('/get_basedata_group_count' => sub ($c) {
+        my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        my $result = $bd ? $bd->get_group_count : undef;
+        return $c->render(json => $result);
+    });
+
+    $r->post ('/get_basedata_label_count' => sub ($c) {
+        my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        my $result = $bd ? $bd->get_label_count : undef;
+        return $c->render(json => $result);
+    });
+
+
 }
+
 
 1;
