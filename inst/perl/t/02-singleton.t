@@ -7,6 +7,8 @@ use Test::More;
 use Test::Mojo;
 use Data::Printer;
 
+use Test::TempDir::Tiny;
+
 my $data_dir = curfile->dirname->dirname->sibling('extdata')->to_string;
 
 my $t = Test::Mojo->new('BiodiverseR');
@@ -102,8 +104,20 @@ foreach my $file_type (@file_arg_keys) {
         ->json_is('' => $exp, "json results, $t_msg_suffix");
 
     # p $t->tx->res->json;
-}
 
+    #  no need to test this more than once
+    if ($file_type =~ /bd_params/) {
+        my $dir = tempdir();
+        my $filename = Mojo::File->new($dir, "$file_type.bds");
+        $t->post_ok('/bd_save_to_bds' => json => {filename => $filename})
+            ->status_is(200, "status save basedata, $t_msg_suffix")
+            ->json_is('' => 1, "json results, $t_msg_suffix");
+        ok -e $filename, "$filename exists";
+        my $bd = Biodiverse::BaseData->new(file => $filename);
+        is $bd->get_group_count, 4, "saved basedata has expected group count";
+        is $bd->get_label_count, 3, "saved basedata has expected label count";
+    }
+}
 
 
 done_testing();

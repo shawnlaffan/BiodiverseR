@@ -158,6 +158,15 @@ $log->debug("Called startup");
         return $c->render(json => $result);
     });
 
+    $r->post ('/bd_save_to_bds' => sub ($c) {
+        my $args = $c->req->json;
+        my $filename = $args->{filename};
+        my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        return $c->render(json => undef)
+          if !$bd || !defined $filename;
+        my $result = $bd->save(filename => $filename);
+        return $c->render(json => defined $result);
+    });
 
 
 
