@@ -23,7 +23,8 @@ install_strawberry_perl = function () {
   if (!fs::file_exists(sp_zip)) {
     tryCatch ({
       options (timeout = 180)
-      utils::download.file (sp_url, sp_zip)
+      #utils::download.file (sp_url, sp_zip)
+      httr::GET(sp_url, write_disk(sp_zip, overwrite=TRUE))
       utils::unzip (sp_zip, exdir = extract_to)
       options(timeout = oldtimeout)
     },
@@ -40,13 +41,11 @@ install_strawberry_perl = function () {
   old_wd = getwd()
   tryCatch ( {
 
-      p <- Sys.getenv("PATH") |> strsplit(";") |> unlist()
+      p <- Sys.getenv("PATH") |> strsplit(";") |> unlist() |> fs::path()
       #p <- p[!grepl("rtools", p)]
       p <- grep (pattern="rtools", p, invert=TRUE, value=TRUE)
       p <- c(
-        fs::path (extract_to, "c/bin"),
-        fs::path (extract_to, "perl/site/bin"),
-        fs::path (extract_to, "perl/bin"),
+        fs::path (extract_to, c("c/bin", "perl/site/bin", "perl/bin")),
         unlist (p)
       )
       Sys.setenv(PATH = paste(p, collapse=";"))
