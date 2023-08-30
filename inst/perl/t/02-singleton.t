@@ -26,13 +26,13 @@ my $exp = {
 my $json_tree = '{"edge":[4,5,5,4,5,1,2,3],"edge.length":["NaN",1,1,2],"Nnode":2,"tip.label":["r1","r2","r3"]}';
 my $tree = JSON::MaybeXS::decode_json ($json_tree);
 # p $tree;
-my %common_args = (
-    bd              => {
-        params => { name => 'blognorb', cellsizes => [ 500, 500 ] },
-    },
-    analysis_config => {
-        calculations => [ qw/calc_endemism_central calc_pd calc_redundancy/ ],
-    },
+my %bd_setup_params = (
+    name => 'blognorb',
+    cellsizes => [ 500, 500 ],
+);
+
+my %analysis_args = (
+    calculations => [ qw/calc_endemism_central calc_pd calc_redundancy/ ],
     tree => $tree,
 );
 
@@ -71,16 +71,16 @@ my %file_type_args = (
 );
 
 my @file_arg_keys = sort keys %file_type_args;
-# @file_arg_keys = 'raster_params';
+# @file_arg_keys = ($file_arg_keys[1]);
 
 foreach my $file_type (@file_arg_keys) {
-    diag "File type is $file_type";
-    my $bd_params = $common_args{bd}{params};
+    # diag "File type is $file_type";
+    my $bd_params = \%bd_setup_params;
     my $data_params = {
         $file_type => $file_type_args{$file_type},
     };
 
-    my $t_msg_suffix = 'default config, raster files';
+    my $t_msg_suffix = "default config, $file_type";
     $t->post_ok('/init_basedata' => json => $bd_params)
         ->status_is(200, "status init, $t_msg_suffix")
         ->json_is('' => 1, "json results, $t_msg_suffix");
@@ -97,8 +97,13 @@ foreach my $file_type (@file_arg_keys) {
         ->json_is('' => 3, "label count, $t_msg_suffix");
 
 
+    $t->post_ok('/bd_run_spatial_analysis' => json => \%analysis_args)
+        ->status_is(200, "status run spatial, $t_msg_suffix")
+        ->json_is('' => $exp, "json results, $t_msg_suffix");
+
     # p $t->tx->res->json;
 }
+
 
 
 done_testing();

@@ -5,7 +5,7 @@ use Mojo::Base 'Mojolicious', -signatures;
 #use Mojo::File qw(curfile);
 #use lib curfile->dirname->dirname->dirname->dirname->child('biodiverse/lib')->to_string;
 
-use Ref::Util qw /is_ref is_arrayref/;
+use Ref::Util qw /is_ref is_arrayref is_hashref/;
 use Carp qw /croak/;
 
 use BiodiverseR::SpatialAnalysisOneShot;
@@ -136,6 +136,29 @@ $log->debug("Called startup");
         my $result = $bd ? $bd->get_label_count : undef;
         return $c->render(json => $result);
     });
+
+    $r->post ('/bd_run_spatial_analysis' => sub ($c) {
+        my $analysis_params = $c->req->json;
+
+        croak "analysis_params must be a hash structure"
+          if !is_hashref $analysis_params;
+
+        $log->debug("parameters are:");
+        $log->debug(np ($analysis_params));
+        $log->debug("About to call load_data");
+
+        my $result = eval {
+            BiodiverseR::BaseData->run_spatial_analysis ($analysis_params);
+        };
+        croak "Cannot run spatial analysis, $@"
+            if $@;
+        # my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        # say STDERR "LOADED, result is $result, group count is " . $bd->get_group_count;
+        #  should just return success or failure
+        return $c->render(json => $result);
+    });
+
+
 
 
 }

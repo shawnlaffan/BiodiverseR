@@ -6,6 +6,8 @@ use warnings;
 use Carp;
 use Ref::Util qw/is_ref is_arrayref is_hashref/;
 
+use Mojo::Base 'Mojolicious', -signatures;
+
 use Data::Printer;
 
 use Biodiverse::BaseData;
@@ -174,6 +176,64 @@ sub load_data {
     return 1;
 }
 
+sub run_spatial_analysis ($self, $analysis_params) {
 
+    #  rjson converts single item vectors to scalars
+    #  so need to handle both scalars and arrays
+    my $spatial_conditions
+        = $analysis_params->{spatial_conditions} // ['sp_self_only()'];
+    if (is_ref($spatial_conditions) && !is_arrayref($spatial_conditions)) {
+        croak 'reftype of spatial_conditions must be array';
+    }
+    elsif (!is_ref($spatial_conditions)) {
+        $spatial_conditions = [$spatial_conditions];
+    }
+
+    my $calculations
+        = $analysis_params->{calculations} // ['calc_richness'];
+    if (is_ref($calculations) && !is_arrayref($calculations)) {
+        croak 'reftype of spatial_conditions must be array';
+    }
+    elsif (!is_ref($calculations)) {
+        $calculations = [$calculations];
+    }
+
+    my $result_lists
+        = $analysis_params->{result_lists} // ['SPATIAL_RESULTS'];
+    croak 'result_lists must be an array reference'
+        if !is_arrayref($result_lists);
+
+    my $bd = $self->get_basedata_ref;
+    croak "Data not yet loaded"
+        if !$bd->get_group_count;
+
+    my $tree;
+    if ($analysis_params->{tree}) {
+        my $readnex = Biodiverse::ReadNexus->new;
+        $readnex->import_data(data => $analysis_params->{tree});
+        my @results = $readnex->get_tree_array;
+        $tree = shift @results;
+    }
+    #p $bd->{LABELS};
+    #p $analysis_params->{tree};
+    #p $tree->{TREE_BY_NAME};
+    my $sp_name = $analysis_params->{name} // localtime();
+    my $sp = $bd->add_spatial_output(name => $sp_name);
+    $sp->run_analysis (
+        spatial_conditions => $spatial_conditions,
+        calculations => $calculations,
+        tree_ref => $tree,
+    );
+    #p $sp;
+    my @list_names = $sp->get_hash_list_names_across_elements(no_private => 1);
+    #p @list_names;
+    my %results;
+    foreach my $listname (@list_names) {
+        my $table = $sp->to_table (list => $listname, symmetric => 1);
+        $results{$listname} = $table;
+    }
+    # p %results;
+    return \%results;
+}
 
 1;
