@@ -35,4 +35,5 @@ Imports:
     tools,
     ape,
     utils,
-    R6
+    R6,
+    checkmate
