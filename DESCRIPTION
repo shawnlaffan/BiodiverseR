@@ -34,4 +34,6 @@ Imports:
     rjson,
     tools,
     ape,
-    utils
+    utils,
+    R6,
+    checkmate
