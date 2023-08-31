@@ -24,7 +24,7 @@ install_strawberry_perl = function () {
     tryCatch ({
       options (timeout = 180)
       #utils::download.file (sp_url, sp_zip)
-      httr::GET(sp_url, write_disk(sp_zip, overwrite=TRUE))
+      httr::GET(sp_url, httr::write_disk(sp_zip, overwrite=TRUE))
       utils::unzip (sp_zip, exdir = extract_to)
       options(timeout = oldtimeout)
     },
