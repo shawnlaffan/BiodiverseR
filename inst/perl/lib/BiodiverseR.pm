@@ -111,6 +111,8 @@ $log->debug("Called startup");
             BiodiverseR::BaseData->load_data ($analysis_params);
             1;
         };
+        my $e = $@;
+        $log->debug ($e) if $e;
         croak "Cannot load data into basedata"
           if !$result;
         # my $bd = BiodiverseR::BaseData->get_basedata_ref;
