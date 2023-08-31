@@ -39,6 +39,9 @@ sub get_basedata_ref {
     $self->{basedata};
 }
 
+sub _as_arrray_ref {
+    return is_ref ($_[0]) ? $_[0] : [$_[0]];
+}
 
 sub load_data ($class, $args) {
     my $bd = get_basedata_ref();
@@ -101,7 +104,7 @@ sub load_data ($class, $args) {
         }
         # p $bd_params;
         my %in_options_hash
-            = map {$_ => $params->{$_}}
+            = map {$_ => _as_arrray_ref($params->{$_})}
             (qw /group_field_names label_field_names sample_count_col_names/);
         #  add croaks for missing field names groups and labels
         # p %in_options_hash;
@@ -127,7 +130,7 @@ sub load_data ($class, $args) {
             $files = [$files];
         }
         my %in_options_hash
-            = map {$_ => $params->{$_}}
+            = map {$_ => _as_arrray_ref($params->{$_})}
             (qw /group_columns label_columns sample_count_columns/);
 
         #  add croaks for missing field names groups and labels
@@ -153,7 +156,7 @@ sub load_data ($class, $args) {
         }
         # p $bd_params;
         my %in_options_hash
-            = map {$_ => $params->{$_}}
+            = map {$_ => _as_arrray_ref($params->{$_})}
             (qw /group_field_names label_field_names sample_count_col_names/);
 
         #  add croaks for missing field names groups and labels
