@@ -142,7 +142,4 @@ basedata = R6Class("basedata",
   )
 )
 
-is_null_or_na = function (x) {
-  is.null(x) || is.na(x)
-}
 
