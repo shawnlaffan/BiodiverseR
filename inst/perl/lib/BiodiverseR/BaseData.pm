@@ -190,6 +190,8 @@ sub run_spatial_analysis ($self, $analysis_params) {
         $spatial_conditions = [$spatial_conditions];
     }
 
+    my $def_query = $analysis_params->{definition_query};
+
     my $calculations
         = $analysis_params->{calculations} // ['calc_richness'];
     if (is_ref($calculations) && !is_arrayref($calculations)) {
@@ -222,8 +224,9 @@ sub run_spatial_analysis ($self, $analysis_params) {
     my $sp = $bd->add_spatial_output(name => $sp_name);
     $sp->run_analysis (
         spatial_conditions => $spatial_conditions,
-        calculations => $calculations,
-        tree_ref => $tree,
+        definition_query   => $def_query,
+        calculations       => $calculations,
+        tree_ref           => $tree,
     );
     #p $sp;
     my @list_names = $sp->get_hash_list_names_across_elements(no_private => 1);
