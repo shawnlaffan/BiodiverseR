@@ -63,10 +63,17 @@ $log->debug("Called startup");
   # Normal route to controller
   $r->get('/')->to('Example#welcome');
 
-  $r->get('/calculations_metadata' => sub ($c) {
-      my $metadata = BiodiverseR::IndicesMetadata->get_indices_metadata();
-      return $c->render(json => $metadata);
-  });
+    $r->get('/calculations_metadata' => sub ($c) {
+        my $metadata;
+        my $success = eval {
+            $metadata = BiodiverseR::IndicesMetadata->get_indices_metadata();
+            1;
+        };
+        my $e = $@;
+        return error_as_json($c, $e)
+          if $e;
+        return success_as_json($c, $metadata);
+    });
 
     #  pass some data, get a result.  Or the broken pieces.
     $r->post ('/analysis_spatial_oneshot' => sub ($c) {
