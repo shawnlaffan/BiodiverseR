@@ -34,81 +34,33 @@ analyse_oneshot_spatial <- function(
     stopifnot("tree must be of class phylo or inherit from it" = inherits (tree, "phylo")) # nolint
   }
 
-  config <- start_server(...)
-
-  #prints out config, used for debugging
-  message("server process is live? ", config$server_object$is_alive())
-  stopifnot(config$server_object$is_alive())  #  need a better error
-
-  #  unique-ish name that is human readable
-  sp_output_name <- paste("BiodiversR_analyse_rasters_spatial", Sys.time())
-  params <- list(
-    analysis_config = list(
-      spatial_conditions = "sp_self_only()",  #  limited options for now
-      calculations = calculations
-    ),
-    raster_params = list(
+  bd = BiodiverseR:::basedata$new(
+    cellsizes = cellsizes
+  )
+  params = list (
+    raster_params = list (
       files = raster_files
     ),
     spreadsheet_params = convert_to_params(spreadsheet_data),
     delimited_text_params = convert_to_params(delimited_text_file_data),
     shapefile_params = convert_to_params(shapefile_data),
-    bd = list(
-      params = list(
-        name = sp_output_name,
-        cellsizes = cellsizes
-      ),
-    data = r_data
-    ),
+    r_data = list (data = r_data)
+  )
+  result = bd$load_data(params)
+
+  result = bd$run_spatial_analysis(
+    spatial_conditions = c("sp_self_only()"),
+    calculations = calculations,
     tree = tree
   )
-  params_as_json <- rjson::toJSON(params)
 
-  target_url <- paste0(config$server_url, "/analysis_spatial_oneshot")
+  #  clean up
+  bd$stop_server()
+  bd = NULL
+  gc()
 
-  response <- httr::POST(
-    url = target_url,
-    body = params_as_json,
-    encode = "json",
-  )
-  httr::stop_for_status(response)
-
-  call_results <- httr::content(response, "parsed")
-
-  #  terminate the server - don't wait for garbage collection
-  config$server_object$kill()
-
-  processed_results <- list()
-  #apply? - nah.  There will never be more than ten list elements
-  #  convert list structure to a data frame
-  #  maybe the server could give a more DF-like structure,
-  #  but this is already an array
-  for (list_name in sort(names(call_results))) {
-    #Spatial results is the only result in our test case. Which contains a list of expected stuff # nolint
-    message("Processing ", list_name)
-
-    results <- call_results[[list_name]]  #  need to handle when it is not there
-    header <- unlist(results[[1]])
-    results[[1]] <- NULL  #  remove the header
-    #99 percent sure this removes the names of the rows, like axis_0, can always check  #nolint
-
-    df <- do.call(rbind, lapply(results, rbind)) |> as.data.frame()
-    df[df == "NULL"] <- NA
-    colnames(df) <- header
-    if (header[1] == "ELEMENT") {
-      #  make the element names the row names, and remove from main table
-      row.names(df) <- df$ELEMENT
-      df[[1]] <- NULL
-      #  the other data are numeric for raster inputs
-      for (c in colnames(df)) {
-        df[[c]] <- as.numeric(df[[c]])
-      }
-    }
-    processed_results[[list_name]] <- df
-  }
-  #check if the processign happened before this function, using  utils::str (call_results)
-
-  return(processed_results)
+  # message(result)
+  return (result)
 }
 
 #' Doodle and fiddle to get some args in the right format
