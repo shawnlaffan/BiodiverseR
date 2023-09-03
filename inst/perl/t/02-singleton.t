@@ -15,16 +15,19 @@ my $t = Test::Mojo->new('BiodiverseR');
 $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
 
 my $exp = {
-    SPATIAL_RESULTS => [
-        [qw /ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/],
-        ['250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99992743983553',  '0.99992743983553'],
-        ['250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999910222647833', '0.999910222647833'],
-        ['750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999909793426948', '0.999909793426948'],
-        ['750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999885974914481', '0.999885974914481'],
-    ]
+    result => {
+        SPATIAL_RESULTS => [
+            [ qw/ELEMENT Axis_0 Axis_1 ENDC_CWE ENDC_RICHNESS ENDC_SINGLE ENDC_WE PD PD_P PD_P_per_taxon PD_per_taxon REDUNDANCY_ALL REDUNDANCY_SET1/ ],
+            [ '250:250', '250', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.99992743983553', '0.99992743983553' ],
+            [ '250:750', '250', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999910222647833', '0.999910222647833' ],
+            [ '750:250', '750', '250', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999909793426948', '0.999909793426948' ],
+            [ '750:750', '750', '750', '0.25', 3, '0.75', '0.75', 4, 1, '0.333333333333333', '1.33333333333333', '0.999885974914481', '0.999885974914481' ],
+        ]
+    },
+    error  => undef,
 };
 
-#  plenty repetition below - could do with a refactor
+
 my $json_tree = '{"edge":[4,5,5,4,5,1,2,3],"edge.length":["NaN",1,1,2],"Nnode":2,"tip.label":["r1","r2","r3"]}';
 my $tree = JSON::MaybeXS::decode_json ($json_tree);
 # p $tree;
@@ -85,18 +88,18 @@ foreach my $file_type (@file_arg_keys) {
     my $t_msg_suffix = "default config, $file_type";
     $t->post_ok('/init_basedata' => json => $bd_params)
         ->status_is(200, "status init, $t_msg_suffix")
-        ->json_is('' => 1, "json results, $t_msg_suffix");
+        ->json_is('' => {result => 1, error => undef}, "json results, $t_msg_suffix");
 
     $t->post_ok('/bd_load_data' => json => $data_params)
         ->status_is(200, "status load data, $t_msg_suffix")
-        ->json_is('' => 1, "json results, $t_msg_suffix");
+        ->json_is('' => {result => 1, error => undef}, "json results, $t_msg_suffix");
 
     $t->post_ok('/bd_get_group_count')
         ->status_is(200, "status gp count, $t_msg_suffix")
-        ->json_is('' => 4, "group count, $t_msg_suffix");
+        ->json_is('' => {result => 4, error => undef}, "group count, $t_msg_suffix");
     $t->post_ok('/bd_get_label_count')
         ->status_is(200, "status lb count, $t_msg_suffix")
-        ->json_is('' => 3, "label count, $t_msg_suffix");
+        ->json_is('' => {result => 3, error => undef}, "label count, $t_msg_suffix");
 
 
     $t->post_ok('/bd_run_spatial_analysis' => json => \%analysis_args)
@@ -111,7 +114,7 @@ foreach my $file_type (@file_arg_keys) {
         my $filename = Mojo::File->new($dir, "$file_type.bds");
         $t->post_ok('/bd_save_to_bds' => json => {filename => $filename})
             ->status_is(200, "status save basedata, $t_msg_suffix")
-            ->json_is('' => 1, "json results, $t_msg_suffix");
+            ->json_is('' => {result => 1, error => ''}, "json results, $t_msg_suffix");
         ok -e $filename, "$filename exists";
         my $bd = Biodiverse::BaseData->new(file => $filename);
         is $bd->get_group_count, 4, "saved basedata has expected group count";

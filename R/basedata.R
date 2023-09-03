@@ -108,7 +108,17 @@ basedata = R6Class("basedata",
       httr::stop_for_status(response)
 
       call_results <- httr::content(response, "parsed")
-      call_results
+      #  check the error field
+      e = call_results[['error']]
+      if (
+           (checkmate::test_scalar(e) && e != "")
+        || !checkmate::test_scalar(e) && length(e)
+        ) {
+        message ("ERROR is :", e, ":")
+        stop (e)
+      }
+
+      call_results[['result']]
     },
     load_data = function (params) {
       BiodiverseR:::load_data_(self, params = params)
@@ -132,7 +142,4 @@ basedata = R6Class("basedata",
   )
 )
 
-is_null_or_na = function (x) {
-  is.null(x) || is.na(x)
-}
 

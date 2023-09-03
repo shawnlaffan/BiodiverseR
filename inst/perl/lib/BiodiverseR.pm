@@ -63,10 +63,17 @@ $log->debug("Called startup");
   # Normal route to controller
   $r->get('/')->to('Example#welcome');
 
-  $r->get('/calculations_metadata' => sub ($c) {
-      my $metadata = BiodiverseR::IndicesMetadata->get_indices_metadata();
-      return $c->render(json => $metadata);
-  });
+    $r->get('/calculations_metadata' => sub ($c) {
+        my $metadata;
+        my $success = eval {
+            $metadata = BiodiverseR::IndicesMetadata->get_indices_metadata();
+            1;
+        };
+        my $e = $@;
+        return error_as_json($c, $e)
+          if $e;
+        return success_as_json($c, $metadata);
+    });
 
     #  pass some data, get a result.  Or the broken pieces.
     $r->post ('/analysis_spatial_oneshot' => sub ($c) {
@@ -94,10 +101,12 @@ $log->debug("Called startup");
         my $result = eval {
             BiodiverseR::BaseData->init_basedata ($analysis_params);
             1;
-        } or die "Cannot initialise basedata";
+        };
+        my $e = $@;
+        return error_as_json ($c,  "Cannot initialise basedata, $e")
+            if $e;
 
-        #  should just return success or failure
-        return $c->render(json => $result);
+        return success_as_json ($c, $result);
     });
 
     $r->post ('/bd_load_data' => sub ($c) {
@@ -113,58 +122,78 @@ $log->debug("Called startup");
         };
         my $e = $@;
         $log->debug ($e) if $e;
-        croak "Cannot load data into basedata"
-          if !$result;
+        return error_as_json ($c, "Cannot load data into basedata, $e")
+          if $e;
         # my $bd = BiodiverseR::BaseData->get_basedata_ref;
         # say STDERR "LOADED, result is $result, group count is " . $bd->get_group_count;
         #  should just return success or failure
-        return $c->render(json => $result);
+        return success_as_json ($c, $result);
     });
 
     $r->post ('/bd_get_group_count' => sub ($c) {
         my $bd = BiodiverseR::BaseData->get_basedata_ref;
         my $result = $bd ? $bd->get_group_count : undef;
-        return $c->render(json => $result);
+        return success_as_json ($c, $result);
     });
 
     $r->post ('/bd_get_label_count' => sub ($c) {
         my $bd = BiodiverseR::BaseData->get_basedata_ref;
         my $result = $bd ? $bd->get_label_count : undef;
-        return $c->render(json => $result);
+        return success_as_json ($c, $result);
     });
 
     $r->post ('/bd_run_spatial_analysis' => sub ($c) {
         my $analysis_params = $c->req->json;
 
-        croak "analysis_params must be a hash structure"
-          if !is_hashref $analysis_params;
-
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
         $log->debug("About to call run_spatial_analysis");
 
+        return error_as_json($c,
+            ('analysis_params must be a hash structure, got '
+            . reftype($analysis_params)))
+          if !is_hashref ($analysis_params);
+
         my $result = eval {
             BiodiverseR::BaseData->run_spatial_analysis ($analysis_params);
         };
-        croak "Cannot run spatial analysis, $@"
-            if $@;
-        # my $bd = BiodiverseR::BaseData->get_basedata_ref;
-        # say STDERR "LOADED, result is $result, group count is " . $bd->get_group_count;
-        #  should just return success or failure
-        return $c->render(json => $result);
+        my $e = $@;
+        return error_as_json($c, "Cannot run spatial analysis\n$e")
+            if $e;
+
+        return success_as_json($c, $result);
     });
 
     $r->post ('/bd_save_to_bds' => sub ($c) {
         my $args = $c->req->json;
         my $filename = $args->{filename};
-        my $bd = BiodiverseR::BaseData->get_basedata_ref;
-        return $c->render(json => undef)
-          if !$bd || !defined $filename;
-        my $result = $bd->save(filename => $filename);
-        return $c->render(json => defined $result);
+        my $result = eval {
+            my $bd = BiodiverseR::BaseData->get_basedata_ref;
+            return $c->render(json => undef)
+                if !$bd || !defined $filename;
+            $bd->save(filename => $filename);
+        };
+        my $e = $@;
+        return $c->render(json => {error => $e, result => defined $result});
     });
 
+    sub success_as_json ($c, $result) {
+        return $c->render(
+            json => {
+                error  => undef,
+                result => $result,
+            }
+        );
+    }
 
+    sub error_as_json ($c, $error) {
+        return $c->render(
+            json => {
+                error  => $error,
+                result => undef
+            }
+        );
+    }
 
 }
 
