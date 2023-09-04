@@ -27,6 +27,9 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     bd_base_dir = find.package("BiodiverseR")
     message ("Env var Biodiverse_basepath not set, assuming ", bd_base_dir)
   }
+  if (is.null(perl_path) || is.na(perl_path)) {
+    perl_path = ""
+  }
 
   path_extras = ""
   running_on_windows = Sys.info()[['sysname']] == "Windows"
@@ -49,22 +52,10 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
       server_path = file.path(bd_base_dir, 'perl', 'script', "BiodiverseR")
     }
     if (running_on_windows && perl_path != "") {
-      if (tools::file_ext(perl_path) == "") {  #  append .exe
+      if (tools::file_ext(perl_path) == "") {  #  append .exe if needed
         perl_path = sprintf ("%s.exe", perl_path)
       }
       stopifnot("perl_path does not exist"=file.exists(perl_path))
-      r = processx::run(perl_path, "-V")
-      on_strawberry = grep("uname.+strawberry", strsplit(unlist(r), "\n"))
-      if (on_strawberry > 0) {
-        #  need to add to the path
-        path_extras = normalizePath(c(
-          file.path(perl_path, '..'),
-          file.path(perl_path, '../../site/bin'),
-          file.path(perl_path, '../../../c/bin')
-        ))
-        path_extras = paste0(path_extras, collapse=";")
-        message ("Will prepend to path: ", path_extras)
-      }
     }
   }
   message (sprintf("server_path is %s", server_path))
@@ -92,10 +83,12 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
       if (running_on_windows) {
         message ("WE ARE RUNNING ON WINDOWS")
         args = c(server_path, "daemon", "-l", server_url)
-        cmd = ifelse(perl_path == "", "perl", perl_path)
-        if (path_extras != "") {
-          Sys.setenv("PATH" = sprintf("%s;%s", path_extras, Sys.getenv("PATH")))
-        }
+        #  version should not be hard coded in the path
+        cmd = ifelse(
+          perl_path == "",
+          fs::path (Sys.getenv("APPDATA"), "BiodiverseR/sp5380/perl/bin/perl"),
+          perl_path
+        )
       }
       else {
         args = c(server_path, "daemon", "-l", server_url)
