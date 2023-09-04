@@ -129,6 +129,7 @@ basedata = R6Class("basedata",
     finalize = function () {
       # message("Finalise called for ", self$name)
       self$stop_server()
+      gc()
     }
   )
 )

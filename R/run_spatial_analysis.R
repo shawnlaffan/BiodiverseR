@@ -18,6 +18,8 @@ run_spatial_analysis = function (
     bd,
     calculations = NULL,
     spatial_conditions = c('sp_self_only()'),
+    def_query = NULL,
+    name = NULL,
     tree = NULL
 ) {
   checkmate::assertR6(bd, c("basedata"))
@@ -33,6 +35,8 @@ run_spatial_analysis = function (
   params = list (
     calculations = calculations,
     spatial_conditions = spatial_conditions,
+    definition_query = def_query,
+    name = name,
     tree = tree
   )
 
