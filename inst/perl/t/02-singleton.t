@@ -108,7 +108,7 @@ foreach my $file_type (@file_arg_keys) {
 
     # p $t->tx->res->json;
 
-    #  no need to test this more than once
+    #  no need to test these more than once
     if ($file_type =~ /bd_params/) {
         my $dir = tempdir();
         my $filename = Mojo::File->new($dir, "$file_type.bds");
@@ -119,6 +119,16 @@ foreach my $file_type (@file_arg_keys) {
         my $bd = Biodiverse::BaseData->new(file => $filename);
         is $bd->get_group_count, 4, "saved basedata has expected group count";
         is $bd->get_label_count, 3, "saved basedata has expected label count";
+
+        my %aargs = %analysis_args;
+        $aargs{definition_query} = '$x <= 250';
+        $aargs{name} = 'with def query';
+        local $exp->{result}{SPATIAL_RESULTS}[3] = ['750:250', '750', '250', (undef) x 10];
+        local $exp->{result}{SPATIAL_RESULTS}[4] = ['750:750', '750', '750', (undef) x 10];
+        $t->post_ok('/bd_run_spatial_analysis' => json => \%aargs)
+            ->status_is(200, "status run spatial with def query, $t_msg_suffix")
+            ->json_is('' => $exp, "json results, $t_msg_suffix");
+        # p $t->tx->res->json;
     }
 }
 

@@ -123,21 +123,13 @@ basedata = R6Class("basedata",
     load_data = function (params) {
       BiodiverseR:::load_data_(self, params = params)
     },
-    run_spatial_analysis = function (
-        spatial_conditions = c('sp_self_only()'),
-        calculations,
-        tree
-      ) {
-      BiodiverseR:::run_spatial_analysis(
-        self,
-        calculations = calculations,
-        spatial_conditions = spatial_conditions,
-        tree = tree
-      )
+    run_spatial_analysis = function (...) {
+      BiodiverseR:::run_spatial_analysis(self, ...)
     },
     finalize = function () {
       # message("Finalise called for ", self$name)
       self$stop_server()
+      gc()
     }
   )
 )

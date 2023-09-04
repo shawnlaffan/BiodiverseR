@@ -66,6 +66,12 @@ test_that("Analyse singleton handles multiple input files", {
   )
   row.names(expected_sample_counts) = row.names(expected_sp_results)
 
+  calculations = c(
+    'calc_endemism_central',
+    'calc_pd',
+    'calc_local_sample_count_lists'
+  )
+
   nargs = length(args)
   for (n in 2:nargs) {
     message(n)
@@ -83,7 +89,7 @@ test_that("Analyse singleton handles multiple input files", {
       expect_equal(result, 1, info=paste ("load_data", target_names))
 
       results = bd$run_spatial_analysis (
-        calculations = c('calc_endemism_central', 'calc_pd', 'calc_local_sample_count_lists'),
+        calculations = calculations,
         tree = tree
       )
 
@@ -102,6 +108,29 @@ test_that("Analyse singleton handles multiple input files", {
         SPATIAL_RESULTS  = expected_sp_results
       )
       expect_equal(results, expected, info=target_names)
+
+      #  def query only needs to be done once
+      #  should be in a separate test
+      if (n == 2 && i == 1) {
+        results = bd$run_spatial_analysis (
+          calculations = calculations,
+          def_query = '$y <= 250',
+          tree = tree,
+          name = "with def query"
+        )
+        names = colnames(expected_abc3)
+        expected_abc3['250:750', names[3:length(names)]] = NA
+        expected_abc3['750:750', names[3:length(names)]] = NA
+        ex = expected_sp_results
+        names = colnames(ex)
+        ex['250:750', names[3:length(names)]] = NA
+        ex['750:750', names[3:length(names)]] = NA
+        expected = list (
+          ABC3_LABELS_SET1 = expected_abc3,
+          SPATIAL_RESULTS  = ex
+        )
+        expect_equal(results, expected, info=target_names)
+      }
 
     }
   }
