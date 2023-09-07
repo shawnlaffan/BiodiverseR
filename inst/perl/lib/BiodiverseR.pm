@@ -109,6 +109,38 @@ $log->debug("Called startup");
         return success_as_json ($c, $result);
     });
 
+    $r->post ('/bd_delete_analysis' => sub ($c) {
+        my $analysis_params = $c->req->json;
+
+        # $log->debug("parameters are:");
+        # $log->debug(np ($analysis_params));
+
+        my $result = eval {
+            BiodiverseR::BaseData->delete_output ($analysis_params);
+            1;
+        };
+        my $e = $@;
+        return error_as_json ($c,  "Cannot delete $analysis_params->{name} from basedata, $e")
+            if $e;
+
+        return success_as_json ($c, $result);
+    });
+
+    $r->post ('/bd_delete_all_analyses' => sub ($c) {
+        my $analysis_params = $c->req->json;
+
+        my $result = eval {
+            BiodiverseR::BaseData->delete_all_outputs;
+            1;
+        };
+        my $e = $@;
+        return error_as_json ($c,  "Cannot delete all analyses from basedata, $e")
+            if $e;
+
+        return success_as_json ($c, $result);
+    });
+
+
     $r->post ('/bd_load_data' => sub ($c) {
         my $analysis_params = $c->req->json;
 
@@ -139,6 +171,11 @@ $log->debug("Called startup");
     $r->post ('/bd_get_label_count' => sub ($c) {
         my $bd = BiodiverseR::BaseData->get_basedata_ref;
         my $result = $bd ? $bd->get_label_count : undef;
+        return success_as_json ($c, $result);
+    });
+
+    $r->post ('/bd_get_analysis_count' => sub ($c) {
+        my $result = BiodiverseR::BaseData->get_output_count;
         return success_as_json ($c, $result);
     });
 

@@ -112,11 +112,12 @@ test_that("Analyse singleton handles multiple input files", {
       #  def query only needs to be done once
       #  should be in a separate test
       if (n == 2 && i == 1) {
+        defq_analysis_name = "with def query"
         results = bd$run_spatial_analysis (
           calculations = calculations,
           def_query = '$y <= 250',
           tree = tree,
-          name = "with def query"
+          name = defq_analysis_name
         )
         names = colnames(expected_abc3)
         expected_abc3['250:750', names[3:length(names)]] = NA
@@ -130,6 +131,33 @@ test_that("Analyse singleton handles multiple input files", {
           SPATIAL_RESULTS  = ex
         )
         expect_equal(results, expected, info=target_names)
+
+        #  now some deletions
+        expect_equal(
+          bd$get_analysis_count(),
+          2,
+          info="correct analysis count before deletion"
+        )
+        expect_equal(
+          bd$delete_analysis(name = defq_analysis_name),
+          1,
+          info="successful deletion of defq analysis"
+        )
+        expect_equal(
+          bd$get_analysis_count(),
+          1,
+          info="correct analysis count after deletion"
+        )
+        expect_equal(
+          bd$delete_all_analyses(),
+          1,
+          info="successful deletion of all analysis"
+        )
+        expect_equal(
+          bd$get_analysis_count(),
+          0,
+          info="correct analysis count after all deleted"
+        )
       }
 
     }

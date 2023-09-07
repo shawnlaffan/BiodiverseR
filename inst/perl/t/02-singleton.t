@@ -129,6 +129,36 @@ foreach my $file_type (@file_arg_keys) {
             ->status_is(200, "status run spatial with def query, $t_msg_suffix")
             ->json_is('' => $exp, "json results, $t_msg_suffix");
         # p $t->tx->res->json;
+
+        my $exp_output_count = {error => undef, result => 2};
+        $t->post_ok('/bd_get_analysis_count' => json => {})
+            ->status_is(200, "number of outputs in basedata")
+            ->json_is('' => $exp_output_count, "json results: number of outputs before deletion");
+
+        my $exp_delete = {error => undef, result => 1};
+        $t->post_ok('/bd_delete_analysis' => json => {name => $aargs{name}})
+            ->status_is(200, "status delete spatial analysis")
+            ->json_is('' => $exp_delete, "json results from output deletion");
+        # p $t->tx->res->json;
+
+        $exp_output_count = {error => undef, result => 1};
+        $t->post_ok('/bd_get_analysis_count' => json => {})
+            ->status_is(200, "number of outputs in basedata")
+            ->json_is('' => $exp_output_count, "json results: number of outputs after deletion");
+        # p $t->tx->res->json;
+
+        $exp_delete = {error => undef, result => 1};
+        $t->post_ok('/bd_delete_all_analyses' => json => {})
+            ->status_is(200, "status delete all analyses")
+            ->json_is('' => $exp_delete, "json results from output deletion");
+        # p $t->tx->res->json;
+
+        $exp_output_count = {error => undef, result => 0};
+        $t->post_ok('/bd_get_analysis_count' => json => {})
+            ->status_is(200, "number of outputs in basedata")
+            ->json_is('' => $exp_output_count, "json results: number of outputs after delete all");
+        # p $t->tx->res->json;
+
     }
 }
 
