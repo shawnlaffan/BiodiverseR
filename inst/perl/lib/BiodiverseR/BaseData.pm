@@ -39,6 +39,18 @@ sub get_basedata_ref {
     $self->{basedata};
 }
 
+sub delete_output ($self, $args) {
+    my $name = $args->{name};
+    my $bd = $self->get_basedata_ref;
+    my %existing = map {$_->get_name => $_} $bd->get_output_refs;
+    # use Data::Printer;
+    # my @keys = sort keys %existing;
+    # p @keys;
+    croak qq{Cannot delete output "$name", it is not in the basedata}
+      if !$existing{$name};
+    return $bd->delete_output (output => $existing{$name});
+}
+
 sub _as_arrray_ref {
     return is_ref ($_[0]) ? $_[0] : [$_[0]];
 }
@@ -210,6 +222,12 @@ sub run_spatial_analysis ($self, $analysis_params) {
     croak "Data not yet loaded"
         if !$bd->get_group_count;
 
+    #  ensure unique names aross all output types
+    my $sp_name = $analysis_params->{name} // localtime();
+    my %existing = map {$_->get_name => 1} $bd->get_output_refs;
+    croak "Basedata already contains an output with name $sp_name"
+      if $existing{$sp_name};
+
     my $tree;
     if ($analysis_params->{tree}) {
         my $readnex = Biodiverse::ReadNexus->new;
@@ -220,7 +238,6 @@ sub run_spatial_analysis ($self, $analysis_params) {
     #p $bd->{LABELS};
     #p $analysis_params->{tree};
     #p $tree->{TREE_BY_NAME};
-    my $sp_name = $analysis_params->{name} // localtime();
     my $sp = $bd->add_spatial_output(name => $sp_name);
     $sp->run_analysis (
         spatial_conditions => $spatial_conditions,

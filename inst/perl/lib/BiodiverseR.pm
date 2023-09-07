@@ -109,6 +109,25 @@ $log->debug("Called startup");
         return success_as_json ($c, $result);
     });
 
+    $r->post ('/bd_delete_analysis' => sub ($c) {
+        my $analysis_params = $c->req->json;
+
+        # $log->debug("parameters are:");
+        # $log->debug(np ($analysis_params));
+
+        my $result = eval {
+            BiodiverseR::BaseData->delete_output ($analysis_params);
+            1;
+        };
+        my $e = $@;
+        return error_as_json ($c,  "Cannot delete $analysis_params->{name} from basedata, $e")
+            if $e;
+
+        return success_as_json ($c, $result);
+    });
+
+
+
     $r->post ('/bd_load_data' => sub ($c) {
         my $analysis_params = $c->req->json;
 
