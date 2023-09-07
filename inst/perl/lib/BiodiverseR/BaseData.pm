@@ -48,6 +48,19 @@ sub delete_output ($self, $args) {
     return $bd->delete_output (output => $existing{$name});
 }
 
+sub delete_all_outputs ($self) {
+    my $bd = $self->get_basedata_ref;
+    return undef
+      if !$bd;
+
+    $bd->delete_all_outputs;
+    return 1;
+}
+
+sub get_analysis_count ($self) {
+    $self->get_output_count;
+}
+
 sub get_output_count ($self) {
     my $bd = $self->get_basedata_ref;
     return undef if !$bd;

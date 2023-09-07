@@ -126,6 +126,19 @@ $log->debug("Called startup");
         return success_as_json ($c, $result);
     });
 
+    $r->post ('/bd_delete_all_analyses' => sub ($c) {
+        my $analysis_params = $c->req->json;
+
+        my $result = eval {
+            BiodiverseR::BaseData->delete_all_outputs;
+            1;
+        };
+        my $e = $@;
+        return error_as_json ($c,  "Cannot delete all analyses from basedata, $e")
+            if $e;
+
+        return success_as_json ($c, $result);
+    });
 
 
     $r->post ('/bd_load_data' => sub ($c) {
@@ -161,7 +174,7 @@ $log->debug("Called startup");
         return success_as_json ($c, $result);
     });
 
-    $r->post ('/bd_get_output_count' => sub ($c) {
+    $r->post ('/bd_get_analysis_count' => sub ($c) {
         my $result = BiodiverseR::BaseData->get_output_count;
         return success_as_json ($c, $result);
     });
