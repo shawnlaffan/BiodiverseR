@@ -161,6 +161,11 @@ $log->debug("Called startup");
         return success_as_json ($c, $result);
     });
 
+    $r->post ('/bd_get_output_count' => sub ($c) {
+        my $result = BiodiverseR::BaseData->get_output_count;
+        return success_as_json ($c, $result);
+    });
+
     $r->post ('/bd_run_spatial_analysis' => sub ($c) {
         my $analysis_params = $c->req->json;
 

@@ -43,12 +43,15 @@ sub delete_output ($self, $args) {
     my $name = $args->{name};
     my $bd = $self->get_basedata_ref;
     my %existing = map {$_->get_name => $_} $bd->get_output_refs;
-    # use Data::Printer;
-    # my @keys = sort keys %existing;
-    # p @keys;
     croak qq{Cannot delete output "$name", it is not in the basedata}
       if !$existing{$name};
     return $bd->delete_output (output => $existing{$name});
+}
+
+sub get_output_count ($self) {
+    my $bd = $self->get_basedata_ref;
+    return undef if !$bd;
+    return $bd->get_output_ref_count;
 }
 
 sub _as_arrray_ref {
