@@ -126,6 +126,17 @@ basedata = R6Class("basedata",
     run_spatial_analysis = function (...) {
       BiodiverseR:::run_spatial_analysis(self, ...)
     },
+    #  we need to use factory generation of methods
+    get_analysis_count = function () {
+      self$call_server("bd_get_analysis_count")
+    },
+    delete_analysis = function (name) {
+      params = list (name = name)
+      self$call_server("bd_delete_analysis", params)
+    },
+    delete_all_analyses = function () {
+      self$call_server("bd_delete_all_analyses")
+    },
     finalize = function () {
       # message("Finalise called for ", self$name)
       self$stop_server()
