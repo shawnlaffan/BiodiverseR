@@ -132,6 +132,10 @@ test_that("Analyse singleton handles multiple input files", {
         )
         expect_equal(results, expected, info=target_names)
 
+        results2 = bd$get_analysis_results(name = defq_analysis_name)
+        expect_equal(results, results2, info="post-hoc grab of analysis results")
+
+
         #  now some deletions
         expect_equal(
           bd$get_analysis_count(),
