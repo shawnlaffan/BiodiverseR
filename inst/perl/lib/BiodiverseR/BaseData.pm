@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use Carp;
 use Ref::Util qw/is_ref is_arrayref is_hashref/;
+use List::Util qw /first/;
 
 use Mojo::Base 'Mojolicious', -signatures;
 
@@ -270,6 +271,32 @@ sub run_spatial_analysis ($self, $analysis_params) {
         $results{$listname} = $table;
     }
     # p %results;
+    return \%results;
+}
+
+sub get_analysis_results ($self, $name) {
+    my $bd = $self->get_basedata_ref;
+
+    croak "Basedata not initialised"
+      if !$bd;
+
+    my $analysis = first {$_->get_name eq $name} $bd->get_output_refs;
+
+    croak "No analysis called $name"
+      if !$analysis;
+
+    my %results;
+
+    if ($analysis->isa('Biodiverse::Spatial')) {
+        my @list_names = $analysis->get_hash_list_names_across_elements(no_private => 1);
+
+        foreach my $listname (@list_names) {
+            my $table = $analysis->to_table(list => $listname, symmetric => 1);
+            $results{$listname} = $table;
+        }
+    }
+    #  handle other types
+
     return \%results;
 }
 

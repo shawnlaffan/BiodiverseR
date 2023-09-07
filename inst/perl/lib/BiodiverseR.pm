@@ -112,9 +112,6 @@ $log->debug("Called startup");
     $r->post ('/bd_delete_analysis' => sub ($c) {
         my $analysis_params = $c->req->json;
 
-        # $log->debug("parameters are:");
-        # $log->debug(np ($analysis_params));
-
         my $result = eval {
             BiodiverseR::BaseData->delete_output ($analysis_params);
             1;
@@ -196,6 +193,29 @@ $log->debug("Called startup");
         };
         my $e = $@;
         return error_as_json($c, "Cannot run spatial analysis\n$e")
+            if $e;
+
+        return success_as_json($c, $result);
+    });
+
+    #  duplicates much from above - needs refactoring
+    $r->post ('/bd_get_analysis_results' => sub ($c) {
+        my $analysis_params = $c->req->json;
+
+        $log->debug("parameters are:");
+        $log->debug(np ($analysis_params));
+        $log->debug("About to call get_analysis_results");
+
+        return error_as_json($c,
+            ('analysis_params must be a hash structure, got '
+                . reftype($analysis_params)))
+            if !is_hashref ($analysis_params);
+
+        my $result = eval {
+            BiodiverseR::BaseData->get_analysis_results ($analysis_params->{name});
+        };
+        my $e = $@;
+        return error_as_json($c, "Failed to get analysis results\n$e")
             if $e;
 
         return success_as_json($c, $result);

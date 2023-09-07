@@ -6,6 +6,7 @@ use JSON::MaybeXS qw //;
 use Test::More;
 use Test::Mojo;
 use Data::Printer;
+use Time::HiRes qw /time/;
 
 use Test::TempDir::Tiny;
 
@@ -102,14 +103,21 @@ foreach my $file_type (@file_arg_keys) {
         ->json_is('' => {result => 3, error => undef}, "label count, $t_msg_suffix");
 
 
-    $t->post_ok('/bd_run_spatial_analysis' => json => \%analysis_args)
+    my $sp_name = "sp_" . time();
+    $t->post_ok('/bd_run_spatial_analysis' => json => {%analysis_args, name => $sp_name})
         ->status_is(200, "status run spatial, $t_msg_suffix")
         ->json_is('' => $exp, "json results, $t_msg_suffix");
 
-    # p $t->tx->res->json;
-
     #  no need to test these more than once
     if ($file_type =~ /bd_params/) {
+        my $sp_res = $t->tx->res->json;
+        $t->post_ok('/bd_get_analysis_results' => json => {name => $sp_name})
+            ->status_is(200, "status get_analysis_results from already run sp analysis")
+            ->json_is('' => $sp_res, "json results, get precalculated sp results");
+
+
+
+
         my $dir = tempdir();
         my $filename = Mojo::File->new($dir, "$file_type.bds");
         $t->post_ok('/bd_save_to_bds' => json => {filename => $filename})
