@@ -8,11 +8,11 @@
 #' @param coords in case of point data: names or numbers of the numeric columns holding coordinates, to be passed to st_as_sf. Required if reading data from .xls file or inputting data.frame
 #' @param abund_col character vector containing the name of column(s) with abundances; defaults to "count" and is assumed to be 1 for all records if no column specified and count column is absent
 #' @param ID_col character vector containing the name of column(s) with data labels or species names. Defaults to "label"
-#' @param group_col character vector containing the name of column(s) with attribute data by which to group observations.
-#' @param cellsize numeric vector indicating the size of desired groups in up to 4 dimensions. If 0, exact point matches are aggregated. A negative number will aggregate based on attributes in group_col.
-#' @param origin numeric vector of 2 numbers specifying the x and y dimensions of the spatial groups into which data needs to be aggregated. Units should be the same as the data projection, usually metres.
+#' @param group_col character vector containing the name of column(s) with attribute data by which to group observations. Ignored unless cellsize is a negative number or if it has 2 or more dimensions. Defaults to XY coordinates if cellsize has 2 dimensions and no group_col is specified.
+#' @param cellsize numeric vector indicating the size of desired groups in up to 4 dimensions. If 0, exact point matches are aggregated. A negative number will aggregate based on attributes in group_col. If 2 or more dimensions are specified, corresponding grouping variables must be provided in group_col.
+#' @param origin numeric vector of numbers specifying the dimensions of the spatial groups into which data needs to be aggregated. Length must match length of cellsize. Units should be the same as the data projection, usually metres.
 #' @param fun name of aggregation function to be used. Defaults to sum.
-#' @param ... passed on to agg2groups call as grouping/ID variables.
+#' @param ... passed on to agg2groups.sf call.
 #'
 #' @return Named list of numeric vectors corresponding to the result of the aggregation function for each unique label in the data. Names correspond to coordinates of bottom left corner of each group. This format is needed to pass through to Biodiverse server.
 #'
@@ -58,12 +58,9 @@ agg2groups.data.frame <- function(x, coords, ...) {
 }
 
 # spatial aggregation, count and label columns specified with convenient defaults
-agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_col, cellsize = 100, origin = c(0,0), fun = sum, ...) {
+agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_col, cellsize = 100, origin = c(0,0), fun = sum) {
   # add XY if not present
   if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, st_coordinates(x))
-
-  #abund_col <- enquo(abund_col)
-  #ID_col <- enquo(ID_col)
 
   # check for existence of abund_col names
   if(!all(abund_col %in% names(x))){
@@ -85,37 +82,41 @@ agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_
     }
   }
 
-
   # aggregate and summarise
   if(length(cellsize) == 1){
     if(cellsize > 0){
       out <- x %>% mutate(x = round_any(X, cellsize, origin = origin[1]),
                           y = round_any(Y, cellsize, origin = origin[2])) %>%
         group_by(across(c(x, y, all_of(ID_col)))) %>%
-        summarise(value := across(all_of(abund_col), fun)) %>% st_drop_geometry()
+        summarise(value := across(all_of(abund_col), fun), .groups = 'keep') %>% st_drop_geometry()
     }
     if(cellsize == 0 ){
       out <- x %>% group_by(across(c(x=X, y=Y, all_of(ID_col)))) %>%
-        summarise(value := across(all_of(abund_col), fun)) %>% st_drop_geometry()
+        summarise(value := across(all_of(abund_col), fun), .groups = 'keep') %>% st_drop_geometry()
     }
     if(cellsize < 0){
-      out <- x %>% group_by(all_of(group_col), all_of(ID_col)) %>%
-        summarise(value := across(all_of(abund_col), fun)) %>% st_drop_geometry()
+      out <- x %>% group_by(across(c(all_of(group_col), all_of(ID_col)))) %>%
+        summarise(value := across(all_of(abund_col), fun), .groups = 'keep') %>% st_drop_geometry()
     }
-  }else if(length(cellsize) == 2) {
-    out <- x %>% group_by(x = round_any(X, cellsize[1], origin = origin[1]),
-                          y = round_any(Y, cellsize[2], origin = origin[2]),
-                          all_of(ID_col)) %>%
-      summarise(value := across(all_of(abund_col), fun)) %>% st_drop_geometry()
-  }
+  }else if(length(cellsize) > 1){
+    if(length(cellsize) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
+    if(length(cellsize) == length(group_col)){
+      x <- st_drop_geometry(x)
+      print(head(x))
+      out <- purrr::map(1:length(cellsize), ~round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])) %>%
+        reduce(data.frame) %>% setNames(all_of(group_col)) %>%
+        data.frame(x %>% select(-all_of(group_col))) %>%
+        group_by(across(c(all_of(ID_col), all_of(group_col)))) %>%
+        summarise(value := across(all_of(abund_col), fun), .groups = "keep")
 
+    }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
+  }
 
   # change to format required by json
   #names <- paste(out$x, out$y, sep = ":")
   names <- out %>% select(group_cols()) %>% apply(1, paste, collapse = ":")
   out <- out %>% split(names) %>%
-    purrr::map(~tidyr::pivot_wider(.x, names_from = all_of(ID_col), values_from = value) %>% unlist())
-
+        purrr::map(~pull(.x, value) %>% unlist())
   return(out)
 }
 
@@ -136,4 +137,6 @@ agg2groups.SpatRaster <- function(x, cellsize = 100, ...) {
 round_any <- function(number, accuracy = 100, origin = 0, f = floor){
   (f((number-origin)/accuracy) * accuracy) + origin
   }
+
+# TODO support line and polygon inputs.
 
