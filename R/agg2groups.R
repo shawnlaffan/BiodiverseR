@@ -59,11 +59,9 @@ agg2groups.data.frame <- function(x, coords, ...) {
 
 # spatial aggregation, count and label columns specified with convenient defaults
 agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_col, cellsize = 100, origin = c(0,0), fun = sum) {
-  # add XY if not present
-  if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, st_coordinates(x))
 
   # check for existence of abund_col names
-  if(!all(abund_col %in% names(x))){
+ if(!all(abund_col %in% names(x))){
     missing <- abund_col[!abund_col %in% names(x)]
     if(length(abund_col) > 1){
       if(length(missing) == length(abund_col)){
@@ -82,43 +80,55 @@ agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_
     }
   }
 
-  # aggregate and summarise
-  if(length(cellsize) == 1){
-    if(cellsize > 0){
-      out <- x %>% mutate(x = round_any(X, cellsize, origin = origin[1]),
-                          y = round_any(Y, cellsize, origin = origin[2])) %>%
-        group_by(across(c(x, y, all_of(ID_col)))) %>%
-        summarise(value := across(all_of(abund_col), fun), .groups = 'keep') %>% st_drop_geometry()
-    }
-    if(cellsize == 0 ){
-      out <- x %>% group_by(across(c(x=X, y=Y, all_of(ID_col)))) %>%
-        summarise(value := across(all_of(abund_col), fun), .groups = 'keep') %>% st_drop_geometry()
-    }
-    if(cellsize < 0){
-      out <- x %>% group_by(across(c(all_of(group_col), all_of(ID_col)))) %>%
-        summarise(value := across(all_of(abund_col), fun), .groups = 'keep') %>% st_drop_geometry()
-    }
-  }else if(length(cellsize) > 1){
-    if(length(cellsize) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
-    if(length(cellsize) == length(group_col)){
-      x <- st_drop_geometry(x)
-      print(head(x))
-      out <- purrr::map(1:length(cellsize), ~round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])) %>%
-        reduce(data.frame) %>% setNames(all_of(group_col)) %>%
-        data.frame(x %>% select(-all_of(group_col))) %>%
-        group_by(across(c(all_of(ID_col), all_of(group_col)))) %>%
-        summarise(value := across(all_of(abund_col), fun), .groups = "keep")
+  # code for aggregating point data
+ if(all(st_geometry_type(x) == "POINT")){
+   # add XY if not present
+   if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, st_coordinates(x))
 
-    }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
+   # aggregate and summarise
+   if(length(cellsize) == 1){
+     if(cellsize > 0){
+       out <- x %>% mutate(x = round_any(X, cellsize, origin = origin[1]),
+                           y = round_any(Y, cellsize, origin = origin[2])) %>%
+         group_by(across(c(x, y, all_of(ID_col)))) %>%
+         summarise(value := across(all_of(abund_col), fun), .groups = 'keep') %>% st_drop_geometry()
+     }
+     if(cellsize == 0 ){
+       out <- x %>% group_by(across(c(x=X, y=Y, all_of(ID_col)))) %>%
+         summarise(value := across(all_of(abund_col), fun), .groups = 'keep') %>% st_drop_geometry()
+     }
+     if(cellsize < 0){
+       out <- x %>% group_by(across(c(all_of(group_col), all_of(ID_col)))) %>%
+         summarise(value := across(all_of(abund_col), fun), .groups = 'keep') %>% st_drop_geometry()
+     }
+   }else if(length(cellsize) > 1){
+     if(length(cellsize) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
+     if(length(cellsize) == length(group_col)){
+       x <- st_drop_geometry(x)
+       print(head(x))
+       out <- purrr::map(1:length(cellsize), ~round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])) %>%
+         reduce(data.frame) %>% setNames(all_of(group_col)) %>%
+         data.frame(x %>% select(-all_of(group_col))) %>%
+         group_by(across(c(all_of(ID_col), all_of(group_col)))) %>%
+         summarise(value := across(all_of(abund_col), fun), .groups = "keep")
+
+     }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
+   }
+
+   # change to format required by json
+   #names <- paste(out$x, out$y, sep = ":")
+   names <- out %>% select(group_cols()) %>% apply(1, paste, collapse = ":")
+   out <- out %>% split(names) %>%
+     purrr::map(~pull(.x, value) %>% unlist())
+   return(out)
+
+
+ }else{
+   # support line and polygon inputs.
+   agg2group.sfpoly(x, ID_col, cellsize, origin)
+ }
+
   }
-
-  # change to format required by json
-  #names <- paste(out$x, out$y, sep = ":")
-  names <- out %>% select(group_cols()) %>% apply(1, paste, collapse = ":")
-  out <- out %>% split(names) %>%
-        purrr::map(~pull(.x, value) %>% unlist())
-  return(out)
-}
 
 # raster aggregation
 agg2groups.SpatRaster <- function(x, cellsize = 100, ...) {
@@ -138,5 +148,16 @@ round_any <- function(number, accuracy = 100, origin = 0, f = floor){
   (f((number-origin)/accuracy) * accuracy) + origin
   }
 
-# TODO support line and polygon inputs.
+agg2group.sfpoly <- function(x, ID_col = c("label"), cellsize, origin){
+  # create fishnet
+  grid <- st_make_grid(x, cellsize = cellsize, offset = origin) %>%
+    st_as_sf() %>% mutate(ID = 1:nrow(.),
+                          xmin = map_dbl(st_geometry(grid), ~st_bbox(.x)$xmin),
+                          ymin = map_dbl(st_geometry(grid), ~st_bbox(.x)$ymin))
+
+  out <- st_intersection(x, grid) %>% mutate(area = st_area(x)) %>%
+    left_join(st_drop_geometry(grid)) %>% st_drop_geometry()
+
+  return(out)
+}
 
