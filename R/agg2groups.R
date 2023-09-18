@@ -61,7 +61,7 @@ agg2groups.data.frame <- function(x, coords, ...) {
 agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_col, cellsize = 100, origin = c(0,0), fun = sum) {
 
   # check for existence of abund_col names
- if(!all(abund_col %in% names(x))){
+  if(!all(abund_col %in% names(x))){
     missing <- abund_col[!abund_col %in% names(x)]
     if(length(abund_col) > 1){
       if(length(missing) == length(abund_col)){
@@ -81,41 +81,41 @@ agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_
   }
 
   # code for aggregating point data
- if(all(st_geometry_type(x) == "POINT")){
-   # add XY if not present
-   if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, st_coordinates(x))
-   # aggregate and summarise
-     if(length(cellsize) == 1){cellsize <- rep_len(cellsize, length(group_col))}
-     if(length(cellsize) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
-     if(length(cellsize) == length(group_col)){
-       x <- st_drop_geometry(x)
-       out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
-         }else{x[,group_col[.x]]}) %>%
-         reduce(cbind) %>% data.frame() %>%  setNames(all_of(group_col)) %>%
-         data.frame(x %>% select(-all_of(group_col))) %>%
-         group_by(across(c(all_of(ID_col), all_of(group_col)))) %>%
-         summarise(value := across(all_of(abund_col), fun), .groups = "keep")
+  if(all(st_geometry_type(x) == "POINT")){
+    # add XY if not present
+    if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, st_coordinates(x))
+    # aggregate and summarise
+    if(length(cellsize) == 1){cellsize <- rep_len(cellsize, length(group_col))}
+    if(length(cellsize) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
+    if(length(cellsize) == length(group_col)){
+      x <- st_drop_geometry(x)
+      out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
+      }else{x[,group_col[.x]]}) %>%
+        reduce(cbind) %>% data.frame() %>%  setNames(all_of(group_col)) %>%
+        data.frame(x %>% select(-all_of(group_col))) %>%
+        group_by(across(c(all_of(ID_col), all_of(group_col)))) %>%
+        summarise(value := across(all_of(abund_col), fun), .groups = "keep")
 
-     }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
+    }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
 
-   # change to format required by json
-   #names <- paste(out$x, out$y, sep = ":")
-   names <- out %>% select(group_cols()) %>% apply(1, paste, collapse = ":")
-   out <- out %>% split(names) %>%
-     purrr::map(~pull(.x, value) %>% unlist())
-   return(out)
+    # change to format required by json
+    #names <- paste(out$x, out$y, sep = ":")
+    names <- out %>% select(group_cols()) %>% apply(1, paste, collapse = ":")
+    out <- out %>% split(names) %>%
+      purrr::map(~pull(.x, value) %>% unlist())
+    return(out)
 
 
- }else{
-   # support line and polygon inputs.
-   agg2group.sfpoly(x, ID_col, cellsize, origin)
- }
-
+  }else{
+    # support line and polygon inputs.
+    agg2group.sfpoly(x, ID_col, cellsize, origin)
   }
+
+}
 
 # raster aggregation
 agg2groups.SpatRaster <- function(x, cellsize = 100, ...) {
- temp <- aggregate(x, fact = cellsize/res(x), fun = sum, ...) |>
+  temp <- aggregate(x, fact = cellsize/res(x), fun = sum, ...) |>
     as.data.frame(xy = TRUE) |>
     mutate(x = x - cellsize/2, y = y - cellsize/2) # change xy to represent bottom left corner rather than centre of cell
 
