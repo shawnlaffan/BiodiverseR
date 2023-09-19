@@ -87,6 +87,19 @@ $log->debug("Called startup");
         return success_as_json($c, $metadata);
     });
 
+    $r->get('/valid_cluster_linkage_functions' => sub ($c) {
+        my $metadata;
+        use Biodiverse::Cluster;
+        my $success = eval {
+            $metadata = 'Biodiverse::Cluster'->get_linkage_functions();
+            1;
+        };
+        my $e = $@;
+        return error_as_json($c, $e)
+            if $e;
+        return success_as_json($c, $metadata);
+    });
+
     #  pass some data, get a result.  Or the broken pieces.
     $r->post ('/analysis_spatial_oneshot' => sub ($c) {
         my $analysis_params = $c->req->json;
