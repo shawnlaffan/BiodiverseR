@@ -364,7 +364,15 @@ sub get_analysis_results ($self, $name) {
             $results{$listname} = $table;
         }
     }
-    #  handle other types
+    elsif ($analysis->isa('Biodiverse::Cluster')) {
+        $results{dendrogram} = scalar $analysis->to_R_phylo;
+        my @list_names = $analysis->get_hash_list_names_across_nodes(no_private => 1);
+        foreach my $listname (@list_names) {
+            my $table = $analysis->to_table (list => $listname, symmetric => 1);
+            $results{$listname} = $table;
+        }
+    }
+    #  handle other types - randomisations and matrices mainly
 
     return \%results;
 }
