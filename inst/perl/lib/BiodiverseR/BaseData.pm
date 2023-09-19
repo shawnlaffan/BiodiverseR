@@ -262,16 +262,8 @@ sub run_spatial_analysis ($self, $analysis_params) {
         calculations       => $calculations,
         tree_ref           => $tree,
     );
-    #p $sp;
-    my @list_names = $sp->get_hash_list_names_across_elements(no_private => 1);
-    #p @list_names;
-    my %results;
-    foreach my $listname (@list_names) {
-        my $table = $sp->to_table (list => $listname, symmetric => 1);
-        $results{$listname} = $table;
-    }
-    # p %results;
-    return \%results;
+
+    return $self->get_analysis_results($sp);
 }
 
 sub run_cluster_analysis ($self, $analysis_params) {
@@ -330,30 +322,23 @@ sub run_cluster_analysis ($self, $analysis_params) {
         cluster_tie_breaker  => undef,  #  support
     );
 
-    my @list_names = $cl->get_hash_list_names_across_nodes(no_private => 1);
-
-    my %results = (
-        dendrogram => scalar $cl->to_R_phylo,
-    );
-    foreach my $listname (@list_names) {
-        my $table = $cl->to_table (list => $listname, symmetric => 1);
-        $results{lists}{$listname} = $table;
-    }
-# $bd->save(filename => 'xxx.bds');
-    return \%results;
+    return $self->get_analysis_results($cl);
 }
 
-sub get_analysis_results ($self, $name) {
-    my $bd = $self->get_basedata_ref;
+#  centralised here to avoid duplicate code in the respective subs
+sub get_analysis_results ($self, $analysis) {
+    if (!is_ref $analysis) {
+        my $bd = $self->get_basedata_ref;
 
-    croak "Basedata not initialised"
-      if !$bd;
+        croak "Basedata not initialised"
+            if !$bd;
 
-    my $analysis = first {$_->get_name eq $name} $bd->get_output_refs;
+        my $name = $analysis;
+        $analysis = first {$_->get_name eq $name} $bd->get_output_refs;
 
-    croak "No analysis called $name"
-      if !$analysis;
-
+        croak "No analysis called $name"
+            if !$analysis;
+    }
     my %results;
 
     if ($analysis->isa('Biodiverse::Spatial')) {
@@ -365,9 +350,15 @@ sub get_analysis_results ($self, $name) {
         }
     }
     elsif ($analysis->isa('Biodiverse::Cluster')) {
-        $results{dendrogram} = scalar $analysis->to_R_phylo;
+        $results{dendrogram}  = scalar $analysis->to_R_phylo;
+        $results{NODE_VALUES} = scalar $analysis->to_table (
+            list => 'NODE_VALUES',
+            use_internal_names => 1,
+            symmetric => 1
+        );
+        $results{lists} = {};
         my @list_names = $analysis->get_hash_list_names_across_nodes(no_private => 1);
-        foreach my $listname (@list_names) {
+        foreach my $listname (grep {$_ ne 'NODE_VALUES'} @list_names) {
             my $table = $analysis->to_table (list => $listname, symmetric => 1);
             $results{lists}{$listname} = $table;
         }

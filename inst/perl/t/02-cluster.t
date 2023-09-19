@@ -113,32 +113,31 @@ $t->post_ok('/bd_get_label_count')
 my $exp = {
     error => undef,
     result => {
-        lists => {
-            NODE_VALUES => [
-                [
-                    'ELEMENT', 'Axis_0', 'COLOUR', 'LENGTHTOPARENT', 'NAME',
-                    'NODE_NUMBER', 'PARENTNODE', 'TREENAME',
-                ],
-                [ 1, 1, undef, 0, '', 1, 0, 'TREE' ],
-                [ 2, 2, undef, '0.0611111111111111', '', 2, 1, 'TREE' ],
-                [ 3, 3, undef, '0.216666666666667', '', 3, 2, 'TREE' ],
-                [ 4, 4, undef, '0.2', '250:250', 4, 3, 'TREE' ],
-                [ 5, 5, undef, '0.2', '750:750', 5, 3, 'TREE' ],
-                [ 6, 6, undef, '0.416666666666667', '750:250', 6, 2, 'TREE' ],
-                [ 7, 7, undef, '0.477777777777778', '250:750', 7, 1, 'TREE' ],
+        NODE_VALUES => [
+            [
+                'ELEMENT', 'Axis_0', 'COLOUR', 'LENGTHTOPARENT', 'NAME',
+                'NODE_NUMBER', 'PARENTNODE', 'TREENAME',
             ],
-        },
-        dendrogram => {
-            Nnode => 3,
-            edge => [ 5, 6, 7, 7, 5, 6, 1, 2, 3, 4, 6, 7 ],
+            [ 1, 1, undef, 0, '2___', 1, 0, 'TREE' ],
+            [ 2, 2, undef, '0.0611111111111111', '1___', 2, 1, 'TREE' ],
+            [ 3, 3, undef, '0.216666666666667', '0___', 3, 2, 'TREE' ],
+            [ 4, 4, undef, '0.2', '250:250', 4, 3, 'TREE' ],
+            [ 5, 5, undef, '0.2', '750:750', 5, 3, 'TREE' ],
+            [ 6, 6, undef, '0.416666666666667', '750:250', 6, 2, 'TREE' ],
+            [ 7, 7, undef, '0.477777777777778', '250:750', 7, 1, 'TREE' ],
+        ],
+        dendrogram  => {
+            Nnode         => 3,
+            edge          => [ 5, 6, 7, 7, 5, 6, 1, 2, 3, 4, 6, 7 ],
             'edge.length' => [
                 '0.477777777777778', '0.416666666666667', '0.2', '0.2',
                 '0.0611111111111111', '0.216666666666667',
             ],
-            'node.label' => [ '1___', '0___' ],
-            'root.edge' => 0,
-            'tip.label' => [ '250:750', '750:250', '250:250', '750:750' ],
+            'node.label'  => [ '1___', '0___' ],
+            'root.edge'   => 0,
+            'tip.label'   => [ '250:750', '750:250', '250:250', '750:750' ],
         },
+        lists       => {},
     },
 };
 
