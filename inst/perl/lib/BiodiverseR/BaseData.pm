@@ -337,7 +337,7 @@ sub run_cluster_analysis ($self, $analysis_params) {
     );
     foreach my $listname (@list_names) {
         my $table = $cl->to_table (list => $listname, symmetric => 1);
-        $results{$listname} = $table;
+        $results{lists}{$listname} = $table;
     }
 # $bd->save(filename => 'xxx.bds');
     return \%results;
@@ -369,7 +369,7 @@ sub get_analysis_results ($self, $name) {
         my @list_names = $analysis->get_hash_list_names_across_nodes(no_private => 1);
         foreach my $listname (@list_names) {
             my $table = $analysis->to_table (list => $listname, symmetric => 1);
-            $results{$listname} = $table;
+            $results{lists}{$listname} = $table;
         }
     }
     #  handle other types - randomisations and matrices mainly
