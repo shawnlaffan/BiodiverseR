@@ -198,6 +198,29 @@ $log->debug("Called startup");
         return success_as_json($c, $result);
     });
 
+    #  refactor needed - mostly the same as spatial variant
+    $r->post ('/bd_run_cluster_analysis' => sub ($c) {
+        my $analysis_params = $c->req->json;
+
+        $log->debug("parameters are:");
+        $log->debug(np ($analysis_params));
+        $log->debug("About to call run_cluster_analysis");
+
+        return error_as_json($c,
+            ('analysis_params must be a hash structure, got '
+                . reftype($analysis_params)))
+            if !is_hashref ($analysis_params);
+
+        my $result = eval {
+            BiodiverseR::BaseData->run_cluster_analysis ($analysis_params);
+        };
+        my $e = $@;
+        return error_as_json($c, "Cannot run cluster analysis\n$e")
+          if $e;
+
+        return success_as_json($c, $result);
+    });
+
     #  duplicates much from above - needs refactoring
     $r->post ('/bd_get_analysis_results' => sub ($c) {
         my $analysis_params = $c->req->json;

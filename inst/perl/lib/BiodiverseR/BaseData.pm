@@ -243,7 +243,7 @@ sub run_spatial_analysis ($self, $analysis_params) {
     my $sp_name = $analysis_params->{name} // localtime();
     my %existing = map {$_->get_name => 1} $bd->get_output_refs;
     croak "Basedata already contains an output with name $sp_name"
-      if $existing{$sp_name};
+        if $existing{$sp_name};
 
     my $tree;
     if ($analysis_params->{tree}) {
@@ -271,6 +271,75 @@ sub run_spatial_analysis ($self, $analysis_params) {
         $results{$listname} = $table;
     }
     # p %results;
+    return \%results;
+}
+
+sub run_cluster_analysis ($self, $analysis_params) {
+
+    #  rjson converts single item vectors to scalars
+    #  so need to handle both scalars and arrays
+    my $spatial_conditions
+        = $analysis_params->{spatial_conditions};
+    if (is_ref($spatial_conditions) && !is_arrayref($spatial_conditions)) {
+        croak 'reftype of spatial_conditions must be array';
+    }
+    elsif (defined $spatial_conditions && !is_ref($spatial_conditions)) {
+        $spatial_conditions = [$spatial_conditions];
+    }
+
+    my $def_query = $analysis_params->{definition_query};
+
+    my $linkage_function = $analysis_params->{linkage_function} // 'link_average';
+    my $index = $analysis_params->{index} // 'SORENSON';
+
+    my $calculations
+        = $analysis_params->{calculations_per_node};
+    if (defined $calculations && is_ref($calculations) && !is_arrayref($calculations)) {
+        croak 'reftype of calculations_per_node must be array';
+    }
+
+    my $bd = $self->get_basedata_ref;
+    croak "Data not yet loaded"
+        if !$bd->get_group_count;
+
+    #  ensure unique names aross all output types
+    my $name = $analysis_params->{name} // localtime();
+    my %existing = map {$_->get_name => 1} $bd->get_output_refs;
+    croak "Basedata already contains an output with name $name"
+        if $existing{$name};
+
+    my $tree;
+    if ($analysis_params->{tree}) {
+        my $readnex = Biodiverse::ReadNexus->new;
+        $readnex->import_data(data => $analysis_params->{tree});
+        my @results = $readnex->get_tree_array;
+        $tree = shift @results;
+    }
+
+    my $cl = $bd->add_cluster_output(name => $name);
+    my @linkage_functions = $cl->get_linkage_functions;
+    # return {result => {L => \@linkage_functions}};
+
+    $cl->run_analysis (
+        index                => $index,
+        linkage_function     => $linkage_function,
+        spatial_conditions   => $spatial_conditions,
+        definition_query     => $def_query,
+        spatial_calculations => $calculations,
+        tree_ref             => $tree,
+        cluster_tie_breaker  => undef,  #  support
+    );
+
+    my @list_names = $cl->get_hash_list_names_across_nodes(no_private => 1);
+
+    my %results = (
+        dendrogram => scalar $cl->to_R_phylo,
+    );
+    foreach my $listname (@list_names) {
+        my $table = $cl->to_table (list => $listname, symmetric => 1);
+        $results{$listname} = $table;
+    }
+# $bd->save(filename => 'xxx.bds');
     return \%results;
 }
 
