@@ -126,11 +126,22 @@ basedata = R6Class("basedata",
     run_spatial_analysis = function (...) {
       BiodiverseR:::run_spatial_analysis(self, ...)
     },
+    run_cluster_analysis = function (...) {
+      BiodiverseR:::run_cluster_analysis(self, ...)
+    },
     get_analysis_results = function (name) {
       #  needs to do more than spatial...
       params = list (name = name)
       results = self$call_server("bd_get_analysis_results", params)
-      BiodiverseR:::process_tabular_results(results)
+      processed = NULL
+      if (!is.null (results[['dendrogram']])) {
+        processed = list()
+        processed[['dendrogram']] = results[['dendrogram']]
+        processed[['lists']] = BiodiverseR:::process_tabular_results(results[['lists']])
+      } else {
+        processed = BiodiverseR:::process_tabular_results(results)
+      }
+      return (processed)
     },
     #  we need to use factory generation of methods
     get_analysis_count = function () {
