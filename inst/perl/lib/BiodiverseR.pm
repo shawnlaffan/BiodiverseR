@@ -71,7 +71,32 @@ $log->debug("Called startup");
         };
         my $e = $@;
         return error_as_json($c, $e)
-          if $e;
+            if $e;
+        return success_as_json($c, $metadata);
+    });
+
+    $r->get('/valid_cluster_indices' => sub ($c) {
+        my $metadata;
+        my $success = eval {
+            $metadata = BiodiverseR::IndicesMetadata->get_valid_cluster_indices();
+            1;
+        };
+        my $e = $@;
+        return error_as_json($c, $e)
+            if $e;
+        return success_as_json($c, $metadata);
+    });
+
+    $r->get('/valid_cluster_linkage_functions' => sub ($c) {
+        my $metadata;
+        use Biodiverse::Cluster;
+        my $success = eval {
+            $metadata = 'Biodiverse::Cluster'->get_linkage_functions();
+            1;
+        };
+        my $e = $@;
+        return error_as_json($c, $e)
+            if $e;
         return success_as_json($c, $metadata);
     });
 
@@ -177,25 +202,12 @@ $log->debug("Called startup");
     });
 
     $r->post ('/bd_run_spatial_analysis' => sub ($c) {
-        my $analysis_params = $c->req->json;
+        return analysis_call ($c, 'run_spatial_analysis');
+    });
 
-        $log->debug("parameters are:");
-        $log->debug(np ($analysis_params));
-        $log->debug("About to call run_spatial_analysis");
-
-        return error_as_json($c,
-            ('analysis_params must be a hash structure, got '
-            . reftype($analysis_params)))
-          if !is_hashref ($analysis_params);
-
-        my $result = eval {
-            BiodiverseR::BaseData->run_spatial_analysis ($analysis_params);
-        };
-        my $e = $@;
-        return error_as_json($c, "Cannot run spatial analysis\n$e")
-            if $e;
-
-        return success_as_json($c, $result);
+    #  refactor needed - mostly the same as spatial variant
+    $r->post ('/bd_run_cluster_analysis' => sub ($c) {
+        return analysis_call ($c, 'run_cluster_analysis');
     });
 
     #  duplicates much from above - needs refactoring
@@ -250,6 +262,28 @@ $log->debug("Called startup");
                 result => undef
             }
         );
+    }
+
+    sub analysis_call ($c, $method){
+        my $analysis_params = $c->req->json;
+
+        $log->debug("parameters are:");
+        $log->debug(np ($analysis_params));
+        $log->debug("About to call $method");
+
+        return error_as_json($c,
+            ('analysis_params must be a hash structure, got '
+                . reftype($analysis_params)))
+            if !is_hashref ($analysis_params);
+
+        my $result = eval {
+            BiodiverseR::BaseData->$method ($analysis_params);
+        };
+        my $e = $@;
+        return error_as_json($c, "Failed to get analysis results\n$e")
+            if $e;
+
+        return success_as_json($c, $result);
     }
 
 }

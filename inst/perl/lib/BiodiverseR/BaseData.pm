@@ -243,7 +243,7 @@ sub run_spatial_analysis ($self, $analysis_params) {
     my $sp_name = $analysis_params->{name} // localtime();
     my %existing = map {$_->get_name => 1} $bd->get_output_refs;
     croak "Basedata already contains an output with name $sp_name"
-      if $existing{$sp_name};
+        if $existing{$sp_name};
 
     my $tree;
     if ($analysis_params->{tree}) {
@@ -262,29 +262,83 @@ sub run_spatial_analysis ($self, $analysis_params) {
         calculations       => $calculations,
         tree_ref           => $tree,
     );
-    #p $sp;
-    my @list_names = $sp->get_hash_list_names_across_elements(no_private => 1);
-    #p @list_names;
-    my %results;
-    foreach my $listname (@list_names) {
-        my $table = $sp->to_table (list => $listname, symmetric => 1);
-        $results{$listname} = $table;
-    }
-    # p %results;
-    return \%results;
+
+    return $self->get_analysis_results($sp);
 }
 
-sub get_analysis_results ($self, $name) {
+sub run_cluster_analysis ($self, $analysis_params) {
+
+    #  rjson converts single item vectors to scalars
+    #  so need to handle both scalars and arrays
+    my $spatial_conditions
+        = $analysis_params->{spatial_conditions};
+    if (is_ref($spatial_conditions) && !is_arrayref($spatial_conditions)) {
+        croak 'reftype of spatial_conditions must be array';
+    }
+    elsif (defined $spatial_conditions && !is_ref($spatial_conditions)) {
+        $spatial_conditions = [$spatial_conditions];
+    }
+
+    my $def_query = $analysis_params->{definition_query};
+
+    my $linkage_function = $analysis_params->{linkage_function} // 'link_average';
+    my $index = $analysis_params->{index} // 'SORENSON';
+
+    my $calculations
+        = $analysis_params->{calculations_per_node};
+    if (defined $calculations && is_ref($calculations) && !is_arrayref($calculations)) {
+        croak 'reftype of calculations_per_node must be array';
+    }
+
     my $bd = $self->get_basedata_ref;
+    croak "Data not yet loaded"
+        if !$bd->get_group_count;
 
-    croak "Basedata not initialised"
-      if !$bd;
+    #  ensure unique names aross all output types
+    my $name = $analysis_params->{name} // localtime();
+    my %existing = map {$_->get_name => 1} $bd->get_output_refs;
+    croak "Basedata already contains an output with name $name"
+        if $existing{$name};
 
-    my $analysis = first {$_->get_name eq $name} $bd->get_output_refs;
+    my $tree;
+    if ($analysis_params->{tree}) {
+        my $readnex = Biodiverse::ReadNexus->new;
+        $readnex->import_data(data => $analysis_params->{tree});
+        my @results = $readnex->get_tree_array;
+        $tree = shift @results;
+    }
 
-    croak "No analysis called $name"
-      if !$analysis;
+    my $cl = $bd->add_cluster_output(name => $name);
+    my @linkage_functions = $cl->get_linkage_functions;
+    # return {result => {L => \@linkage_functions}};
 
+    $cl->run_analysis (
+        index                => $index,
+        linkage_function     => $linkage_function,
+        spatial_conditions   => $spatial_conditions,
+        definition_query     => $def_query,
+        spatial_calculations => $calculations,
+        tree_ref             => $tree,
+        cluster_tie_breaker  => undef,  #  support
+    );
+
+    return $self->get_analysis_results($cl);
+}
+
+#  centralised here to avoid duplicate code in the respective subs
+sub get_analysis_results ($self, $analysis) {
+    if (!is_ref $analysis) {
+        my $bd = $self->get_basedata_ref;
+
+        croak "Basedata not initialised"
+            if !$bd;
+
+        my $name = $analysis;
+        $analysis = first {$_->get_name eq $name} $bd->get_output_refs;
+
+        croak "No analysis called $name"
+            if !$analysis;
+    }
     my %results;
 
     if ($analysis->isa('Biodiverse::Spatial')) {
@@ -295,7 +349,21 @@ sub get_analysis_results ($self, $name) {
             $results{$listname} = $table;
         }
     }
-    #  handle other types
+    elsif ($analysis->isa('Biodiverse::Cluster')) {
+        $results{dendrogram}  = scalar $analysis->to_R_phylo;
+        $results{NODE_VALUES} = scalar $analysis->to_table (
+            list => 'NODE_VALUES',
+            use_internal_names => 1,
+            symmetric => 1
+        );
+        $results{lists} = {};
+        my @list_names = $analysis->get_hash_list_names_across_nodes(no_private => 1);
+        foreach my $listname (grep {$_ ne 'NODE_VALUES'} @list_names) {
+            my $table = $analysis->to_table (list => $listname, symmetric => 1);
+            $results{lists}{$listname} = $table;
+        }
+    }
+    #  handle other types - randomisations and matrices mainly
 
     return \%results;
 }
