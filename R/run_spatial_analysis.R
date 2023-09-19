@@ -42,13 +42,13 @@ run_spatial_analysis = function (
 
   call_results = bd$call_server("bd_run_spatial_analysis", params)
 
-  processed_results = process_spatial_results(call_results)
+  processed_results = process_tabular_results(call_results)
 
   return(processed_results)
 }
 
 
-process_spatial_results = function (call_results) {
+process_tabular_results = function (call_results) {
   processed_results <- list()
   #apply? - nah.  There will never be more than ten list elements
   #  convert list structure to a data frame

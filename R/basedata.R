@@ -130,7 +130,7 @@ basedata = R6Class("basedata",
       #  needs to do more than spatial...
       params = list (name = name)
       results = self$call_server("bd_get_analysis_results", params)
-      BiodiverseR:::process_spatial_results(results)
+      BiodiverseR:::process_tabular_results(results)
     },
     #  we need to use factory generation of methods
     get_analysis_count = function () {
