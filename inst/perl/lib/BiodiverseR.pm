@@ -71,7 +71,19 @@ $log->debug("Called startup");
         };
         my $e = $@;
         return error_as_json($c, $e)
-          if $e;
+            if $e;
+        return success_as_json($c, $metadata);
+    });
+
+    $r->get('/valid_cluster_indices' => sub ($c) {
+        my $metadata;
+        my $success = eval {
+            $metadata = BiodiverseR::IndicesMetadata->get_valid_cluster_indices();
+            1;
+        };
+        my $e = $@;
+        return error_as_json($c, $e)
+            if $e;
         return success_as_json($c, $metadata);
     });
 
