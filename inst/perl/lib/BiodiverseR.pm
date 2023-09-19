@@ -177,48 +177,12 @@ $log->debug("Called startup");
     });
 
     $r->post ('/bd_run_spatial_analysis' => sub ($c) {
-        my $analysis_params = $c->req->json;
-
-        $log->debug("parameters are:");
-        $log->debug(np ($analysis_params));
-        $log->debug("About to call run_spatial_analysis");
-
-        return error_as_json($c,
-            ('analysis_params must be a hash structure, got '
-            . reftype($analysis_params)))
-          if !is_hashref ($analysis_params);
-
-        my $result = eval {
-            BiodiverseR::BaseData->run_spatial_analysis ($analysis_params);
-        };
-        my $e = $@;
-        return error_as_json($c, "Cannot run spatial analysis\n$e")
-            if $e;
-
-        return success_as_json($c, $result);
+        return analysis_call ($c, 'run_spatial_analysis');
     });
 
     #  refactor needed - mostly the same as spatial variant
     $r->post ('/bd_run_cluster_analysis' => sub ($c) {
-        my $analysis_params = $c->req->json;
-
-        $log->debug("parameters are:");
-        $log->debug(np ($analysis_params));
-        $log->debug("About to call run_cluster_analysis");
-
-        return error_as_json($c,
-            ('analysis_params must be a hash structure, got '
-                . reftype($analysis_params)))
-            if !is_hashref ($analysis_params);
-
-        my $result = eval {
-            BiodiverseR::BaseData->run_cluster_analysis ($analysis_params);
-        };
-        my $e = $@;
-        return error_as_json($c, "Cannot run cluster analysis\n$e")
-          if $e;
-
-        return success_as_json($c, $result);
+        return analysis_call ($c, 'run_cluster_analysis');
     });
 
     #  duplicates much from above - needs refactoring
@@ -273,6 +237,28 @@ $log->debug("Called startup");
                 result => undef
             }
         );
+    }
+
+    sub analysis_call ($c, $method){
+        my $analysis_params = $c->req->json;
+
+        $log->debug("parameters are:");
+        $log->debug(np ($analysis_params));
+        $log->debug("About to call $method");
+
+        return error_as_json($c,
+            ('analysis_params must be a hash structure, got '
+                . reftype($analysis_params)))
+            if !is_hashref ($analysis_params);
+
+        my $result = eval {
+            BiodiverseR::BaseData->$method ($analysis_params);
+        };
+        my $e = $@;
+        return error_as_json($c, "Failed to get analysis results\n$e")
+            if $e;
+
+        return success_as_json($c, $result);
     }
 
 }
