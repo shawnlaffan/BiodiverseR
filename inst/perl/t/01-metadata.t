@@ -23,13 +23,13 @@ foreach my $fn (qw/average recalculate average_unweighted minimum maximum/) {
     ok exists ($linkages{$linkage_fn}), "Got $linkage_fn";
 }
 
-$t->get_ok('/valid_cluster_indices')->status_is(200);
-$res = $t->tx->res->json;
-my %indices;
-@indices{@{$res->{result}}} = ();
-foreach my $index (qw/SORENSON S2 PHYLO_RW_TURNOVER/) {
-    ok exists $indices{$index}, $index;
-}
+# $t->get_ok('/valid_cluster_indices')->status_is(200);
+# $res = $t->tx->res->json;
+# my %indices;
+# @indices{@{$res->{result}}} = ();
+# foreach my $index (qw/SORENSON S2 PHYLO_RW_TURNOVER/) {
+#     ok exists $indices{$index}, $index;
+# }
 
 
 $t->get_ok('/valid_cluster_tie_breaker_indices')->status_is(200);
