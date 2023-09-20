@@ -8,17 +8,7 @@ use Mojo::Base 'Mojolicious', -signatures;
 
 
 sub get_indices_metadata ($self, %args) {
-
-    my $bd = Biodiverse::BaseData->new (
-        CELL_SIZES => [1,1],
-    );
-    $bd->add_element (
-        label => 'a:b',
-        group => '1:1',
-        count => 1,
-    );
-    my $lb_ref = $bd->get_labels_ref;
-    $lb_ref->set_param (CELL_SIZES => [-1,-1]);
+    my $bd = $self->_get_dummy_basedata;
 
     # my $label_props = get_label_properties();
     # eval {
@@ -123,6 +113,23 @@ END_LABEL_PROPS
 }
 
 sub get_valid_cluster_indices ($self, %args) {
+    my $bd = $self->_get_dummy_basedata;
+
+    my $indices = Biodiverse::Indices->new(BASEDATA_REF => $bd);
+    my $list = $indices->get_valid_cluster_indices;
+    return $list;
+}
+
+sub get_valid_cluster_tie_breaker_indices ($self, %args) {
+    my $bd = $self->_get_dummy_basedata;
+
+    my $indices = Biodiverse::Indices->new(BASEDATA_REF => $bd);
+    my $cl_indices = $indices->get_valid_cluster_indices;
+    my $rg_indices = $indices->get_valid_region_grower_indices;
+    return ['none', 'random', sort (keys %$cl_indices, keys %$rg_indices)];
+}
+
+sub _get_dummy_basedata {
     my $bd = Biodiverse::BaseData->new (
         CELL_SIZES => [1,1],
     );
@@ -134,10 +141,7 @@ sub get_valid_cluster_indices ($self, %args) {
     my $lb_ref = $bd->get_labels_ref;
     $lb_ref->set_param (CELL_SIZES => [-1,-1]);
 
-
-    my $indices = Biodiverse::Indices->new(BASEDATA_REF => $bd);
-    my $list = $indices->get_valid_cluster_indices;
-    return $list;
+    return $bd;
 }
 
 1;
