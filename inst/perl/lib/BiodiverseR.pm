@@ -87,6 +87,18 @@ $log->debug("Called startup");
         return success_as_json($c, $metadata);
     });
 
+    $r->get('/valid_cluster_tie_breaker_indices' => sub ($c) {
+        my $metadata;
+        my $success = eval {
+            $metadata = BiodiverseR::IndicesMetadata->get_valid_cluster_tie_breaker_indices();
+            1;
+        };
+        my $e = $@;
+        return error_as_json($c, $e)
+            if $e;
+        return success_as_json($c, $metadata);
+    });
+
     $r->get('/valid_cluster_linkage_functions' => sub ($c) {
         my $metadata;
         use Biodiverse::Cluster;
