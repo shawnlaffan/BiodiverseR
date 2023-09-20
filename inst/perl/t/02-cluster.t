@@ -46,7 +46,7 @@ my $expected_cluster_indices = {
 
 $t->get_ok('/valid_cluster_indices')
     ->status_is(200, "status valid cluster indices")
-    ->json_is('' => $expected_cluster_indices, "json results");
+    ->json_is('' => $expected_cluster_indices, "results valid cluster indices");
 
 
 my $exp_linkages = {
@@ -58,7 +58,7 @@ my $exp_linkages = {
 };
 $t->get_ok('/valid_cluster_linkage_functions')
     ->status_is(200, "status valid cluster linkage functions")
-    ->json_is('' => $exp_linkages, "json results");
+    ->json_is('' => $exp_linkages, "json results valid cluster linkage functions");
 # use Data::Dumper::Compact qw/ddc/;
 # print STDERR ddc $t->tx->res->json;
 
@@ -94,14 +94,14 @@ my %data_params = (
     },
 );
 
-my $t_msg_suffix = "";
+my $t_msg_suffix = "cluster analysis";
 $t->post_ok('/init_basedata' => json => \%bd_setup_params)
     ->status_is(200, "status init, $t_msg_suffix")
-    ->json_is('' => {result => 1, error => undef}, "json results, $t_msg_suffix");
+    ->json_is('' => {result => 1, error => undef}, "basedata init, $t_msg_suffix");
 
 $t->post_ok('/bd_load_data' => json => \%data_params)
     ->status_is(200, "status load data, $t_msg_suffix")
-    ->json_is('' => {result => 1, error => undef}, "json results, $t_msg_suffix");
+    ->json_is('' => {result => 1, error => undef}, "basedata load, $t_msg_suffix");
 
 $t->post_ok('/bd_get_group_count')
     ->status_is(200, "status gp count, $t_msg_suffix")
@@ -144,11 +144,11 @@ my $exp = {
 my $cl_name = "cl_" . time();
 $t->post_ok('/bd_run_cluster_analysis' => json => {%analysis_args, name => $cl_name})
     ->status_is(200, "status run cluster, $t_msg_suffix")
-    ->json_is('' => $exp, "json results, $t_msg_suffix");
+    ->json_is('' => $exp, "results, $t_msg_suffix");
 
 $t->post_ok('/bd_get_analysis_results' => json => {%analysis_args, name => $cl_name})
     ->status_is(200, "status get cluster results, $t_msg_suffix")
-    ->json_is('' => $exp, "json results, $t_msg_suffix");
+    ->json_is('' => $exp, "results posthoc, $t_msg_suffix");
 
 
 
