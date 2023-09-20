@@ -23,7 +23,11 @@ use Data::Printer qw /p np/;
 
 local $| = 1;
 
-my $logname = path (sprintf ("./mojo_log_%s.txt", time()))->absolute;
+my $logname = path (sprintf ("./mojo_log_%s_%s.txt", time(), $$))->absolute;
+while (-e $logname) {
+    $logname =~ s/.txt$//;
+    $logname .= 'x.txt';
+}
 say STDERR "log file is $logname";
 my $log = Mojo::Log->new(path => $logname, level => 'trace');
 
