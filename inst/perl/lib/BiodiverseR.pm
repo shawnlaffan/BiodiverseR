@@ -23,7 +23,9 @@ use Data::Printer qw /p np/;
 
 local $| = 1;
 
-my $logname = path (sprintf ("./BiodiverseR_log_%s_%s.txt", time(), $$))->absolute;
+#  maybe should save mac logs to ~/Library/BiodiverseR
+my $logdir  = path (($^O eq 'MSWin32' ? $ENV{APPDATA} : $ENV{HOME}), "BiodiverseR/logs")->mkdir;
+my $logname = path (sprintf ("$logdir/BiodiverseR_log_%s_%s.txt", time(), $$))->absolute;
 while (-e $logname) {
     $logname =~ s/.txt$//;
     $logname .= 'x.txt';
