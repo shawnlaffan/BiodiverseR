@@ -46,8 +46,9 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-#  mojo logs
+# log files
 mojo_log*.txt
+BiodiverseR_log*.txt
 
 
 #  intellij files
