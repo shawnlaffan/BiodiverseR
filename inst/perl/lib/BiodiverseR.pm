@@ -215,6 +215,18 @@ $log->debug("Called startup");
         return success_as_json ($c, $result);
     });
 
+    $r->post ('/bd_get_cell_sizes' => sub ($c) {
+        my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        my $result = $bd ? $bd->get_cell_sizes : undef;
+        return success_as_json ($c, $result);
+    });
+
+    $r->post ('/bd_get_cell_origins' => sub ($c) {
+        my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        my $result = $bd ? $bd->get_cell_origins : undef;
+        return success_as_json ($c, $result);
+    });
+
     $r->post ('/bd_get_analysis_count' => sub ($c) {
         my $result = BiodiverseR::BaseData->get_output_count;
         return success_as_json ($c, $result);
