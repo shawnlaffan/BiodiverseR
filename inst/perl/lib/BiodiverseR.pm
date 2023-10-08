@@ -138,6 +138,7 @@ $log->debug("Called startup");
     $r->post ('/init_basedata' => sub ($c) {
         my $analysis_params = $c->req->json;
 
+        $log->debug("Init basedata");
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
 
