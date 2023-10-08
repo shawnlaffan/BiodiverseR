@@ -1,3 +1,4 @@
+library("fs")
 test_that("Analyse singleton handles multiple input files", {
   file_path <- system.file("extdata", package ="BiodiverseR")
 
@@ -112,6 +113,30 @@ test_that("Analyse singleton handles multiple input files", {
       #  def query only needs to be done once
       #  should be in a separate test
       if (n == 2 && i == 1) {
+
+        f = fs::file_temp(pattern = "test_", tmp_dir = tempdir(), ext = "bds")
+        #message ("Saving to ", f)
+        results = bd$save_to_bds (f)
+        expect_equal(results, 1, info="basedata saved to file")
+        bd2 = BiodiverseR:::basedata$new(filename = f)
+        gp_cnt = bd2$get_group_count()
+        expect_equal(
+          gp_cnt,
+          4,
+          info="basedata loaded from file"
+        )
+        expect_equal(
+          bd$cellsizes,
+          bd2$cellsizes,
+          info="cellsizes match after save/reload"
+        )
+        expect_equal(
+          bd$cellorigins,
+          bd2$cellorigins,
+          info="cell origins match after save/reload"
+        )
+        fs::file_delete(f)
+
         defq_analysis_name = "with def query"
         results = bd$run_spatial_analysis (
           calculations = calculations,
@@ -166,5 +191,9 @@ test_that("Analyse singleton handles multiple input files", {
 
     }
   }
+
+  # files <- list.files(temp_dir, full.names=TRUE)
+  # file.remove(files)
+  # file.remove(temp_dir)
 
 })

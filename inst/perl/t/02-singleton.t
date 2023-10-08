@@ -115,9 +115,6 @@ foreach my $file_type (@file_arg_keys) {
             ->status_is(200, "status get_analysis_results from already run sp analysis")
             ->json_is('' => $sp_res, "json results, get precalculated sp results");
 
-
-
-
         my $dir = tempdir();
         my $filename = Mojo::File->new($dir, "$file_type.bds");
         $t->post_ok('/bd_save_to_bds' => json => {filename => $filename})
@@ -127,6 +124,21 @@ foreach my $file_type (@file_arg_keys) {
         my $bd = Biodiverse::BaseData->new(file => $filename);
         is $bd->get_group_count, 4, "saved basedata has expected group count";
         is $bd->get_label_count, 3, "saved basedata has expected label count";
+
+        #  try a reload
+        $t->post_ok('/init_basedata' => json => {filename => $filename})
+            ->status_is(200, "status load basedata from file, $t_msg_suffix")
+            ->json_is('' => {result => 1, error => undef}, "results basedata file exists, $t_msg_suffix");
+
+        my $err_fname = "$filename.zorb";
+        my $exp_error = "Cannot initialise basedata, Unable to load basedata file $err_fname";
+        $t->post_ok('/init_basedata' => json => {filename => $err_fname})
+            ->status_is(200, "status load basedata from file that does not exist, $t_msg_suffix");
+            #->json_like('' => {result => 0, error => qr/$exp_error/}, "results basedata file does not exist, $t_msg_suffix");
+        my $res = $t->tx->res->json;
+        # p $res;
+        ok !$res->{result}, "Got a non result";
+        like $res->{error}, qr/$exp_error/, "Got expected error text";
 
         my %aargs = %analysis_args;
         $aargs{definition_query} = '$x <= 250';

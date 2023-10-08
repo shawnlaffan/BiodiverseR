@@ -138,6 +138,7 @@ $log->debug("Called startup");
     $r->post ('/init_basedata' => sub ($c) {
         my $analysis_params = $c->req->json;
 
+        $log->debug("Init basedata");
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
 
@@ -211,6 +212,18 @@ $log->debug("Called startup");
     $r->post ('/bd_get_label_count' => sub ($c) {
         my $bd = BiodiverseR::BaseData->get_basedata_ref;
         my $result = $bd ? $bd->get_label_count : undef;
+        return success_as_json ($c, $result);
+    });
+
+    $r->post ('/bd_get_cell_sizes' => sub ($c) {
+        my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        my $result = $bd ? $bd->get_cell_sizes : undef;
+        return success_as_json ($c, $result);
+    });
+
+    $r->post ('/bd_get_cell_origins' => sub ($c) {
+        my $bd = BiodiverseR::BaseData->get_basedata_ref;
+        my $result = $bd ? $bd->get_cell_origins : undef;
         return success_as_json ($c, $result);
     });
 

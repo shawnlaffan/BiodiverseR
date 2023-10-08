@@ -24,13 +24,26 @@ sub get_instance {
 
 sub init_basedata ($class, $args) {
     my $self = $class->get_instance;
-    my %params = (
-        NAME         => ($args->{name} // ('BiodiverseR ' . localtime())),
-        CELL_SIZES   => $args->{cellsizes},
-        CELL_ORIGINS => $args->{cellorigins},
-    );
 
-    my $bd = Biodiverse::BaseData->new (%params);
+    my $bd;
+    if (defined $args->{filename}) {
+        eval {
+            my $x = Biodiverse::BaseData->new(CELL_SIZES => [1], NAME => 'temp');
+            $bd = $x->load_file(file => $args->{filename});
+            1;
+        } or die "Unable to load basedata file $args->{filename}\n$@";
+        die "Unable to load basedata file $args->{filename}"
+          if !$bd;
+    }
+    else {
+        my %params = (
+            NAME         => ($args->{name} // ('BiodiverseR ' . localtime())),
+            CELL_SIZES   => $args->{cellsizes},
+            CELL_ORIGINS => $args->{cellorigins},
+        );
+
+        $bd = Biodiverse::BaseData->new(%params);
+    }
     $self->{basedata} = $bd;
     return defined $self->{basedata};
 }
