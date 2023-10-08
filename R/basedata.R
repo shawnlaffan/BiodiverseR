@@ -31,35 +31,48 @@ basedata = R6Class("basedata",
         name = paste("BiodiverseR::basedata", date()),
         cellsizes,
         cellorigins,
+        filename = '',
         port=0, use_exe=FALSE, perl_path=NA
       ) {
       self$name = name
 
-      checkmate::assert_vector(cellsizes, any.missing=FALSE, min.len=1)
-      checkmate::assert_numeric(cellsizes)
-      self$cellsizes = cellsizes
+      if (filename == '') {
+        checkmate::assert_vector(cellsizes, any.missing=FALSE, min.len=1)
+        checkmate::assert_numeric(cellsizes)
 
-      if (missing(cellorigins)) {
-        cellorigins = cellsizes * 0
+        if (missing(cellorigins)) {
+          cellorigins = cellsizes * 0
+        }
+        checkmate::assert_vector(cellorigins, any.missing=FALSE, min.len=1)
+        checkmate::assert_numeric(cellorigins)
+        if (length(cellsizes) != length(cellorigins)) {
+          stop("cellsizes and cellorigins vectors must of of same length")
+        }
+
+        self$cellsizes   = cellsizes
+        self$cellorigins = cellorigins
       }
-      checkmate::assert_vector(cellorigins, any.missing=FALSE, min.len=1)
-      checkmate::assert_numeric(cellorigins)
-      if (length(cellsizes) != length(cellorigins)) {
-        stop("cellsizes and cellorigins vectors must of of same length")
-      }
-      self$cellorigins = cellorigins
 
       self$server = BiodiverseR::start_server(
         port=port,
         use_exe=use_exe,
         perl_path=perl_path
       )
-      p = list (
-        name = self$name,
-        cellsizes = self$cellsizes,
-        cellorigins = self$cellorigins
-      )
-      self$call_server (call_path = "init_basedata", params = p)
+      if (filename == '') {
+        p = list (
+          name = self$name,
+          cellsizes = self$cellsizes,
+          cellorigins = self$cellorigins
+        )
+        self$call_server (call_path = "init_basedata", params = p)
+      } else {
+        p = list (filename = filename)
+        self$call_server (call_path = "init_basedata", params = p)
+        r = self$call_server("bd_get_cell_sizes")
+        self$cellsizes = unlist(r)
+        r = self$call_server("bd_get_cell_origins")
+        self$cellorigins = unlist(r)
+      }
 
       return (self)
     },
@@ -153,6 +166,16 @@ basedata = R6Class("basedata",
     },
     delete_all_analyses = function () {
       self$call_server("bd_delete_all_analyses")
+    },
+    save_to_bds = function (filename) {
+      params = list (filename = filename)
+      self$call_server("bd_save_to_bds", params)
+    },
+    get_group_count = function () {
+      self$call_server("bd_get_group_count")
+    },
+    get_label_count = function () {
+      self$call_server("bd_get_label_count")
     },
     finalize = function () {
       # message("Finalise called for ", self$name)
