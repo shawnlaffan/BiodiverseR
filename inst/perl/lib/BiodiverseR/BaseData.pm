@@ -381,4 +381,43 @@ sub get_analysis_results ($self, $analysis) {
     return \%results;
 }
 
+sub run_randomisation_analysis ($self, $analysis_params) {
+
+    my $function = $analysis_params->{function} // 'rand_structured';
+    my $iterations = $analysis_params->{iterations} // 99;
+
+    #  rjson converts single item vectors to scalars
+    #  so need to handle both scalars and arrays
+    my $spatial_conditions
+        = $analysis_params->{spatial_conditions_for_subset};
+    if (defined $spatial_conditions && is_ref($spatial_conditions) && !is_arrayref($spatial_conditions)) {
+        croak 'reftype of spatial_conditions must be array';
+    }
+    elsif (!is_ref($spatial_conditions)) {
+        $spatial_conditions = [$spatial_conditions];
+    }
+
+    my $bd = $self->get_basedata_ref;
+    croak "Data not yet loaded"
+        if !$bd->get_group_count;
+    croak "There are no outputs to randomise"
+        if !$self->get_output_count;
+
+    #  ensure unique names aross all output types
+    my $output_name = $analysis_params->{name} // localtime();
+    my %existing = map {$_->get_name => 1} $bd->get_output_refs;
+    croak "Basedata already contains an output with name $output_name"
+        if $existing{$output_name};
+
+    my $rand = $bd->add_randomisation_output(name => $output_name);
+    my $success = $rand->run_analysis (
+        %$analysis_params,
+        function   => $function,
+        iterations => $iterations,
+        spatial_conditions_for_subset => $spatial_conditions,
+    );
+
+    return $success;
+}
+
 1;

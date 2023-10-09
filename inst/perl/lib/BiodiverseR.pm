@@ -200,7 +200,7 @@ $log->debug("Called startup");
     }
 
     #  analysis factory
-    foreach my $stub (qw /spatial cluster/) {
+    foreach my $stub (qw /spatial cluster randomisation/) {
         my $method = "run_${stub}_analysis";
         $r->post ("/bd_$method" => sub ($c) {
             return analysis_call ($c, $method);
