@@ -92,9 +92,9 @@ $log->debug("Called startup");
                 if $e;
             return success_as_json($c, $metadata);
         });
-
     }
 
+    #  does not yet fit into a factory
     $r->get('/valid_cluster_linkage_functions' => sub ($c) {
         my $metadata;
         use Biodiverse::Cluster;
@@ -129,6 +129,7 @@ $log->debug("Called startup");
         return success_as_json ($c, $result);
     });
 
+    # a reasonably complex factory
     my %bd_route_factory = (
         init_basedata       => {
             route  => 'init_basedata',
@@ -182,14 +183,13 @@ $log->debug("Called startup");
                 }
                 return error_as_json($c, $msg);
             }
-            # my $bd = BiodiverseR::BaseData->get_basedata_ref;
-            # say STDERR "LOADED, result is $result, group count is " . $bd->get_group_count;
-            #  should just return success or failure
+
             return success_as_json ($c, $result);
         });
     }
 
 
+    #  some simple ones
     foreach my $stub (qw /label_count group_count cell_sizes cell_origins/) {
         my $method = "get_$stub";
         $r->post ("/bd_$method" => sub ($c) {
@@ -199,6 +199,7 @@ $log->debug("Called startup");
         });
     }
 
+    #  analysis factory
     foreach my $stub (qw /spatial cluster/) {
         my $method = "run_${stub}_analysis";
         $r->post ("/bd_$method" => sub ($c) {
@@ -263,7 +264,7 @@ $log->debug("Called startup");
     sub analysis_call ($c, $method){
         my $analysis_params = $c->req->json;
 
-        $log->debug("parameters are:");
+        $log->debug("Analysis parameters are:");
         $log->debug(np ($analysis_params));
         $log->debug("About to call $method");
 
