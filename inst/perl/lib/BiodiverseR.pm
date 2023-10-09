@@ -69,42 +69,32 @@ $log->debug("Called startup");
   # Normal route to controller
   $r->get('/')->to('Example#welcome');
 
-    $r->get('/calculations_metadata' => sub ($c) {
-        my $metadata;
-        my $success = eval {
-            $metadata = BiodiverseR::IndicesMetadata->get_indices_metadata();
-            1;
-        };
-        my $e = $@;
-        return error_as_json($c, $e)
-            if $e;
-        return success_as_json($c, $metadata);
-    });
+    my %metadata_route_factory = (
+        calculations_metadata             => {
+            method => 'get_indices_metadata',
+        },
+        valid_cluster_indices             => {},
+        valid_cluster_tie_breaker_indices => {}
+    );
 
-    $r->get('/valid_cluster_indices' => sub ($c) {
-        my $metadata;
-        my $success = eval {
-            $metadata = BiodiverseR::IndicesMetadata->get_valid_cluster_indices();
-            1;
-        };
-        my $e = $@;
-        return error_as_json($c, $e)
-            if $e;
-        return success_as_json($c, $metadata);
-    });
+    foreach my $route (keys %metadata_route_factory) {
+        my $method = $metadata_route_factory{$route}{method}
+          // "get_${route}";
 
-    $r->get('/valid_cluster_tie_breaker_indices' => sub ($c) {
-        my $metadata;
-        my $success = eval {
-            $metadata = BiodiverseR::IndicesMetadata->get_valid_cluster_tie_breaker_indices();
-            1;
-        };
-        my $e = $@;
-        return error_as_json($c, $e)
-            if $e;
-        return success_as_json($c, $metadata);
-    });
+        $r->get("/$route" => sub ($c) {
+            my $metadata;
+            my $success = eval {
+                $metadata = BiodiverseR::IndicesMetadata->$method();
+                1;
+            };
+            my $e = $@;
+            return error_as_json($c, $e)
+                if $e;
+            return success_as_json($c, $metadata);
+        });
+    }
 
+    #  does not yet fit into a factory
     $r->get('/valid_cluster_linkage_functions' => sub ($c) {
         my $metadata;
         use Biodiverse::Cluster;
@@ -134,114 +124,90 @@ $log->debug("Called startup");
         return $c->render(json => $results);
     });
 
-    #  initialise a basedata.
-    $r->post ('/init_basedata' => sub ($c) {
-        my $analysis_params = $c->req->json;
-
-        $log->debug("Init basedata");
-        $log->debug("parameters are:");
-        $log->debug(np ($analysis_params));
-
-        my $result = eval {
-            BiodiverseR::BaseData->init_basedata ($analysis_params);
-            1;
-        };
-        my $e = $@;
-        return error_as_json ($c,  "Cannot initialise basedata, $e")
-            if $e;
-
-        return success_as_json ($c, $result);
-    });
-
-    $r->post ('/bd_delete_analysis' => sub ($c) {
-        my $analysis_params = $c->req->json;
-
-        my $result = eval {
-            BiodiverseR::BaseData->delete_output ($analysis_params);
-            1;
-        };
-        my $e = $@;
-        return error_as_json ($c,  "Cannot delete $analysis_params->{name} from basedata, $e")
-            if $e;
-
-        return success_as_json ($c, $result);
-    });
-
-    $r->post ('/bd_delete_all_analyses' => sub ($c) {
-        my $analysis_params = $c->req->json;
-
-        my $result = eval {
-            BiodiverseR::BaseData->delete_all_outputs;
-            1;
-        };
-        my $e = $@;
-        return error_as_json ($c,  "Cannot delete all analyses from basedata, $e")
-            if $e;
-
-        return success_as_json ($c, $result);
-    });
-
-
-    $r->post ('/bd_load_data' => sub ($c) {
-        my $analysis_params = $c->req->json;
-
-        $log->debug("parameters are:");
-        $log->debug(np ($analysis_params));
-        $log->debug("About to call load_data");
-
-        my $result = eval {
-            BiodiverseR::BaseData->load_data ($analysis_params);
-            1;
-        };
-        my $e = $@;
-        $log->debug ($e) if $e;
-        return error_as_json ($c, "Cannot load data into basedata, $e")
-          if $e;
-        # my $bd = BiodiverseR::BaseData->get_basedata_ref;
-        # say STDERR "LOADED, result is $result, group count is " . $bd->get_group_count;
-        #  should just return success or failure
-        return success_as_json ($c, $result);
-    });
-
-    $r->post ('/bd_get_group_count' => sub ($c) {
-        my $bd = BiodiverseR::BaseData->get_basedata_ref;
-        my $result = $bd ? $bd->get_group_count : undef;
-        return success_as_json ($c, $result);
-    });
-
-    $r->post ('/bd_get_label_count' => sub ($c) {
-        my $bd = BiodiverseR::BaseData->get_basedata_ref;
-        my $result = $bd ? $bd->get_label_count : undef;
-        return success_as_json ($c, $result);
-    });
-
-    $r->post ('/bd_get_cell_sizes' => sub ($c) {
-        my $bd = BiodiverseR::BaseData->get_basedata_ref;
-        my $result = $bd ? $bd->get_cell_sizes : undef;
-        return success_as_json ($c, $result);
-    });
-
-    $r->post ('/bd_get_cell_origins' => sub ($c) {
-        my $bd = BiodiverseR::BaseData->get_basedata_ref;
-        my $result = $bd ? $bd->get_cell_origins : undef;
-        return success_as_json ($c, $result);
-    });
-
     $r->post ('/bd_get_analysis_count' => sub ($c) {
         my $result = BiodiverseR::BaseData->get_output_count;
         return success_as_json ($c, $result);
     });
 
-    $r->post ('/bd_run_spatial_analysis' => sub ($c) {
-        return analysis_call ($c, 'run_spatial_analysis');
-    });
+    # a reasonably complex factory
+    my %bd_route_factory = (
+        init_basedata       => {
+            route  => 'init_basedata',
+            method => 'init_basedata',
+            error  => 'Cannot initialise basedata, %{error}',
+        },
+        load_data           => {
+            method => 'load_data',
+            error  => 'Cannot load data into basedata, %{error}'
+        },
+        delete_analysis     => {
+            method => 'delete_output',
+            error  => "Cannot delete %{name} from basedata, %{error}"
+        },
+        delete_all_analyses => {
+            method  => 'delete_all_outputs',
+            error   => 'Cannot delete all analyses from basedata, %{error}',
+            no_args => 1,
+        },
+    );
 
-    #  refactor needed - mostly the same as spatial variant
-    $r->post ('/bd_run_cluster_analysis' => sub ($c) {
-        return analysis_call ($c, 'run_cluster_analysis');
-    });
+    foreach my $stub (keys %bd_route_factory) {
+        my %rprops = %{$bd_route_factory{$stub}};
+        my $route    = $rprops{route} // "bd_$stub";
+        my $method   = $rprops{method} // $stub;
+        my $error    = $rprops{error} // '';
+        my $has_args = !$rprops{no_args};
 
-    #  duplicates much from above - needs refactoring
+        my $name_template = '%{name}';
+        my $err_template  = '%{error}';
+
+        $r->post ($route => sub ($c) {
+            my $analysis_params = $c->req->json;
+
+            $log->debug("bd_$stub parameters are:");
+            $log->debug(np ($analysis_params));
+            $log->debug("About to call $method");
+
+            my $result = eval {
+                BiodiverseR::BaseData->$method ($has_args ? $analysis_params : ());
+                1;
+            };
+
+            if (my $e = $@) {
+                $log->debug ($e);
+                my $msg = $error;
+                $msg =~ s/\Q$err_template\E/$e/;
+                if ($msg =~ /\Q$name_template\E/) {
+                    my $name = $analysis_params->{name} // '';
+                    $msg =~ s/\Q$name_template\E/$name/;
+                }
+                return error_as_json($c, $msg);
+            }
+
+            return success_as_json ($c, $result);
+        });
+    }
+
+
+    #  some simple ones
+    foreach my $stub (qw /label_count group_count cell_sizes cell_origins/) {
+        my $method = "get_$stub";
+        $r->post ("/bd_$method" => sub ($c) {
+            my $bd = BiodiverseR::BaseData->get_basedata_ref;
+            my $result = $bd ? $bd->$method : undef;
+            return success_as_json ($c, $result);
+        });
+    }
+
+    #  analysis factory
+    foreach my $stub (qw /spatial cluster/) {
+        my $method = "run_${stub}_analysis";
+        $r->post ("/bd_$method" => sub ($c) {
+            return analysis_call ($c, $method);
+        });
+    }
+
+
     $r->post ('/bd_get_analysis_results' => sub ($c) {
         my $analysis_params = $c->req->json;
 
@@ -298,7 +264,7 @@ $log->debug("Called startup");
     sub analysis_call ($c, $method){
         my $analysis_params = $c->req->json;
 
-        $log->debug("parameters are:");
+        $log->debug("Analysis parameters are:");
         $log->debug(np ($analysis_params));
         $log->debug("About to call $method");
 
