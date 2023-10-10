@@ -142,6 +142,9 @@ basedata = R6Class("basedata",
     run_cluster_analysis = function (...) {
       BiodiverseR:::run_cluster_analysis(self, ...)
     },
+    run_randomisation_analysis = function (...) {
+      BiodiverseR:::run_randomisation_analysis(self, ...)
+    },
     get_analysis_results = function (name) {
       #  needs to do more than spatial...
       params = list (name = name)
