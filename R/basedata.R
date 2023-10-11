@@ -7,7 +7,17 @@ library("R6")
 #' Data can then be loaded onto the server,
 #' analyses run and results returned.
 #'
+#' The filename argument is optional and can be used to load
+#' a pre-generated basedata file, for example one created using
+#' the Biodiverse GUI.
+#' In that case the cellsizes and cellorigins parameters are ignored.
+#'
+#' If the name argument is not passed then a default name will
+#' be generated using the current time.
+#'
+#'
 #' @param name character
+#' @param filename character
 #' @param cellsizes numeric
 #' @param cellorigins numeric
 #' @param name character
