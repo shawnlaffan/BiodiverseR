@@ -3,11 +3,12 @@
 #'
 #'
 #' @param bd list
-#' @param r_data list
-#' @param raster_params list
-#' @param spreadsheet_params list
-#' @param delimited_text_params list
-#' @param shapefile_params list
+#' @param rand_function character
+#' @param iterations integer
+#' @param name character
+#' @param spatial_conditions character
+#' @param def_query character
+#' @param ...
 #'
 #' @export
 #' @examples
@@ -39,37 +40,3 @@ run_randomisation_analysis = function (
   return(call_results)
 }
 
-
-process_tabular_results = function (call_results) {
-  processed_results <- list()
-  #apply? - nah.  There will never be more than ten list elements
-  #  convert list structure to a data frame
-  #  maybe the server could give a more DF-like structure,
-  #  but this is already an array
-  for (list_name in sort(names(call_results))) {
-    #Spatial results is the only result in our test case. Which contains a list of expected stuff # nolint
-    message("Processing ", list_name)
-
-    results <- call_results[[list_name]]  #  need to handle when it is not there
-    header <- unlist(results[[1]])
-    results[[1]] <- NULL  #  remove the header
-    #99 percent sure this removes the names of the rows, like axis_0, can always check  #nolint
-
-    df <- do.call(rbind, lapply(results, rbind)) |> as.data.frame()
-    df[df == "NULL"] <- NA
-    colnames(df) <- header
-    if (header[1] == "ELEMENT") {
-      #  make the element names the row names, and remove from main table
-      row.names(df) <- df$ELEMENT
-      df[[1]] <- NULL
-      #  the other data are numeric for raster inputs
-      for (c in colnames(df)) {
-        df[[c]] <- as.numeric(df[[c]])
-      }
-    }
-    processed_results[[list_name]] <- df
-  }
-  #check if the processign happened before this function, using  utils::str (call_results)
-
-  processed_results
-}
