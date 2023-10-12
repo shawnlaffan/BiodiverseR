@@ -20,12 +20,19 @@ use Biodiverse::Spatial;
 #  should use Mojo::File
 use Path::Tiny qw /path/;
 use Data::Printer qw /p np/;
+use POSIX ();
+use Time::HiRes qw /time/;
+
 
 local $| = 1;
 
 #  maybe should save mac logs to ~/Library/BiodiverseR
 my $logdir  = path (($^O eq 'MSWin32' ? $ENV{APPDATA} : $ENV{HOME}), "BiodiverseR/logs")->mkdir;
-my $logname = path (sprintf ("$logdir/BiodiverseR_log_%s_%s.txt", time(), $$))->absolute;
+#  Looks nasty but gets us a lexically sorting, human comprehensible time stamp
+#  that should have low risk of overlap across parallel runs
+my $timestamp = POSIX::strftime( "%Y%m%d_%H%M%S", gmtime())
+              . (sprintf ("%.6f", POSIX::fmod (Time::HiRes::time(), 1)) =~ s/^0//r);
+my $logname = path (sprintf ("$logdir/BiodiverseR_log_%s_%s.txt", $timestamp, $$))->absolute;
 while (-e $logname) {
     $logname =~ s/.txt$//;
     $logname .= 'x.txt';
