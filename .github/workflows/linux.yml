@@ -93,4 +93,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: mojo-files
-          path: ./**/mojo*.txt
+          path: /home/runner/BiodiverseR/logs/*.txt
