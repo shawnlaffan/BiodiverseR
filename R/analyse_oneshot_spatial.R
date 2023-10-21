@@ -34,7 +34,7 @@ analyse_oneshot_spatial <- function(
     stopifnot("tree must be of class phylo or inherit from it" = inherits (tree, "phylo")) # nolint
   }
 
-  bd = BiodiverseR:::basedata$new(
+  bd = basedata$new(
     cellsizes = cellsizes
   )
   params = list (

@@ -1,3 +1,7 @@
+## Workaround an R CMD check false positive
+dummy_r6 <- function() R6::R6Class
+
+
 #' Start the Biodiverse server
 #'
 #' Starts a Biodiverse server.
