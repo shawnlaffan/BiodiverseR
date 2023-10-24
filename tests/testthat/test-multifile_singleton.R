@@ -1,4 +1,5 @@
 library("fs")
+library("BiodiverseR")
 test_that("Analyse singleton handles multiple input files", {
   file_path <- system.file("extdata", package ="BiodiverseR")
 
@@ -83,7 +84,7 @@ test_that("Analyse singleton handles multiple input files", {
       targets = args[names(args)[i:(i+n)]]
       target_names = paste (names(targets), collapse=(":"))
 
-      bd = BiodiverseR:::basedata$new(cellsizes=c(500,500))
+      bd = basedata$new(cellsizes=c(500,500))
 
       result = bd$load_data(targets)
 
@@ -118,7 +119,7 @@ test_that("Analyse singleton handles multiple input files", {
         #message ("Saving to ", f)
         results = bd$save_to_bds (f)
         expect_equal(results, 1, info="basedata saved to file")
-        bd2 = BiodiverseR:::basedata$new(filename = f)
+        bd2 = basedata$new(filename = f)
         gp_cnt = bd2$get_group_count()
         expect_equal(
           gp_cnt,

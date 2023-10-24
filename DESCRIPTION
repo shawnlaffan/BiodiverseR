@@ -1,6 +1,6 @@
 Package: BiodiverseR
 Title: An R interface to the Biodiverse engine for the spatial analysis of diversity
-Version: 0.0.0.9000
+Version: 0.0.0.9001
 Authors@R: c(
     person(given = "Shawn",
            family = "Laffan",
@@ -16,7 +16,6 @@ Description: BiodiverseR provides an interface to Biodiverse.
     based on taxonomic, phylogenetic, trait and matrix-based 
     (e.g. genetic distance) relationships, as well as related environmental 
     variations. 
-License: use_gpl_license()
 URL: https://github.com/shawnlaffan/BiodiverseR
 BugReports: https://github.com/shawnlaffan/BiodiverseR/issues
 Encoding: UTF-8
@@ -38,3 +37,4 @@ Imports:
     utils,
     R6,
     checkmate
+License: GPL (>= 3)

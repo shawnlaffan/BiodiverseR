@@ -1,3 +1,5 @@
+library("BiodiverseR")
+
 test_that("Analyse oneshot handles multiple input files", {
   file_path <- system.file("extdata", package ="BiodiverseR")
 

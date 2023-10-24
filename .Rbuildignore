@@ -1,5 +1,5 @@
 ^BiodiverseR\.Rproj$
-^\.Rproj\.user$
+\.Rproj\.user
 ^LICENSE\.md$
 ^README\.Rmd$
 ^\.github$
@@ -8,4 +8,10 @@
 mojo_log.+.txt$
 ^\.idea
 ^inst/perl/\.idea
-^tree\..+
+^tree\\..+
+nytprof.out$
+nyt\d
+nytprof
+BiodiverseR.[.]Rproj[.]user
+^\.Rproj\.user$
+

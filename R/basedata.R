@@ -7,7 +7,17 @@ library("R6")
 #' Data can then be loaded onto the server,
 #' analyses run and results returned.
 #'
+#' The filename argument is optional and can be used to load
+#' a pre-generated basedata file, for example one created using
+#' the Biodiverse GUI.
+#' In that case the cellsizes and cellorigins parameters are ignored.
+#'
+#' If the name argument is not passed then a default name will
+#' be generated using the current time.
+#'
+#'
 #' @param name character
+#' @param filename character
 #' @param cellsizes numeric
 #' @param cellorigins numeric
 #' @param name character
@@ -134,13 +144,16 @@ basedata = R6Class("basedata",
       call_results[['result']]
     },
     load_data = function (params) {
-      BiodiverseR:::load_data_(self, params = params)
+      load_data_(self, params = params)
     },
     run_spatial_analysis = function (...) {
-      BiodiverseR:::run_spatial_analysis(self, ...)
+      run_spatial_analysis(self, ...)
     },
     run_cluster_analysis = function (...) {
-      BiodiverseR:::run_cluster_analysis(self, ...)
+      run_cluster_analysis(self, ...)
+    },
+    run_randomisation_analysis = function (...) {
+      run_randomisation_analysis(self, ...)
     },
     get_analysis_results = function (name) {
       #  needs to do more than spatial...
@@ -150,9 +163,9 @@ basedata = R6Class("basedata",
       if (!is.null (results[['dendrogram']])) {
         processed = list()
         processed[['dendrogram']] = results[['dendrogram']]
-        processed[['lists']] = BiodiverseR:::process_tabular_results(results[['lists']])
+        processed[['lists']] = process_tabular_results(results[['lists']])
       } else {
-        processed = BiodiverseR:::process_tabular_results(results)
+        processed = process_tabular_results(results)
       }
       return (processed)
     },
