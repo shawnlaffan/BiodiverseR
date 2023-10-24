@@ -76,6 +76,7 @@ jobs:
           cpanm --notest --installdeps --no-man-pages PDL
           cpanm --notest --no-man-pages PDL
           cpanm --notest https://github.com/shawnlaffan/biodiverse.git
+          cpanm --notest Excel::ValueReader::XLSX
           cd inst/perl
           cpanm --installdeps .
           cd -
