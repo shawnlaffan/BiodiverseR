@@ -47,7 +47,12 @@ run_spatial_analysis = function (
   return(processed_results)
 }
 
-
+#' Process the results of the spatial analysis
+#'
+#'
+#' @param call_results list
+#'
+#' @export
 process_tabular_results = function (call_results) {
   processed_results <- list()
   #apply? - nah.  There will never be more than ten list elements
