@@ -22,6 +22,12 @@ dummy_r6 <- function() R6::R6Class
 #'   start_server(port=3001, use_exe=FALSE)
 #' }
 
+
+library("openssl")
+library("stringi")
+
+
+
 start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
   process = NULL  #  silence some check warnings
@@ -136,11 +142,16 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     Sys.setenv("PATH"=orig_path)
   }
 
+  # Generate a random api key every time server starts
+  api_key = sha256(stri_rand_strings(1, 20, "[A-Za-z0-9]"))
+
+ 
   config = list (
     port = port,
     using_exe = use_exe,
     server_object = server_object,
-    server_url = server_url
+    server_url = server_url,
+    server_api_key = api_key
   )
 
   #  hopefully redundant now but leaving just in case
