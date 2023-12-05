@@ -111,10 +111,11 @@ basedata = R6Class("basedata",
       target_url <- paste(self$server$server_url, call_path, sep = "/")
 
 #message(target_url)
-
       #  filter any nulls
       if (!is.null(params)) {
         params[sapply(params, is.null)] <- NULL
+        # Attaches api key to params
+        params[["api_key"]] = self$server$server_api_key
         params_as_json <- rjson::toJSON(params)
       }
       else {
