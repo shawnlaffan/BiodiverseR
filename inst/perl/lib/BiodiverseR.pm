@@ -54,7 +54,7 @@ sub startup ($self) {
 
 $log->debug("Called startup");
 
-  # Load configuration from config file
+  # Load configuration from config filesecrets
   #my $config = $self->plugin('NotYAMLConfig');
 
   $self->helper(data => sub {state $data = BiodiverseR::Data->new});
@@ -67,6 +67,9 @@ $log->debug("Called startup");
   # Configure the application
   #$self->secrets($config->{secrets});
   $self->secrets(rand());
+  
+  # Store api key generated on the R side
+  my $api_key;
 
   # Router
   my $r = $self->routes;
@@ -248,6 +251,13 @@ $log->debug("Called startup");
         };
         my $e = $@;
         return $c->render(json => {error => $e, result => defined $result});
+    });
+
+    $r->post ('/api_key' => sub ($c) {
+        # Store the api_key
+        $api_key = $c->req->json;
+        $log->debug("$api_key");
+        return $c->render(json => $self->api_key);
     });
 
     sub success_as_json ($c, $result) {

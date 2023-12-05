@@ -154,6 +154,15 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     server_api_key = api_key
   )
 
+  # Sends api key to the mojolicious server
+  target_url <- paste0(config$server_url, "/api_key")
+  key_as_json <- rjson::toJSON(api_key)
+  response <- httr::POST(
+    url = target_url,
+    body = key_as_json,
+    encode = "json",
+  )
+
   #  hopefully redundant now but leaving just in case
   server_running = 0
   max_tries = 10
@@ -186,3 +195,5 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
   return(config)
 }
+
+# start_server()
