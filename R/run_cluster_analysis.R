@@ -1,13 +1,18 @@
-#' Load data onto the server associated with
-#' a BiodiverseR::basedata object
+#' Runs a cluster analysis with the given parameters
+#' Uses the given basedata object to call the server
 #'
 #'
 #' @param bd list
-#' @param r_data list
-#' @param raster_params list
-#' @param spreadsheet_params list
-#' @param delimited_text_params list
-#' @param shapefile_params list
+#' @param index string
+#' @param linkage_function string
+#' @param calculations
+#' @param spatial_conditions string
+#' @param def_query string
+#' @param name string
+#' @param tree list
+#' @param cluster_tie_breakers
+#'
+#' @return The processed results of the cluster analysis 
 #'
 #' @export
 #' @examples

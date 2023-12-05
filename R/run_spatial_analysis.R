@@ -1,13 +1,15 @@
-#' Load data onto the server associated with
-#' a BiodiverseR::basedata object
-#'
+#' Runs a spatial analysis with the given paramaters
+#' Uses the basedata object (bd) to call the server
+#' 
 #'
 #' @param bd list
-#' @param r_data list
-#' @param raster_params list
-#' @param spreadsheet_params list
-#' @param delimited_text_params list
-#' @param shapefile_params list
+#' @param calculations 
+#' @param spatial_conditions string 
+#' @param def_query string
+#' @param name string 
+#' @param tree list
+#'
+#' @return The processed results of the spatial analysis
 #'
 #' @export
 #' @examples
