@@ -288,9 +288,9 @@ $log->debug("Called startup");
     }
 
     # Check if the api_key sent with the call is the same as api_key stored. If not stop the call.
-    sub check_api_key ($c, $stored_api_key) {
+    sub check_api_key ($c, $api_key) {
         my $body_params = $c->req->json;
-        if ($body_params->{api_key} ne $stored_api_key) {
+        if ($body_params->{api_key} ne $api_key) {
             my $error_msg = "Stored api_key does not match api_key passed in";
             return error_as_json($c, $error_msg);
         }
