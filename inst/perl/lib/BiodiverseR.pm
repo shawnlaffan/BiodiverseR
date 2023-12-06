@@ -122,6 +122,8 @@ $log->debug("Called startup");
     $r->post ('/analysis_spatial_oneshot' => sub ($c) {
         my $analysis_params = $c->req->json;
 
+        check_api_key ($c, $api_key);
+
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
 
@@ -174,6 +176,8 @@ $log->debug("Called startup");
         $r->post ($route => sub ($c) {
             my $analysis_params = $c->req->json;
 
+            check_api_key ($c, $api_key);
+
             $log->debug("bd_$stub parameters are:");
             $log->debug(np ($analysis_params));
             $log->debug("About to call $method");
@@ -213,6 +217,7 @@ $log->debug("Called startup");
     foreach my $stub (qw /spatial cluster randomisation/) {
         my $method = "run_${stub}_analysis";
         $r->post ("/bd_$method" => sub ($c) {
+            check_api_key ($c, $api_key);
             return analysis_call ($c, $method);
         });
     }
@@ -220,6 +225,8 @@ $log->debug("Called startup");
 
     $r->post ('/bd_get_analysis_results' => sub ($c) {
         my $analysis_params = $c->req->json;
+
+        check_api_key ($c, $api_key);
 
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
@@ -242,6 +249,7 @@ $log->debug("Called startup");
 
     $r->post ('/bd_save_to_bds' => sub ($c) {
         my $args = $c->req->json;
+        check_api_key ($c, $api_key);
         my $filename = $args->{filename};
         my $result = eval {
             my $bd = BiodiverseR::BaseData->get_basedata_ref;
@@ -253,8 +261,8 @@ $log->debug("Called startup");
         return $c->render(json => {error => $e, result => defined $result});
     });
 
+    # Store the api_key
     $r->post ('/api_key' => sub ($c) {
-        # Store the api_key
         $api_key = $c->req->json;
         $log->debug("Api Key is:");
         $log->debug("$api_key");
@@ -277,6 +285,16 @@ $log->debug("Called startup");
                 result => undef
             }
         );
+    }
+
+    # Check if the api_key sent with the call is the same as api_key stored. If not stop the call.
+    sub check_api_key ($c, $stored_api_key) {
+        my $body_params = $c->req->json;
+        if ($body_params->{api_key} ne $stored_api_key) {
+            my $error_msg = "Stored api_key does not match api_key passed in";
+            return error_as_json($c, $error_msg);
+        }
+        return;
     }
 
     sub analysis_call ($c, $method){
