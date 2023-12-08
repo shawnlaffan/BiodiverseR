@@ -1,5 +1,5 @@
-#' Load data onto the server associated with
-#' a BiodiverseR::basedata object
+#' Runs a randomisation analysis by calling the server
+#' using a basedata object
 #'
 #'
 #' @param bd list
@@ -10,10 +10,20 @@
 #' @param def_query character
 #' @param ...
 #'
+#' @return Returns the results from calling the server
+#' 
 #' @export
 #' @examples
 #' if(interactive()) {
-#'   b = BiodiverseR::basedata$new(name = "trial")
+#'   run_randomisation_analysis (
+#'     bd                 = basedata$new(cellsizes=c(500,500))
+#'     rand_function      = 'some_rand_function'
+#'     iterations         = integer
+#'     name               = 'some_name',
+#'     spatial_conditions = c("calc_endemism_central", "calc_richness", "calc_pd"),
+#'     def_query          = 'some_def_query'
+#'     ...
+#'   )
 #' }
 run_randomisation_analysis = function (
     bd,
