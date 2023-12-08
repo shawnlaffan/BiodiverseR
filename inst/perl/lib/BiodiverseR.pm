@@ -298,7 +298,7 @@ $log->debug("Called startup");
         if (!defined $perl_stored_api_key) {
             $perl_stored_api_key = "";
         }
-        if ($sent_api_key ne $perl_stored_api_key) {
+        if ($sent_api_key ne $perl_stored_api_key || $sent_api_key eq "" || $perl_stored_api_key eq "") {
             my $error_msg = "Stored api_key does not match api_key passed in";
             return error_as_json($c, $error_msg);
         }
