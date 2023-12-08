@@ -295,10 +295,10 @@ $log->debug("Called startup");
         $log->debug($api_key);
         my $sent_api_key = "";
         my $stored_api_key = "";
-        if (defined $body_params->{api_key}) {
+        if (length $body_params->{api_key}) {
             $sent_api_key = $body_params->{api_key};
         }
-        if (defined $api_key) {
+        if (length $api_key) {
             $stored_api_key = $api_key;
         }
         if ($sent_api_key ne $stored_api_key) {
