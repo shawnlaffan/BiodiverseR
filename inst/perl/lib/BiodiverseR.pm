@@ -294,11 +294,11 @@ $log->debug("Called startup");
         my $perl_stored_api_key = $api_key;
         
         if (!defined $sent_api_key) {
-            # $sent_api_key = "";
+            $sent_api_key = "";
             return error_as_json($c, "R api_key sent is undefined");
         }
         if (!defined $perl_stored_api_key) {
-            # $perl_stored_api_key = "";
+            $perl_stored_api_key = "";
             return error_as_json($c, "Perl api_key stored is undefined");
         }
         if ($sent_api_key ne $perl_stored_api_key) {
