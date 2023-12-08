@@ -293,10 +293,10 @@ $log->debug("Called startup");
         my $sent_api_key = $body_params->{api_key};
         my $perl_stored_api_key = $api_key;
         if (!defined $sent_api_key) {
-            $sent_api_key = "sent";
+            $sent_api_key = "";
         }
         if (!defined $perl_stored_api_key) {
-            $perl_stored_api_key = "stored";
+            $perl_stored_api_key = "";
         }
         if ($sent_api_key ne $perl_stored_api_key) {
             my $error_msg = "Stored api_key does not match api_key passed in";
