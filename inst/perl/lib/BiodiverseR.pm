@@ -293,6 +293,9 @@ $log->debug("Called startup");
         my $sent_api_key = $body_params->{api_key};
         my $perl_stored_api_key = $api_key;
         
+        # The comparison ne gives us an error for when the two variables are not checked for being undefined.
+        # Thus, we check that the api_key sent and the api_key stored are not undefined. If they are set them to empty string.
+        # Technically, they will never be undefined and hence the case of both of them being undefined is not handled.
         if (!defined $sent_api_key) {
             $sent_api_key = "";
         }
