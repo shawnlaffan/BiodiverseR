@@ -1,6 +1,10 @@
 #' Use the Biodiverse server to load a set of rasters and then analyse them
 #'
 #' @param raster_files character
+#' @param r_data list
+#' @param spreadsheet_data list
+#' @param delimited_text_file_data list
+#' @param shapefile_data list
 #' @param cellsizes numeric
 #' @param calculations character
 #' @param tree class phylo
@@ -10,9 +14,17 @@
 #' @examples
 #' if(interactive()) {
 #'   analyse_oneshot_spatial (
-#'     raster_files = c("r1.tif", "r2.tif"),
-#'     calculations = c("calc_endemism_central", "calc_richness", "calc_pd"),
-#'     tree = some_phylo_tree
+#'     raster_files             = c("r1.tif", "r2.tif"),
+#'     r_data                   = list(
+#'                                    '250:250' = list (r1 = 13758, r2 = 13860, r3 = 13727),
+#'                                    '250:750' = list (r1 = 11003, r2 = 11134, r3 = 11279),
+#'                                    )
+#'     spreadsheet_data         = r[12].xlsx
+#'     delimited_text_file_data = r[12].csv
+#'     shapefile_data           = r[12].shp
+#'     cellsizes                = c(500, 500),
+#'     calculations             = c("calc_endemism_central", "calc_richness", "calc_pd"),
+#'     tree                     = some_phylo_tree
 #'   )
 #' }
 #format for data is list(list(files), list(group_columns), list(label_columns), list(sample_count_columns)) # nolint
