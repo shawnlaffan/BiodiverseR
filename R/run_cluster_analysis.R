@@ -3,12 +3,12 @@
 #'
 #'
 #' @param bd list
-#' @param index string
-#' @param linkage_function string
-#' @param calculations
-#' @param spatial_conditions string
-#' @param def_query string
-#' @param name string
+#' @param index character
+#' @param linkage_function character
+#' @param calculations character
+#' @param spatial_conditions character
+#' @param def_query character
+#' @param name character
 #' @param tree list
 #' @param cluster_tie_breakers
 #'
