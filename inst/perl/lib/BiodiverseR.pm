@@ -124,7 +124,7 @@ $log->debug("Called startup");
 
         my $api_key_valid = check_api_key ($c, $api_key);
         if ($api_key_valid ne "") {
-            return error_as_json($c, "Stored api_key does not match api_key passed in");
+            return error_as_json($c, $api_key_valid);
         }
 
         $log->debug("parameters are:");
@@ -181,7 +181,7 @@ $log->debug("Called startup");
 
             my $api_key_valid = check_api_key ($c, $api_key);
             if ($api_key_valid ne "") {
-                return error_as_json($c, "Stored api_key does not match api_key passed in");
+                return error_as_json($c, $api_key_valid);
             }
 
             $log->debug("bd_$stub parameters are:");
@@ -225,7 +225,7 @@ $log->debug("Called startup");
         $r->post ("/bd_$method" => sub ($c) {
             my $api_key_valid = check_api_key ($c, $api_key);
             if ($api_key_valid ne "") {
-                return error_as_json($c, "Stored api_key does not match api_key passed in");
+                return error_as_json($c, $api_key_valid);
             }
             return analysis_call ($c, $method);
         });
@@ -237,7 +237,7 @@ $log->debug("Called startup");
 
         my $api_key_valid = check_api_key ($c, $api_key);
         if ($api_key_valid ne "") {
-            return error_as_json($c, "Stored api_key does not match api_key passed in");
+            return error_as_json($c, $api_key_valid);
         }
 
         $log->debug("parameters are:");
@@ -263,7 +263,7 @@ $log->debug("Called startup");
         my $args = $c->req->json;
         my $api_key_valid = check_api_key ($c, $api_key);
         if ($api_key_valid ne "") {
-            return error_as_json($c, "Stored api_key does not match api_key passed in");
+            return error_as_json($c, $api_key_valid);
         }
         my $filename = $args->{filename};
         my $result = eval {
