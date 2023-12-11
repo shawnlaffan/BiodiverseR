@@ -122,7 +122,10 @@ $log->debug("Called startup");
     $r->post ('/analysis_spatial_oneshot' => sub ($c) {
         my $analysis_params = $c->req->json;
 
-        check_api_key ($c, $api_key);
+        my $api_key_valid = check_api_key ($c, $api_key);
+        if ($api_key_valid ne "") {
+            return error_as_json($c, "Stored api_key does not match api_key passed in");
+        }
 
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
@@ -176,7 +179,10 @@ $log->debug("Called startup");
         $r->post ($route => sub ($c) {
             my $analysis_params = $c->req->json;
 
-            check_api_key ($c, $api_key);
+            my $api_key_valid = check_api_key ($c, $api_key);
+            if ($api_key_valid ne "") {
+                return error_as_json($c, "Stored api_key does not match api_key passed in");
+            }
 
             $log->debug("bd_$stub parameters are:");
             $log->debug(np ($analysis_params));
@@ -217,7 +223,10 @@ $log->debug("Called startup");
     foreach my $stub (qw /spatial cluster randomisation/) {
         my $method = "run_${stub}_analysis";
         $r->post ("/bd_$method" => sub ($c) {
-            check_api_key ($c, $api_key);
+            my $api_key_valid = check_api_key ($c, $api_key);
+            if ($api_key_valid ne "") {
+                return error_as_json($c, "Stored api_key does not match api_key passed in");
+            }
             return analysis_call ($c, $method);
         });
     }
@@ -226,7 +235,10 @@ $log->debug("Called startup");
     $r->post ('/bd_get_analysis_results' => sub ($c) {
         my $analysis_params = $c->req->json;
 
-        check_api_key ($c, $api_key);
+        my $api_key_valid = check_api_key ($c, $api_key);
+        if ($api_key_valid ne "") {
+            return error_as_json($c, "Stored api_key does not match api_key passed in");
+        }
 
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
@@ -249,7 +261,10 @@ $log->debug("Called startup");
 
     $r->post ('/bd_save_to_bds' => sub ($c) {
         my $args = $c->req->json;
-        check_api_key ($c, $api_key);
+        my $api_key_valid = check_api_key ($c, $api_key);
+        if ($api_key_valid ne "") {
+            return error_as_json($c, "Stored api_key does not match api_key passed in");
+        }
         my $filename = $args->{filename};
         my $result = eval {
             my $bd = BiodiverseR::BaseData->get_basedata_ref;
@@ -303,9 +318,9 @@ $log->debug("Called startup");
             $perl_stored_api_key = "";
         }
         if ($sent_api_key ne $perl_stored_api_key) {
-            return error_as_json($c, "Stored api_key does not match api_key passed in");
+            return "Stored api_key does not match api_key passed in";
         }
-        return;
+        return "";
     }
 
     sub analysis_call ($c, $method){
