@@ -307,10 +307,11 @@ $log->debug("Called startup");
         my $body_params = $c->req->json;
         my $sent_api_key = $body_params->{api_key};
         my $perl_stored_api_key = $api_key;
-        $log->debug("Stored api key is:");
-        $log->debug($perl_stored_api_key);
-        $log->debug("Sent api key is:");
-        $log->debug($sent_api_key);
+        # $log->debug("Stored api key is:");
+        # $log->debug($perl_stored_api_key);
+        # $log->debug("Sent api key is:");
+        # $log->debug($sent_api_key);
+        
         # The comparison ne gives us an error for when the two variables are not checked for being undefined.
         # Thus, we check that the api_key sent and the api_key stored are not undefined. If they are set them to empty string.
         # Technically, they will never be undefined and hence the case of both of them being undefined is not handled.
