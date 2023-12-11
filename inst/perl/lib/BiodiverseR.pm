@@ -313,9 +313,11 @@ $log->debug("Called startup");
         # Technically, they will never be undefined and hence the case of both of them being undefined is not handled.
         if (!defined $sent_api_key) {
             $sent_api_key = "";
+            return "Sent api key from R is undefined"
         }
         if (!defined $perl_stored_api_key) {
             $perl_stored_api_key = "";
+            return "Stored api key from perl is undefined"
         }
         if ($sent_api_key ne $perl_stored_api_key) {
             return "Stored api_key does not match api_key passed in";
