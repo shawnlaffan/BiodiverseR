@@ -19,9 +19,9 @@
 #'                                    '250:250' = list (r1 = 13758, r2 = 13860, r3 = 13727),
 #'                                    '250:750' = list (r1 = 11003, r2 = 11134, r3 = 11279),
 #'                                    )
-#'     spreadsheet_data         = r[12].xlsx
-#'     delimited_text_file_data = r[12].csv
-#'     shapefile_data           = r[12].shp
+#'     spreadsheet_data         = c("r1.xlsx", "r2.xlsx"),
+#'     delimited_text_file_data = c("r1.csv", "r2.csv"),
+#'     shapefile_data           = c("r1.shp", "r2.shp"),
 #'     cellsizes                = c(500, 500),
 #'     calculations             = c("calc_endemism_central", "calc_richness", "calc_pd"),
 #'     tree                     = some_phylo_tree
