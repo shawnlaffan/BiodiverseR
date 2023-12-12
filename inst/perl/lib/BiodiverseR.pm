@@ -92,6 +92,12 @@ $log->debug("Called startup");
           // "get_${route}";
 
         $r->get("/$route" => sub ($c) {
+            # Checks the api key
+            my $api_key_valid = check_api_key ($c, $api_key);
+            if ($api_key_valid ne "") {
+                return error_as_json($c, $api_key_valid);
+            }
+
             my $metadata;
             my $success = eval {
                 $metadata = BiodiverseR::IndicesMetadata->$method();
@@ -106,6 +112,12 @@ $log->debug("Called startup");
 
     #  does not yet fit into a factory
     $r->get('/valid_cluster_linkage_functions' => sub ($c) {
+        # Checks the api key
+        my $api_key_valid = check_api_key ($c, $api_key);
+        if ($api_key_valid ne "") {
+            return error_as_json($c, $api_key_valid);
+        }
+
         my $metadata;
         use Biodiverse::Cluster;
         my $success = eval {
@@ -122,6 +134,7 @@ $log->debug("Called startup");
     $r->post ('/analysis_spatial_oneshot' => sub ($c) {
         my $analysis_params = $c->req->json;
 
+        # Checks the api key
         my $api_key_valid = check_api_key ($c, $api_key);
         if ($api_key_valid ne "") {
             return error_as_json($c, $api_key_valid);
@@ -140,6 +153,12 @@ $log->debug("Called startup");
     });
 
     $r->post ('/bd_get_analysis_count' => sub ($c) {
+        # Checks the api key
+        my $api_key_valid = check_api_key ($c, $api_key);
+        if ($api_key_valid ne "") {
+            return error_as_json($c, $api_key_valid);
+        }
+
         my $result = BiodiverseR::BaseData->get_output_count;
         return success_as_json ($c, $result);
     });
@@ -179,6 +198,7 @@ $log->debug("Called startup");
         $r->post ($route => sub ($c) {
             my $analysis_params = $c->req->json;
 
+            # Checks the api key
             my $api_key_valid = check_api_key ($c, $api_key);
             if ($api_key_valid ne "") {
                 return error_as_json($c, $api_key_valid);
@@ -213,6 +233,12 @@ $log->debug("Called startup");
     foreach my $stub (qw /label_count group_count cell_sizes cell_origins/) {
         my $method = "get_$stub";
         $r->post ("/bd_$method" => sub ($c) {
+            # Checks the api key
+            my $api_key_valid = check_api_key ($c, $api_key);
+            if ($api_key_valid ne "") {
+                return error_as_json($c, $api_key_valid);
+            }
+
             my $bd = BiodiverseR::BaseData->get_basedata_ref;
             my $result = $bd ? $bd->$method : undef;
             return success_as_json ($c, $result);
@@ -223,6 +249,7 @@ $log->debug("Called startup");
     foreach my $stub (qw /spatial cluster randomisation/) {
         my $method = "run_${stub}_analysis";
         $r->post ("/bd_$method" => sub ($c) {
+            # Checks the api key
             my $api_key_valid = check_api_key ($c, $api_key);
             if ($api_key_valid ne "") {
                 return error_as_json($c, $api_key_valid);
@@ -235,6 +262,7 @@ $log->debug("Called startup");
     $r->post ('/bd_get_analysis_results' => sub ($c) {
         my $analysis_params = $c->req->json;
 
+        # Checks the api key
         my $api_key_valid = check_api_key ($c, $api_key);
         if ($api_key_valid ne "") {
             return error_as_json($c, $api_key_valid);
@@ -261,10 +289,13 @@ $log->debug("Called startup");
 
     $r->post ('/bd_save_to_bds' => sub ($c) {
         my $args = $c->req->json;
+        
+        # Checks the api key
         my $api_key_valid = check_api_key ($c, $api_key);
         if ($api_key_valid ne "") {
             return error_as_json($c, $api_key_valid);
         }
+
         my $filename = $args->{filename};
         my $result = eval {
             my $bd = BiodiverseR::BaseData->get_basedata_ref;
