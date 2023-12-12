@@ -9,7 +9,7 @@
 #' @param spatial_conditions character
 #' @param def_query character
 #' @param name character
-#' @param tree list
+#' @param tree class phylo
 #' @param cluster_tie_breakers
 #'
 #' @return The processed results of the cluster analysis 
