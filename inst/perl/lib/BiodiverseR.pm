@@ -279,8 +279,8 @@ $log->debug("Called startup");
     # Store the api_key
     $r->post ('/api_key' => sub ($c) {
         $api_key = $c->req->json;
-        $log->debug("Api Key is:");
-        $log->debug("$api_key");
+        # $log->debug("Api Key is:");
+        # $log->debug("$api_key");
         return $c->render(json => $self->api_key);
     });
 
@@ -302,7 +302,7 @@ $log->debug("Called startup");
         );
     }
 
-    # Check if the api_key sent with the call is the same as api_key stored. If not stop the call.
+    # Check if the api_key sent with the call is the same as api_key stored. If not return a string containing the error message.
     sub check_api_key ($c, $api_key) {
         my $body_params = $c->req->json;
         my $sent_api_key = $body_params->{api_key};
@@ -312,16 +312,14 @@ $log->debug("Called startup");
         # $log->debug("Sent api key is:");
         # $log->debug($sent_api_key);
         
-        # The comparison ne gives us an error for when the two variables are not checked for being undefined.
-        # Thus, we check that the api_key sent and the api_key stored are not undefined. If they are set them to empty string.
-        # Technically, they will never be undefined and hence the case of both of them being undefined is not handled.
+        # Keys are undefined in Perl tests but I believe thats because its not calling anything from the R server so it makes sense there are no keys
         if (!defined $sent_api_key) {
             $sent_api_key = "";
-            # return "Sent api key from R is undefined";  # Removing this as it causes error for the perl tests
+            # return "Sent api key from R is undefined"; 
         }
         if (!defined $perl_stored_api_key) {
             $perl_stored_api_key = "";
-            # return "Stored api key from perl is undefined"; # Removing this as it causes error for the perl tests
+            # return "Stored api key from perl is undefined";
         }
         if ($sent_api_key ne $perl_stored_api_key) {
             return "Stored api_key does not match api_key passed in";
