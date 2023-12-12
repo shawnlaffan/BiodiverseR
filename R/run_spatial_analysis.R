@@ -7,7 +7,7 @@
 #' @param spatial_conditions character 
 #' @param def_query character
 #' @param name character 
-#' @param tree list
+#' @param tree class phylo
 #'
 #' @return The processed results of the spatial analysis
 #'
