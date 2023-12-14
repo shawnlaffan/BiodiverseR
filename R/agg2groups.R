@@ -1,0 +1,133 @@
+#' Create groups for Biodiverse
+#'
+#'Use R to aggregate input data from several formats into user-defined groups
+#'
+#'
+#' @param x input data as path, data source name to be passed to st_read, data.frame, sf object, or SpatRaster object
+#' @param layer in case of shapefile data format: name of layer to be passed to st_read
+#' @param coords in case of point data: names or numbers of the numeric columns holding coordinates, to be passed to st_as_sf. Required if reading data from .xls file or inputting data.frame
+#' @param abund_col character vector containing the name of column(s) with abundances; defaults to "count" and is assumed to be 1 for all records if no column specified and count column is absent
+#' @param ID_col character vector containing the name of column(s) with data labels or species names. Defaults to "label"
+#' @param group_col character vector containing the name of column(s) by which to group observations; may be numeric or categorical.  Defaults to XY coordinates if no group_col is specified.
+#' @param cellsize numeric vector indicating the size of desired groups; length must be 1 or same length as group_col. If length is 1, then its value is recycled over all grouping columns. If value <= 0 exact matches are aggregated, including categorical variables.
+#' @param origin numeric vector of numbers specifying the dimensions of the spatial groups into which data needs to be aggregated. Length must match length of cellsize. Units should be the same as the data projection, usually metres.
+#' @param fun name of aggregation function to be used. Defaults to sum.
+#' @param ... passed on to agg2groups.sf call.
+#'
+#' @return Named list of numeric vectors corresponding to the result of the aggregation function for each unique label in the data. Names correspond to coordinates of bottom left corner of each group. This format is needed to pass through to Biodiverse server.
+#'
+#' @examples
+#' agg2groups("./inst/extdata/r1.tif")
+#' agg2groups("./inst/extdata/", layer = "r1")
+#'
+
+
+agg2groups <- function (x, ...) {
+  UseMethod("agg2groups", x)
+}
+
+# read in files from path names, call appropriate method
+agg2groups.character <- function(x, layer, coords = NULL, ...) {
+  # recognise file type at end of path
+  csv <- grepl(pattern = ".*?\\.csv$", x = x)
+  xls <- grepl(pattern = ".*?\\.xlsx$", x = x)
+  tif <- grepl(pattern = ".*?\\.tif$", x = x)
+  shp <- grepl(pattern = ".*?/$", x = x)
+  if(!csv & !xls & !tif) shp <- TRUE  #assume shp file if other types not recognised
+
+  # read in data accordingly, as spatial object if possible.
+  if(csv){
+    out <- st_read(x, options=c("X_POSSIBLE_NAMES=x*, X*,lon*","Y_POSSIBLE_NAMES=y*, Y*, lat*"), quiet = T)
+    if(!"sf" %in% class(out)) out <- st_as_sf(out, coords = coords, ...) # if coords not in defaults, add coords to make sf
+  } else if(xls) {out <- st_read(x, quiet = TRUE)
+    if(!is.null(coords)) out <- st_as_sf(out, coords = coords, ...)} # if coords specified, make sf
+  if(shp) out <- st_read(x, layer = layer)
+  if(tif) out <- rast(x)
+
+  if("data.frame" == class(out)[1]) return(agg2groups.data.frame(out, coords, ...))
+  if("sf" == class(out)[1]) return(agg2groups.sf(out, ...))
+  if("SpatRaster" == class(out)[1]) return(agg2groups.SpatRaster(out, ...))
+
+}
+
+# change to sf based on coords, call sf method
+agg2groups.data.frame <- function(x, coords, ...) {
+
+  x <- st_as_sf(x, coords = coords)
+  agg2groups.sf(x, ...)
+}
+
+# spatial aggregation, count and label columns specified with convenient defaults
+agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_col, cellsize = 100, origin = c(0,0), fun = sum) {
+
+  # check for existence of abund_col names
+  if(!all(abund_col %in% names(x))){
+    missing <- abund_col[!abund_col %in% names(x)]
+    if(length(abund_col) > 1){
+      if(length(missing) == length(abund_col)){
+        message("Abundance columns not found. Reverting to default: count = 1 for all rows.")
+        abund_col <- "count"
+        x <- x %>% mutate("{abund_col}" = 1)
+
+      }else{message(paste("Column ", missing[1], " not found. Missing columns are ignored."))
+        abund_col <- abund_col[abund_col %in% names(x)]
+      }
+
+    }
+    if(length(abund_col) == 1){
+      message(paste("Column ", missing, " not found. Defaulting to count = 1."))
+      x <- x %>% mutate("{abund_col}" = 1)
+    }
+  }
+
+  # code for aggregating point data
+  if(all(st_geometry_type(x) == "POINT")){
+    # add XY if not present
+    if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, st_coordinates(x))
+    # aggregate and summarise
+    if(length(cellsize) == 1){cellsize <- rep_len(cellsize, length(group_col))}
+    if(length(cellsize) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
+    if(length(cellsize) == length(group_col)){
+      x <- st_drop_geometry(x)
+      out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
+      }else{x[,group_col[.x]]}) %>%
+        reduce(cbind) %>% data.frame() %>%  setNames(all_of(group_col)) %>%
+        data.frame(x %>% select(-all_of(group_col))) %>%
+        group_by(across(c(all_of(ID_col), all_of(group_col)))) %>%
+        summarise(value := across(all_of(abund_col), fun), .groups = "keep")
+
+    }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
+
+    # change to format required by json
+    #names <- paste(out$x, out$y, sep = ":")
+    names <- out %>% select(group_cols()) %>% apply(1, paste, collapse = ":")
+    out <- out %>% split(names) %>%
+      purrr::map(~pull(.x, value) %>% unlist())
+    return(out)
+
+
+  }else{
+    # support line and polygon inputs.
+    agg2group.sfpoly(x, ID_col, cellsize, origin)
+  }
+
+}
+
+# raster aggregation
+agg2groups.SpatRaster <- function(x, cellsize = 100, ...) {
+  temp <- aggregate(x, fact = cellsize/res(x), fun = sum, ...) |>
+    as.data.frame(xy = TRUE) |>
+    mutate(x = x - cellsize/2, y = y - cellsize/2) # change xy to represent bottom left corner rather than centre of cell
+
+  # change data format to json
+  names <- paste(temp$x, temp$y, sep = ":")
+  out <- temp |> dplyr::select(-x, -y) |> split(names) |> purrr::map(unlist)
+
+  return(out)
+}
+
+
+round_any <- function(number, accuracy = 100, origin = 0, f = floor){
+  (f((number-origin)/accuracy) * accuracy) + origin
+  }
+

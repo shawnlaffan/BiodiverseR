@@ -33,7 +33,10 @@ Imports:
     httr,
     rjson,
     tools,
-    ape,
+    ape, 
+    sf, 
+    terra,
+    dplyr
     utils,
     R6,
     checkmate
