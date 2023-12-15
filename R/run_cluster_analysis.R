@@ -17,7 +17,20 @@
 #' @export
 #' @examples
 #' if(interactive()) {
-#'   b = BiodiverseR::basedata$new(name = "trial")
+#'   bd = BiodiverseR::basedata$new(cellsizes=c(500,500))
+#'
+#'   r_data = list(
+#'                 '250:250' = list (r1 = 13, r2 = 13),
+#'                 '250:750' = list (r2 = 11),
+#'                )
+#'
+#'   params = list (bd_params = r_data, raster_params = NULL)
+#'   result = bd$load_data(params)
+#'
+#'   results = bd$run_cluster_analysis (
+#'     # calculations = calculations,
+#'     # tree = tree
+#'   )
 #' }
 run_cluster_analysis = function (
     bd,
