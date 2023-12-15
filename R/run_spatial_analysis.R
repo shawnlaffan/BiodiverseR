@@ -14,7 +14,13 @@
 #' @export
 #' @examples
 #' if(interactive()) {
-#'   b = BiodiverseR::basedata$new(name = "trial")
+#'   bd = BiodiverseR::basedata$new(cellsizes=c(500,500))
+#'
+#'   results = bd$run_spatial_analysis (
+#'      # name = "sp1",
+#'      calculations = c("calc_richness", "calc_endemism_central"),
+#'      spatial_conditions = "sp_self_only()"
+#'   )
 #' }
 run_spatial_analysis = function (
     bd,
