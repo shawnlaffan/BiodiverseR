@@ -2,7 +2,7 @@
 #' Uses the given basedata object to call the server
 #'
 #'
-#' @param bd list
+#' @param bd class R6 basedata
 #' @param index character
 #' @param linkage_function character
 #' @param calculations character

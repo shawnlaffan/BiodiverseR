@@ -2,7 +2,7 @@
 #' using a basedata object
 #'
 #'
-#' @param bd list
+#' @param bd class R6 basedata
 #' @param rand_function character
 #' @param iterations integer
 #' @param name character

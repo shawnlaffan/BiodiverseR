@@ -2,7 +2,7 @@
 #' Uses the basedata object (bd) to call the server
 #' 
 #'
-#' @param bd list
+#' @param bd class R6 basedata
 #' @param calculations integer
 #' @param spatial_conditions character 
 #' @param def_query character
