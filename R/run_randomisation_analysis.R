@@ -29,7 +29,6 @@
 #'
 #'   bd$run_cluster_analysis (
 #'     calculations = c("calc_endemism_central", "calc_richness", "calc_pd"),
-#'     tree = some_phylo_tree
 #'   )
 #'
 #'   bd$run_randomisation_analysis (

@@ -10,17 +10,17 @@
 #' @param tree class phylo
 #' @param ... passed on to start_server call
 #'
-#' @return The results of the analysis
+#' @return The results of the analysis as an R list
 #'
 #' @export
 #' @examples
 #' if(interactive()) {
-#'   analyse_oneshot_spatial (
+#'   analysis_results = analyse_oneshot_spatial (
 #'     raster_files             = c("r1.tif", "r2.tif"),
-#'     r_data                   = r_data = list(
-#'                                              '250:250' = list (r1 = 13758, r2 = 13860),
-#'                                              '250:750' = list (r1 = 11003, r2 = 11134),
-#'                                             )
+#'     r_data                   = list(
+#'                                     '250:250' = list (r1 = 13758, r2 = 13860),
+#'                                     '250:750' = list (r1 = 11003, r2 = 11134),
+#'                                    )
 #'     spreadsheet_data         = c("r1.xlsx", "r2.xlsx"),
 #'     delimited_text_file_data = c("r1.csv", "r2.csv"),
 #'     shapefile_data           = c("r1.shp", "r2.shp"),
