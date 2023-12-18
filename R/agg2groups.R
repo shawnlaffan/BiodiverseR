@@ -29,6 +29,7 @@ agg2groups <- function (x, ...) {
 # read in files from path names, call appropriate method
 agg2groups.character <- function(x, layer, coords = NULL, ...) {
   # recognise file type at end of path
+  message("agg2groups.charater RAN")
   csv <- grepl(pattern = ".*?\\.csv$", x = x)
   xls <- grepl(pattern = ".*?\\.xlsx$", x = x)
   tif <- grepl(pattern = ".*?\\.tif$", x = x)
@@ -37,12 +38,13 @@ agg2groups.character <- function(x, layer, coords = NULL, ...) {
 
   # read in data accordingly, as spatial object if possible.
   if(csv){
-    out <- st_read(x, options=c("X_POSSIBLE_NAMES=x*, X*,lon*","Y_POSSIBLE_NAMES=y*, Y*, lat*"), quiet = T)
-    if(!"sf" %in% class(out)) out <- st_as_sf(out, coords = coords, ...) # if coords not in defaults, add coords to make sf
-  } else if(xls) {out <- st_read(x, quiet = TRUE)
-    if(!is.null(coords)) out <- st_as_sf(out, coords = coords, ...)} # if coords specified, make sf
-  if(shp) out <- st_read(x, layer = layer)
-  if(tif) out <- rast(x)
+    out <- sf::st_read(x, options=c("X_POSSIBLE_NAMES=x*, X*,lon*","Y_POSSIBLE_NAMES=y*, Y*, lat*"), quiet = T)
+    if(!"sf" %in% class(out)) out <- sf::st_as_sf(out, coords = coords, ...) # if coords not in defaults, add coords to make sf
+  } else if(xls) {
+    out <- sf::st_read(x, quiet = TRUE)
+    if(!is.null(coords)) out <- sf::st_as_sf(out, coords = coords, ...)} # if coords specified, make sf
+  if(shp) out <- sf::st_read(x, layer = layer)
+  if(tif) out <- terra::rast(x)
 
   if("data.frame" == class(out)[1]) return(agg2groups.data.frame(out, coords, ...))
   if("sf" == class(out)[1]) return(agg2groups.sf(out, ...))
@@ -53,7 +55,7 @@ agg2groups.character <- function(x, layer, coords = NULL, ...) {
 # change to sf based on coords, call sf method
 agg2groups.data.frame <- function(x, coords, ...) {
 
-  x <- st_as_sf(x, coords = coords)
+  x <- sf::st_as_sf(x, coords = coords)
   agg2groups.sf(x, ...)
 }
 
@@ -67,7 +69,7 @@ agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_
       if(length(missing) == length(abund_col)){
         message("Abundance columns not found. Reverting to default: count = 1 for all rows.")
         abund_col <- "count"
-        x <- x %>% mutate("{abund_col}" = 1)
+        x <- x %>% dplyr::mutate("{abund_col}" = 1)
 
       }else{message(paste("Column ", missing[1], " not found. Missing columns are ignored."))
         abund_col <- abund_col[abund_col %in% names(x)]
@@ -76,31 +78,31 @@ agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_
     }
     if(length(abund_col) == 1){
       message(paste("Column ", missing, " not found. Defaulting to count = 1."))
-      x <- x %>% mutate("{abund_col}" = 1)
+      x <- x %>% dplyr::mutate("{abund_col}" = 1)
     }
   }
 
   # code for aggregating point data
-  if(all(st_geometry_type(x) == "POINT")){
+  if(all(sf::st_geometry_type(x) == "POINT")){
     # add XY if not present
-    if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, st_coordinates(x))
+    if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, sf::st_coordinates(x))
     # aggregate and summarise
     if(length(cellsize) == 1){cellsize <- rep_len(cellsize, length(group_col))}
     if(length(cellsize) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
     if(length(cellsize) == length(group_col)){
-      x <- st_drop_geometry(x)
+      x <- sf::st_drop_geometry(x)
       out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
       }else{x[,group_col[.x]]}) %>%
-        reduce(cbind) %>% data.frame() %>%  setNames(all_of(group_col)) %>%
-        data.frame(x %>% select(-all_of(group_col))) %>%
-        group_by(across(c(all_of(ID_col), all_of(group_col)))) %>%
-        summarise(value := across(all_of(abund_col), fun), .groups = "keep")
+        purrr::reduce(cbind) %>% data.frame() %>%  setNames(tidyselect::all_of(group_col)) %>%
+        data.frame(x %>% dplyr::select(-tidyselect::all_of(group_col))) %>%
+        dplyr::group_by(dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col)))) %>%
+        dplyr::summarise(value := dplyr::across(tidyselect::all_of(abund_col), fun), .groups = "keep")
 
     }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
 
     # change to format required by json
     #names <- paste(out$x, out$y, sep = ":")
-    names <- out %>% select(group_cols()) %>% apply(1, paste, collapse = ":")
+    names <- out %>% dplyr::select(group_cols()) %>% apply(1, paste, collapse = ":")
     out <- out %>% split(names) %>%
       purrr::map(~pull(.x, value) %>% unlist())
     return(out)
@@ -117,7 +119,7 @@ agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_
 agg2groups.SpatRaster <- function(x, cellsize = 100, ...) {
   temp <- aggregate(x, fact = cellsize/res(x), fun = sum, ...) |>
     as.data.frame(xy = TRUE) |>
-    mutate(x = x - cellsize/2, y = y - cellsize/2) # change xy to represent bottom left corner rather than centre of cell
+    dplyr::mutate(x = x - cellsize/2, y = y - cellsize/2) # change xy to represent bottom left corner rather than centre of cell
 
   # change data format to json
   names <- paste(temp$x, temp$y, sep = ":")

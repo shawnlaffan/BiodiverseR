@@ -37,6 +37,8 @@ Imports:
     sf, 
     terra,
     dplyr,
+    purrr,
+    tidyselect,
     utils,
     R6,
     checkmate
