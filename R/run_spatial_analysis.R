@@ -1,18 +1,26 @@
-#' Load data onto the server associated with
-#' a BiodiverseR::basedata object
+#' Runs a spatial analysis with the given paramaters
+#' Uses the basedata object (bd) to call the server
+#' 
 #'
+#' @param bd class R6 basedata
+#' @param calculations integer
+#' @param spatial_conditions character 
+#' @param def_query character
+#' @param name character 
+#' @param tree class phylo
 #'
-#' @param bd list
-#' @param r_data list
-#' @param raster_params list
-#' @param spreadsheet_params list
-#' @param delimited_text_params list
-#' @param shapefile_params list
+#' @return The processed results of the spatial analysis
 #'
 #' @export
 #' @examples
 #' if(interactive()) {
-#'   b = BiodiverseR::basedata$new(name = "trial")
+#'   bd = BiodiverseR::basedata$new(cellsizes=c(500,500))
+#'
+#'   results = bd$run_spatial_analysis (
+#'      # name = "sp1",
+#'      calculations = c("calc_richness", "calc_endemism_central"),
+#'      spatial_conditions = "sp_self_only()"
+#'   )
 #' }
 run_spatial_analysis = function (
     bd,
@@ -47,7 +55,12 @@ run_spatial_analysis = function (
   return(processed_results)
 }
 
-
+#' Process the results of the spatial analysis
+#'
+#'
+#' @param call_results list
+#'
+#' @export
 process_tabular_results = function (call_results) {
   processed_results <- list()
   #apply? - nah.  There will never be more than ten list elements
