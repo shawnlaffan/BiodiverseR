@@ -336,12 +336,8 @@ $log->debug("Called startup");
         # $log->debug($sent_api_key);
         
         # Keys are undefined in Perl tests but I believe thats because its not calling anything from the R server so it makes sense there are no keys
-        $sent_api_key //= "";
-
-        $perl_stored_api_key //= "";
-
         return "Stored api_key does not match api_key passed in"
-            if ($sent_api_key ne $perl_stored_api_key);
+            if ($sent_api_key // 1) ne ($perl_stored_api_key // 2);
 
         return "";
     }
