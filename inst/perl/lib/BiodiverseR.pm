@@ -301,10 +301,11 @@ $log->debug("Called startup");
 
     # Store the api_key
     $r->post ('/api_key' => sub ($c) {
+        die if defined $api_key;
         $api_key = $c->req->json;
         # $log->debug("Api Key is:");
         # $log->debug("$api_key");
-        return $c->render(json => $self->api_key);
+        return $c->render(json => $api_key);
     });
 
     sub success_as_json ($c, $result) {
