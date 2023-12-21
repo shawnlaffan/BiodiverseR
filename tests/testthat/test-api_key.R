@@ -30,6 +30,7 @@ test_that("Test when wrong server api key is passed", {
   call_results <- httr::content(response, "parsed")
   result = call_results[['error']]
   exp = "Stored api_key does not match api_key passed in"
-  # Should get the error message back
-  expect_equal(result, exp)
+
+  # Checks if exp exists in results
+  expect_equal(grepl(exp, result), TRUE)
 })

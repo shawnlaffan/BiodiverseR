@@ -93,9 +93,13 @@ $log->debug("Called startup");
 
         $r->get("/$route" => sub ($c) {
             # Checks the api key
-            my $api_key_valid = check_api_key ($c, $api_key);
-            return error_as_json($c, $api_key_valid)
-                if ($api_key_valid ne "");
+            # my $api_key_valid = check_api_key ($c, $api_key);
+            # return error_as_json($c, $api_key_valid)
+            #     if ($api_key_valid ne "");
+            
+            eval{check_api_key ($c, $api_key)};
+            return error_as_json($c, $@)
+                if ($@);
 
             my $metadata;
             my $success = eval {
@@ -112,9 +116,14 @@ $log->debug("Called startup");
     #  does not yet fit into a factory
     $r->get('/valid_cluster_linkage_functions' => sub ($c) {
         # Checks the api key
-        my $api_key_valid = check_api_key ($c, $api_key);
-        return error_as_json($c, $api_key_valid)
-            if ($api_key_valid ne "");
+        # my $api_key_valid = check_api_key ($c, $api_key);
+        # return error_as_json($c, $api_key_valid)
+        #     if ($api_key_valid ne "");
+        
+        eval{check_api_key ($c, $api_key)};
+        return error_as_json($c, $@)
+            if ($@);
+
 
         my $metadata;
         use Biodiverse::Cluster;
@@ -133,9 +142,15 @@ $log->debug("Called startup");
         my $analysis_params = $c->req->json;
 
         # Checks the api key
-        my $api_key_valid = check_api_key ($c, $api_key);
-        return error_as_json($c, $api_key_valid)
-            if ($api_key_valid ne "");
+        # my $api_key_valid = check_api_key ($c, $api_key);
+        # return error_as_json($c, $api_key_valid)
+        #     if ($api_key_valid ne "");
+        eval{check_api_key ($c, $api_key)};
+        $log->debug("LOOK HERE");
+        $log->debug($@);
+        return error_as_json($c, $@)
+            if ($@);
+
 
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
@@ -151,9 +166,13 @@ $log->debug("Called startup");
 
     $r->post ('/bd_get_analysis_count' => sub ($c) {
         # Checks the api key
-        my $api_key_valid = check_api_key ($c, $api_key);
-        return error_as_json($c, $api_key_valid)
-            if ($api_key_valid ne "");
+        # my $api_key_valid = check_api_key ($c, $api_key);
+        # return error_as_json($c, $api_key_valid)
+        #     if ($api_key_valid ne "");
+        eval{check_api_key ($c, $api_key)};
+        return error_as_json($c, $@)
+            if ($@);
+
 
         my $result = BiodiverseR::BaseData->get_output_count;
         return success_as_json ($c, $result);
@@ -195,9 +214,13 @@ $log->debug("Called startup");
             my $analysis_params = $c->req->json;
 
             # Checks the api key
-            my $api_key_valid = check_api_key ($c, $api_key);
-            return error_as_json($c, $api_key_valid)
-                if ($api_key_valid ne "");
+            # my $api_key_valid = check_api_key ($c, $api_key);
+            # return error_as_json($c, $api_key_valid)
+            #     if ($api_key_valid ne "");
+            eval{check_api_key ($c, $api_key)};
+            return error_as_json($c, $@)
+                if ($@);
+
 
             $log->debug("bd_$stub parameters are:");
             $log->debug(np ($analysis_params));
@@ -229,9 +252,13 @@ $log->debug("Called startup");
         my $method = "get_$stub";
         $r->post ("/bd_$method" => sub ($c) {
             # Checks the api key
-            my $api_key_valid = check_api_key ($c, $api_key);
-            return error_as_json($c, $api_key_valid)
-                if ($api_key_valid ne "");
+            # my $api_key_valid = check_api_key ($c, $api_key);
+            # return error_as_json($c, $api_key_valid)
+            #     if ($api_key_valid ne "");
+            eval{check_api_key ($c, $api_key)};
+            return error_as_json($c, $@)
+                if ($@);
+
 
             my $bd = BiodiverseR::BaseData->get_basedata_ref;
             my $result = $bd ? $bd->$method : undef;
@@ -244,9 +271,13 @@ $log->debug("Called startup");
         my $method = "run_${stub}_analysis";
         $r->post ("/bd_$method" => sub ($c) {
             # Checks the api key
-            my $api_key_valid = check_api_key ($c, $api_key);
-            return error_as_json($c, $api_key_valid)
-                if ($api_key_valid ne "");
+            # my $api_key_valid = check_api_key ($c, $api_key);
+            # return error_as_json($c, $api_key_valid)
+            #     if ($api_key_valid ne "");
+            eval{check_api_key ($c, $api_key)};
+            return error_as_json($c, $@)
+                if ($@);
+
             
             return analysis_call ($c, $method);
         });
@@ -257,9 +288,13 @@ $log->debug("Called startup");
         my $analysis_params = $c->req->json;
 
         # Checks the api key
-        my $api_key_valid = check_api_key ($c, $api_key);
-        return error_as_json($c, $api_key_valid)
-            if ($api_key_valid ne "");
+        # my $api_key_valid = check_api_key ($c, $api_key);
+        # return error_as_json($c, $api_key_valid)
+        #     if ($api_key_valid ne "");
+        eval{check_api_key ($c, $api_key)};
+        return error_as_json($c, $@)
+            if ($@);
+
 
         $log->debug("parameters are:");
         $log->debug(np ($analysis_params));
@@ -284,9 +319,13 @@ $log->debug("Called startup");
         my $args = $c->req->json;
         
         # Checks the api key
-        my $api_key_valid = check_api_key ($c, $api_key);
-        return error_as_json($c, $api_key_valid)
-            if ($api_key_valid ne "");
+        # my $api_key_valid = check_api_key ($c, $api_key);
+        # return error_as_json($c, $api_key_valid)
+        #     if ($api_key_valid ne "");
+        eval{check_api_key ($c, $api_key)};
+        return error_as_json($c, $@)
+            if ($@);
+
 
         my $filename = $args->{filename};
         my $result = eval {
@@ -337,7 +376,7 @@ $log->debug("Called startup");
         # $log->debug($sent_api_key);
         
         # Keys are undefined in Perl tests but I believe thats because its not calling anything from the R server so it makes sense there are no keys
-        return "Stored api_key does not match api_key passed in"
+        die "Stored api_key does not match api_key passed in"
             if ($sent_api_key // 1) ne ($perl_stored_api_key // 2);
 
         return "";
