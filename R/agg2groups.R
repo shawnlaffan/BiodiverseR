@@ -29,7 +29,6 @@ agg2groups <- function (x, ...) {
 # read in files from path names, call appropriate method
 agg2groups.character <- function(x, layer, coords = NULL, ...) {
   # recognise file type at end of path
-  message("agg2groups.charater RAN")
   csv <- grepl(pattern = ".*?\\.csv$", x = x)
   xls <- grepl(pattern = ".*?\\.xlsx$", x = x)
   tif <- grepl(pattern = ".*?\\.tif$", x = x)
