@@ -43,8 +43,8 @@ load_data_ = function (
     print(params[["delimited_text_params"]])
   }
   if(!is.null(params[["shapefile_params"]])) {
-    message("SHAPEFILE PARAMS")
-    print(params[["shapefile_params"]])
+    # message("SHAPEFILE PARAMS")
+    # print(params[["shapefile_params"]])
   }
   params[["r_data"]] = storage
 

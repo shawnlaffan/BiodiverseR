@@ -41,13 +41,22 @@ agg2groups.character <- function(x, layer, coords = NULL, ...) {
     if(!"sf" %in% class(out)) out <- sf::st_as_sf(out, coords = coords, ...) # if coords not in defaults, add coords to make sf
   } else if(xls) {
     out <- sf::st_read(x, quiet = TRUE)
-    if(!is.null(coords)) out <- sf::st_as_sf(out, coords = coords, ...)} # if coords specified, make sf
+    if(!is.null(coords)) out <- sf::st_as_sf(out, coords = coords)} # if coords specified, make sf
   if(shp) out <- sf::st_read(x, layer = layer)
   if(tif) out <- terra::rast(x)
 
-  if("data.frame" == class(out)[1]) return(agg2groups.data.frame(out, coords, ...))
-  if("sf" == class(out)[1]) return(agg2groups.sf(out, ...))
-  if("SpatRaster" == class(out)[1]) return(agg2groups.SpatRaster(out, ...))
+  if("data.frame" == class(out)[1]) {
+    message("DF RAN")
+    return(agg2groups.data.frame(out, coords, ...))
+  }
+  if("sf" == class(out)[1]) {
+    message("SF RAN")
+    return(agg2groups.sf(out, ...))
+  }
+  if("SpatRaster" == class(out)[1]) {
+    message("SPATRASTER")
+    return(agg2groups.SpatRaster(out, ...))
+  }
 
 }
 
@@ -59,8 +68,7 @@ agg2groups.data.frame <- function(x, coords, ...) {
 }
 
 # spatial aggregation, count and label columns specified with convenient defaults
-agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_col, cellsize = 100, origin = c(0,0), fun = sum) {
-
+agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_col = c("X", "Y"), cellsize = 100, origin = c(0,0), fun = sum) {
   # check for existence of abund_col names
   if(!all(abund_col %in% names(x))){
     missing <- abund_col[!abund_col %in% names(x)]
@@ -101,9 +109,9 @@ agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_
 
     # change to format required by json
     #names <- paste(out$x, out$y, sep = ":")
-    names <- out %>% dplyr::select(group_cols()) %>% apply(1, paste, collapse = ":")
+    names <- out %>% dplyr::select(dplyr::group_cols()) %>% apply(1, paste, collapse = ":")
     out <- out %>% split(names) %>%
-      purrr::map(~pull(.x, value) %>% unlist())
+      purrr::map(~dplyr::pull(.x, value) %>% unlist())
     return(out)
 
 
