@@ -37,7 +37,7 @@ agg2groups.character <- function(x, layer, coords = NULL, ...) {
 
   # read in data accordingly, as spatial object if possible.
   if(csv){
-    out <- sf::st_read(x, options=c("X_POSSIBLE_NAMES=x*, X*,lon*","Y_POSSIBLE_NAMES=y*, Y*, lat*"), quiet = T)
+    out <- sf::st_read(x, options=c("X_POSSIBLE_NAMES=x*, X*,lon*","Y_POSSIBLE_NAMES=y*, Y*, lat*"), quiet = TRUE)
     if(!"sf" %in% class(out)) out <- sf::st_as_sf(out, coords = coords, ...) # if coords not in defaults, add coords to make sf
   } else if(xls) {
     out <- sf::st_read(x, quiet = TRUE)
@@ -99,13 +99,35 @@ agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_
     if(length(cellsize) == length(group_col)){
       x <- sf::st_drop_geometry(x)
       out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
-      }else{x[,group_col[.x]]}) %>%
-        purrr::reduce(cbind) %>% data.frame() %>%  setNames(tidyselect::all_of(group_col)) %>%
-        data.frame(x %>% dplyr::select(-tidyselect::all_of(group_col))) %>%
-        dplyr::group_by(dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col)))) %>%
-        dplyr::summarise(value := dplyr::across(tidyselect::all_of(abund_col), fun), .groups = "keep")
+      }else{x[,group_col[.x]]}) 
+      temp1 = purrr::reduce(out, cbind) 
+      temp2 = data.frame(temp1) 
+      temp3 = setNames(temp2, tidyselect::all_of(group_col))
+      temp4 = data.frame(temp3, x %>% dplyr::select(-tidyselect::all_of(group_col)))
+
+      # print(head(temp4, 10))
+      # print(str(temp4))
+      # temp4 = transform(temp4, count = as.numeric(count))
+      # This below hard converts column 3 and 4 to numeric from character. Not sure if this is going to always be the case. Passes R tests for now
+      temp4[, c(3,4)] <- sapply(temp4[, c(3,4)], as.numeric)
+
+      temp5 = dplyr::group_by(temp4, dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col))))
+      temp6 = dplyr::summarise(temp5, value := dplyr::across(tidyselect::all_of(abund_col), fun), .groups = "keep")
+      out = temp6
 
     }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
+
+    # Old Code for above
+    # if(length(cellsize) == length(group_col)){
+    #   x <- sf::st_drop_geometry(x)
+    #   out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
+    #   }else{x[,group_col[.x]]}) %>%
+    #     purrr::reduce(cbind) %>% data.frame() %>%  setNames(tidyselect::all_of(group_col)) %>%
+    #     data.frame(x %>% dplyr::select(-tidyselect::all_of(group_col))) %>%
+    #     dplyr::group_by(dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col)))) %>%
+    #     dplyr::summarise(value := dplyr::across(tidyselect::all_of(abund_col), fun), .groups = "keep")
+
+    # }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
 
     # change to format required by json
     #names <- paste(out$x, out$y, sep = ":")
@@ -138,5 +160,5 @@ agg2groups.SpatRaster <- function(x, cellsize = 100, ...) {
 
 round_any <- function(number, accuracy = 100, origin = 0, f = floor){
   (f((number-origin)/accuracy) * accuracy) + origin
-  }
+}
 

@@ -39,8 +39,21 @@ load_data_ = function (
     }
   } 
   if(!is.null(params[["delimited_text_params"]])) {
-    message("DT PARAMS")
-    print(params[["delimited_text_params"]])
+    for (i in 1:length(params[["delimited_text_params"]][["files"]])) {
+      file_col_names <- colnames(read.csv(params[["delimited_text_params"]][["files"]][i]))
+
+      ID_col_index <- params[["delimited_text_params"]][["label_columns"]][[1]]
+      abund_col_index <- params[["delimited_text_params"]][["sample_count_columns"]][[1]]
+      # group_col_index <- c(params[["delimited_text_params"]][["group_columns"]][[1]], params[["delimited_text_params"]][["group_columns"]][[2]])
+
+      ID_col_params <- file_col_names[ID_col_index + 1]
+      abund_col_params <- file_col_names[abund_col_index + 1]
+      group_col_params <- c(file_col_names[params[["delimited_text_params"]][["group_columns"]][[1]] + 1], file_col_names[params[["delimited_text_params"]][["group_columns"]][[2]] + 1])
+
+
+      result <- agg2groups(x = params[["delimited_text_params"]][["files"]][i], abund_col = abund_col_params, ID_col = ID_col_params, group_col = group_col_params)
+      storage <- append(storage, result)
+    }
   }
   if(!is.null(params[["shapefile_params"]])) {
     # message("SHAPEFILE PARAMS")
