@@ -56,8 +56,17 @@ load_data_ = function (
     }
   }
   if(!is.null(params[["shapefile_params"]])) {
-    # message("SHAPEFILE PARAMS")
-    # print(params[["shapefile_params"]])
+    message("SHAPEFILE PARAMS")
+    print(params[["shapefile_params"]])
+
+    layer_params <- c(params[["shapefile_params"]][["group_field_names"]][[1]], params[["shapefile_params"]][["group_field_names"]][[2]])
+    print(layer_params)
+    ID_col_params <- params[["shapefile_params"]][["label_field_names"]][[1]]
+    abund_col_params <- params[["shapefile_params"]][["sample_count_col_names"]][[1]]
+    for (i in 1:length(params[["shapefile_params"]][["files"]])) {
+      result <- agg2groups(x = params[["shapefile_params"]][["files"]][i], coords = layer_params, ID_col = ID_col_params, abund_col = abund_col_params)
+      storage <- append(storage, result)
+    }
   }
   params[["r_data"]] = storage
 

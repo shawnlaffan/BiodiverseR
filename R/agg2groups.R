@@ -51,7 +51,7 @@ agg2groups.character <- function(x, layer, coords = NULL, ...) {
   }
   if("sf" == class(out)[1]) {
     message("SF RAN")
-    return(agg2groups.sf(out, ...))
+    return(agg2groups.sf(out, csv, ...))
   }
   if("SpatRaster" == class(out)[1]) {
     message("SPATRASTER")
@@ -68,7 +68,7 @@ agg2groups.data.frame <- function(x, coords, ...) {
 }
 
 # spatial aggregation, count and label columns specified with convenient defaults
-agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_col = c("X", "Y"), cellsize = 100, origin = c(0,0), fun = sum) {
+agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), group_col = c("X", "Y"), cellsize = 100, origin = c(0,0), fun = sum) {
   # check for existence of abund_col names
   if(!all(abund_col %in% names(x))){
     missing <- abund_col[!abund_col %in% names(x)]
@@ -102,14 +102,16 @@ agg2groups.sf <- function(x, abund_col = c("count"), ID_col = c("label"), group_
       }else{x[,group_col[.x]]}) 
       temp1 = purrr::reduce(out, cbind) 
       temp2 = data.frame(temp1) 
-      temp3 = setNames(temp2, tidyselect::all_of(group_col))
+      temp3 = setNames(temp2, group_col) # Originally group_col was tidyselect::all_of(group_col) but this raised a deprecated warning.
       temp4 = data.frame(temp3, x %>% dplyr::select(-tidyselect::all_of(group_col)))
 
       # print(head(temp4, 10))
       # print(str(temp4))
       # temp4 = transform(temp4, count = as.numeric(count))
       # This below hard converts column 3 and 4 to numeric from character. Not sure if this is going to always be the case. Passes R tests for now
-      temp4[, c(3,4)] <- sapply(temp4[, c(3,4)], as.numeric)
+      if (csv) {
+        temp4[, c(3,4)] <- sapply(temp4[, c(3,4)], as.numeric)
+      }
 
       temp5 = dplyr::group_by(temp4, dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col))))
       temp6 = dplyr::summarise(temp5, value := dplyr::across(tidyselect::all_of(abund_col), fun), .groups = "keep")
