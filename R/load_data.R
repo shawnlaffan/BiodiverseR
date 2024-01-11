@@ -56,11 +56,7 @@ load_data_ = function (
     }
   }
   if(!is.null(params[["shapefile_params"]])) {
-    message("SHAPEFILE PARAMS")
-    print(params[["shapefile_params"]])
-
     layer_params <- c(params[["shapefile_params"]][["group_field_names"]][[1]], params[["shapefile_params"]][["group_field_names"]][[2]])
-    print(layer_params)
     ID_col_params <- params[["shapefile_params"]][["label_field_names"]][[1]]
     abund_col_params <- params[["shapefile_params"]][["sample_count_col_names"]][[1]]
     for (i in 1:length(params[["shapefile_params"]][["files"]])) {
@@ -68,6 +64,20 @@ load_data_ = function (
       storage <- append(storage, result)
     }
   }
+
+  if(!is.null(params[["raster_params"]])) {
+    message("RASTER PARAMS")
+    print(params[["raster_params"]])
+    for (i in 1:length(params[["raster_params"]][["files"]])) {
+      if (is.null(params[["raster_params"]][["files"]][i])) {
+        next
+      }
+      result <- agg2groups(x = params[["raster_params"]][["files"]][i])
+      storage <- append(storage, result)
+    }
+  }
+
+
   params[["r_data"]] = storage
 
   result = bd$call_server("bd_load_data", params)

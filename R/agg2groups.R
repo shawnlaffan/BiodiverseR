@@ -148,7 +148,7 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
 
 # raster aggregation
 agg2groups.SpatRaster <- function(x, cellsize = 100, ...) {
-  temp <- aggregate(x, fact = cellsize/res(x), fun = sum, ...) |>
+  temp <- terra::aggregate(x, fact = cellsize/terra::res(x), fun = sum, ...) |>
     as.data.frame(xy = TRUE) |>
     dplyr::mutate(x = x - cellsize/2, y = y - cellsize/2) # change xy to represent bottom left corner rather than centre of cell
 
