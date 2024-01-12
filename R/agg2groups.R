@@ -46,15 +46,12 @@ agg2groups.character <- function(x, layer, coords = NULL, ...) {
   if(tif) out <- terra::rast(x)
 
   if("data.frame" == class(out)[1]) {
-    message("DF RAN")
     return(agg2groups.data.frame(out, coords, ...))
   }
   if("sf" == class(out)[1]) {
-    message("SF RAN")
     return(agg2groups.sf(out, csv, ...))
   }
   if("SpatRaster" == class(out)[1]) {
-    message("SPATRASTER")
     return(agg2groups.SpatRaster(out, ...))
   }
 
@@ -140,8 +137,9 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
 
 
   }else{
+    # This function dosen't even exist. Commented out for now but originally uncommented.
     # support line and polygon inputs.
-    agg2group.sfpoly(x, ID_col, cellsize, origin)
+    # agg2group.sfpoly(x, ID_col, cellsize, origin) 
   }
 
 }
