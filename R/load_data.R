@@ -35,7 +35,7 @@ load_data_ = function (
     ID_col_params <- params[["spreadsheet_params"]][["label_field_names"]][[1]]
     abund_col_params <- params[["spreadsheet_params"]][["sample_count_col_names"]][[1]]
     for (i in 1:length(params[["spreadsheet_params"]][["files"]])) {
-      result <- agg2groups(x = params[["spreadsheet_params"]][["files"]][i], coords = coords_params, ID_col = ID_col_params, abund_col = abund_col_params)
+      # result <- agg2groups(x = params[["spreadsheet_params"]][["files"]][i], coords = coords_params, ID_col = ID_col_params, abund_col = abund_col_params)
       storage <- append(storage, result)
     }
   } 
@@ -48,7 +48,7 @@ load_data_ = function (
       ID_col_params <- file_col_names[ID_col_index + 1]
       abund_col_params <- file_col_names[abund_col_index + 1]
       group_col_params <- c(file_col_names[params[["delimited_text_params"]][["group_columns"]][[1]] + 1], file_col_names[params[["delimited_text_params"]][["group_columns"]][[2]] + 1])
-      result <- agg2groups(x = params[["delimited_text_params"]][["files"]][i], abund_col = abund_col_params, ID_col = ID_col_params, group_col = group_col_params)
+      # result <- agg2groups(x = params[["delimited_text_params"]][["files"]][i], abund_col = abund_col_params, ID_col = ID_col_params, group_col = group_col_params)
       storage <- append(storage, result)
     }
   }
@@ -58,7 +58,7 @@ load_data_ = function (
     ID_col_params <- params[["shapefile_params"]][["label_field_names"]][[1]]
     abund_col_params <- params[["shapefile_params"]][["sample_count_col_names"]][[1]]
     for (i in 1:length(params[["shapefile_params"]][["files"]])) {
-      result <- agg2groups(x = params[["shapefile_params"]][["files"]][i], coords = layer_params, ID_col = ID_col_params, abund_col = abund_col_params)
+      # result <- agg2groups(x = params[["shapefile_params"]][["files"]][i], coords = layer_params, ID_col = ID_col_params, abund_col = abund_col_params)
       storage <- append(storage, result)
     }
   }
@@ -70,7 +70,7 @@ load_data_ = function (
       if (is.null(params[["raster_params"]][["files"]][i])) {
         next
       }
-      result <- agg2groups(x = params[["raster_params"]][["files"]][i])
+      # result <- agg2groups(x = params[["raster_params"]][["files"]][i])
       storage <- append(storage, result)
     }
   }
