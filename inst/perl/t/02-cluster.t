@@ -10,38 +10,19 @@ use Time::HiRes qw /time/;
 
 use Test::TempDir::Tiny;
 
-my $data_dir = curfile->dirname->dirname->sibling('extdata')->to_string;
+use Biodiverse::Indices;
+use BiodiverseR::IndicesMetadata;
 
 my $t = Test::Mojo->new('BiodiverseR');
 $t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
 
-#  really need to change this hard coding
+my $bd = BiodiverseR::IndicesMetadata::_get_dummy_basedata();
+my $indices = Biodiverse::Indices->new(BASEDATA_REF => $bd);
+my $cluster_indices = $indices->get_valid_cluster_indices;
+
 my $expected_cluster_indices = {
-    error => undef,
-    result => {
-        BETA_2 => 'The other beta',
-        BRAY_CURTIS => 'Bray Curtis dissimilarity',
-        BRAY_CURTIS_NORM => 'Bray Curtis dissimilarity normalised by groups',
-        HIER_ASUMRAT1_0 =>
-            '1 - Ratio of shared label sample counts, (HIER_ASUM1 / HIER_ASUM0)',
-        JACCARD => 'Jaccard value, 0 is identical, 1 is completely dissimilar',
-        KULCZYNSKI2 => 'Kulczynski 2 index',
-        MXD_MEAN => 'Mean dissimilarity of labels in set 1 to those in set 2.',
-        MXD_VARIANCE => 'Variance of the dissimilarity values, set 1 vs set 2.',
-        NEST_RESULTANT => 'Nestedness-resultant index',
-        NUMD_ABSMEAN =>
-            'Mean absolute dissimilarity of labels in set 1 to those in set 2.',
-        NUMD_VARIANCE =>
-            'Variance of the dissimilarity values (mean squared deviation), set 1 '
-                .'vs set 2.',
-        PHYLO_JACCARD => 'Phylo Jaccard score',
-        PHYLO_RW_TURNOVER => 'Range weighted turnover',
-        PHYLO_S2 => 'Phylo S2 score',
-        PHYLO_SORENSON => 'Phylo Sorenson score',
-        RW_TURNOVER => 'Range weighted turnover',
-        S2 => 'S2 dissimilarity index',
-        SORENSON => 'Sorenson index',
-    },
+    error  => undef,
+    result => $cluster_indices,
 };
 
 $t->get_ok('/valid_cluster_indices')
