@@ -138,7 +138,7 @@ foreach my $file_type (@file_arg_keys) {
         my $res = $t->tx->res->json;
         # p $res;
         ok !$res->{result}, "Got a non result";
-        like $res->{error}, qr/$exp_error/, "Got expected error text";
+        like $res->{error}, qr/\Q$exp_error\E/, "Got expected error text";
 
         my %aargs = %analysis_args;
         $aargs{definition_query} = '$x <= 250';

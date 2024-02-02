@@ -2,7 +2,7 @@
 #' a BiodiverseR::basedata object
 #'
 #'
-#' @param bd list
+#' @param bd class R6 basedata
 #' @param params list
 #'
 #' @export
