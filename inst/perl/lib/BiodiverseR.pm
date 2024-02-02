@@ -23,6 +23,7 @@ use Data::Printer qw /p np/;
 use POSIX ();
 use Time::HiRes qw /time/;
 
+use Digest::SHA qw(sha256);
 
 local $| = 1;
 
@@ -68,8 +69,15 @@ $log->debug("Called startup");
   #$self->secrets($config->{secrets});
   $self->secrets(rand());
   
-  # Store api key generated on the R side
-  my $api_key;
+  # Creating an api key for the server
+  my @valid_chars = ("A".."Z", "a".."z");
+  my $random_str;
+  $random_str .= $valid_chars[rand @valid_chars] for 1..20;
+  $log->debug("RANDOM STR");
+  $log->debug($random_str);
+  my $api_key = sha256($random_str);
+  $log->debug("API KEY");
+  $log->debug($api_key);
 
   # Router
   my $r = $self->routes;
