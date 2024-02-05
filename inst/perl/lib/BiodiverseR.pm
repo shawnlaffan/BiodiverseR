@@ -23,7 +23,7 @@ use Data::Printer qw /p np/;
 use POSIX ();
 use Time::HiRes qw /time/;
 
-use Digest::SHA qw(sha256);
+use Digest::SHA qw(sha256_base64);
 
 local $| = 1;
 
@@ -73,11 +73,11 @@ $log->debug("Called startup");
   my @valid_chars = ("A".."Z", "a".."z");
   my $random_str;
   $random_str .= $valid_chars[rand @valid_chars] for 1..20;
-  $log->debug("RANDOM STR");
-  $log->debug($random_str);
-  my $api_key = sha256($random_str);
-  $log->debug("API KEY");
-  $log->debug($api_key);
+  # $log->debug("RANDOM STR");
+  # $log->debug($random_str);
+  my $api_key = sha256_base64($random_str);
+  # $log->debug("API KEY");
+  # $log->debug($api_key);
 
   # Router
   my $r = $self->routes;
@@ -348,10 +348,6 @@ $log->debug("Called startup");
 
     # Store the api_key
     $r->post ('/api_key' => sub ($c) {
-        die if defined $api_key;
-        $api_key = $c->req->json;
-        # $log->debug("Api Key is:");
-        # $log->debug("$api_key");
         return $c->render(json => $api_key);
     });
 
