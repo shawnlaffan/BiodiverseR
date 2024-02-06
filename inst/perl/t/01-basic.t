@@ -5,7 +5,10 @@ use Test::Mojo;
 use Data::Printer;
 
 my $t = Test::Mojo->new('BiodiverseR');
-$t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
+$t->get_ok('/api_key');
+my $api_key = $t->tx->res->json;
+my @api_args = (json => {api_key => $api_key});
+$t->get_ok('/' => @api_args)->status_is(200)->content_like(qr/Mojolicious/i);
 
 #  plenty repetition below - could do with a refactor
 
@@ -14,6 +17,7 @@ my $gp_lb = {
   '150:150' => {label1 => 1, label2 => 1},
 };
 my $oneshot_data = {
+  api_key => $api_key,
   bd => {
     params => {name => 'blognorb', cellsizes => [100,100]},
     data   => $gp_lb,
