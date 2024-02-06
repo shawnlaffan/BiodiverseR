@@ -17,11 +17,11 @@ test_that("Test when wrong server api key is passed", {
   params = list (
     api_key = "invalidkey"
   )
-  
+
   # Call the server
-  target_url <- paste0(server$server_url, "/analysis_spatial_oneshot")
+  target_url <- paste0(server$server_url, "/valid_cluster_linkage_functions")
   body_as_json <- rjson::toJSON(params)
-  response <- httr::POST(
+  response <- httr::GET(
     url = target_url,
     body = body_as_json,
     encode = "json",
@@ -29,8 +29,11 @@ test_that("Test when wrong server api key is passed", {
 
   call_results <- httr::content(response, "parsed")
   result = call_results[['error']]
-  exp = "Stored api_key does not match api_key passed in"
+  #exp = "Stored api_key does not match api_key passed in"
+
+  #  should get nothing back if api_key is wrong
+  expect_equal(call_results, NULL, info = 'Null result when API key is wrong')
 
   # Checks if exp exists in results
-  expect_equal(grepl(exp, result), TRUE)
+  #expect_equal(grepl(exp, result), TRUE)
 })
