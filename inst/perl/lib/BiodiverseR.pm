@@ -102,7 +102,7 @@ $log->debug("Called startup");
         $r->get("/$route" => sub ($c) {
             #  drop calls with invalid api key
             return $c->render(json => undef)
-                if !check_api_key($c);
+                if !is_valid_api_key($c);
 
             my $metadata;
             my $success = eval {
@@ -120,7 +120,7 @@ $log->debug("Called startup");
     $r->get('/valid_cluster_linkage_functions' => sub ($c) {
         #  drop calls with invalid api key
         return $c->render(json => undef)
-            if !check_api_key($c);
+            if !is_valid_api_key($c);
 
         my $metadata;
         use Biodiverse::Cluster;
@@ -138,7 +138,7 @@ $log->debug("Called startup");
     $r->post ('/analysis_spatial_oneshot' => sub ($c) {
         #  drop calls with invalid api key
         return $c->render(json => undef)
-            if !check_api_key($c);
+            if !is_valid_api_key($c);
 
         my $analysis_params = $c->req->json;
 
@@ -157,7 +157,7 @@ $log->debug("Called startup");
     $r->post ('/bd_get_analysis_count' => sub ($c) {
         #  drop calls with invalid api key
         return $c->render(json => undef)
-            if !check_api_key($c);
+            if !is_valid_api_key($c);
 
         my $result = BiodiverseR::BaseData->get_output_count;
         return success_as_json ($c, $result);
@@ -198,7 +198,7 @@ $log->debug("Called startup");
         $r->post ($route => sub ($c) {
             #  drop calls with invalid api key
             return $c->render(json => undef)
-                if !check_api_key($c);
+                if !is_valid_api_key($c);
 
             my $analysis_params = $c->req->json;
 
@@ -233,7 +233,7 @@ $log->debug("Called startup");
         $r->post ("/bd_$method" => sub ($c) {
             #  drop calls with invalid api key
             return $c->render(json => undef)
-                if !check_api_key($c);
+                if !is_valid_api_key($c);
 
             my $bd = BiodiverseR::BaseData->get_basedata_ref;
             my $result = $bd ? $bd->$method : undef;
@@ -253,7 +253,7 @@ $log->debug("Called startup");
     $r->post ('/bd_get_analysis_results' => sub ($c) {
         #  drop calls with invalid api key
         return $c->render(json => undef)
-            if !check_api_key($c);
+            if !is_valid_api_key($c);
 
         my $analysis_params = $c->req->json;
 
@@ -280,7 +280,7 @@ $log->debug("Called startup");
 
         #  drop calls with invalid api key
         return $c->render(json => undef)
-            if !check_api_key($c);
+            if !is_valid_api_key($c);
 
         my $args = $c->req->json;
 
@@ -325,7 +325,7 @@ $log->debug("Called startup");
 
     # Check if the api_key sent with the call is the same as api_key stored.
     #  Returns true on match.
-    sub check_api_key ($c, @rest) {
+    sub is_valid_api_key ($c, @rest) {
         my $body_params = $c->req->json;
         my $sent_api_key = $body_params->{api_key} // 1;
 
@@ -335,7 +335,7 @@ $log->debug("Called startup");
     sub analysis_call ($c, $method){
         #  drop calls with invalid api key
         return $c->render(json => undef)
-            if !check_api_key($c);
+            if !is_valid_api_key($c);
 
         my $analysis_params = $c->req->json;
 
