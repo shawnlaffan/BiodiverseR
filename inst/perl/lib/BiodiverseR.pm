@@ -347,7 +347,7 @@ $log->debug("Called startup");
     });
 
     # Store the api_key
-    $r->post ('/api_key' => sub ($c) {
+    $r->get ('/api_key' => sub ($c) {
         return $c->render(json => $api_key);
     });
 
