@@ -6,7 +6,11 @@ use Test::Mojo;
 use Data::Printer;
 
 my $t = Test::Mojo->new('BiodiverseR');
-$t->get_ok('/calculations_metadata')->status_is(200);
+$t->get_ok('/api_key');
+my $api_key = $t->tx->res->json;
+# p $api_key;
+my @common_args = (json => {api_key => $api_key});
+$t->get_ok('/calculations_metadata' => @common_args)->status_is(200);
 
 #  pretty basic
 $t->json_has ('/result/calc_phylo_rpe2/description');
@@ -14,7 +18,7 @@ $t->json_has ('/result/calc_endemism_whole/indices/ENDW_CWE');
 $t->json_has ('/result/calc_phylo_rpd2/required_args');
 $t->json_has ('/result/calc_phylo_rpe2/indices/PHYLO_RPE_DIFF2/description');
 
-$t->get_ok('/valid_cluster_linkage_functions')->status_is(200);
+$t->get_ok('/valid_cluster_linkage_functions' => @common_args)->status_is(200);
 my $res = $t->tx->res->json;
 my %linkages;
 @linkages{@{$res->{result}}} = (1..5);
@@ -32,7 +36,7 @@ foreach my $fn (qw/average recalculate average_unweighted minimum maximum/) {
 # }
 
 
-$t->get_ok('/valid_cluster_tie_breaker_indices')->status_is(200);
+$t->get_ok('/valid_cluster_tie_breaker_indices' => @common_args)->status_is(200);
 $res = $t->tx->res->json;
 my %tie_breakers;
 @tie_breakers{@{$res->{result}}} = ();

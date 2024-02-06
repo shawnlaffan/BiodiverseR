@@ -10,7 +10,10 @@ use Data::Printer;
 my $data_dir = curfile->dirname->dirname->sibling('extdata')->to_string;
 
 my $t = Test::Mojo->new('BiodiverseR');
-$t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
+$t->get_ok('/api_key');
+my $api_key = $t->tx->res->json;
+my @api_args = (json => {api_key => $api_key});
+$t->get_ok('/' => @api_args)->status_is(200)->content_like(qr/Mojolicious/i);
 
 my $exp = {
     SPATIAL_RESULTS => [
@@ -27,6 +30,7 @@ my $json_tree = '{"edge":[4,5,5,4,5,1,2,3],"edge.length":["NaN",1,1,2],"Nnode":2
 my $tree = JSON::MaybeXS::decode_json ($json_tree);
 # p $tree;
 my %common_args = (
+    api_key => $api_key,
     bd              => {
         params => { name => 'blognorb', cellsizes => [ 500, 500 ] },
     },
