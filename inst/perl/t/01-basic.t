@@ -10,6 +10,10 @@ my $api_key = $t->tx->res->json;
 my @api_args = (json => {api_key => $api_key});
 $t->get_ok('/' => @api_args)->status_is(200)->content_like(qr/Mojolicious/i);
 
+#  empty response if already called /api_key
+$t->get_ok('/api_key')->status_is(200)->json_is(undef);
+$t->get_ok('/api_key')->status_is(200)->json_is(undef);
+
 #  plenty repetition below - could do with a refactor
 
 my $gp_lb = {

@@ -75,7 +75,7 @@ $log->debug("Called startup");
   $random_str .= $valid_chars[rand @valid_chars] for 1..20;
   # $log->debug("RANDOM STR");
   # $log->debug($random_str);
-  my $api_key = sha256_base64($random_str);
+  state $api_key = sha256_base64($random_str);
   # $log->debug("API KEY");
   # $log->debug($api_key);
 
@@ -348,6 +348,11 @@ $log->debug("Called startup");
 
     # Store the api_key
     $r->get ('/api_key' => sub ($c) {
+        state $already_checked = 0;
+        return $c->render(json => undef)
+            if $already_checked;
+        #  could track the count, but we only really need a boolean
+        $already_checked = 1;
         return $c->render(json => $api_key);
     });
 
