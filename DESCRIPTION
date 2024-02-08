@@ -31,6 +31,7 @@ Imports:
     processx,
     httpuv,
     httr,
+    httr2,
     rjson,
     tools,
     ape,
