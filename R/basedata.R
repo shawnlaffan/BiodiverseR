@@ -123,14 +123,20 @@ basedata = R6Class("basedata",
 # message ("about to run call, params are:")
 # message (params_as_json)
 # message ("\n")
-      response <- httr::POST(
-        url = target_url,
-        body = params_as_json,
-        encode = "json",
-      )
-      httr::stop_for_status(response)
+      # response <- httr::POST(
+      #   url = target_url,
+      #   body = params_as_json,
+      #   encode = "json",
+      # )
+      # # httr::stop_for_status(response)
+      # call_results <- httr::content(response, "parsed")
 
-      call_results <- httr::content(response, "parsed")
+
+      req <- httr2::request(target_url)
+      req <- httr2::req_body_raw(req, params_as_json)
+      response <- httr2::req_perform(req)
+      call_results <- httr2::resp_body_json(response)
+
       #  check the error field
       e = call_results[['error']]
       if (

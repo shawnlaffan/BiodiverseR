@@ -65,7 +65,7 @@ analyse_rasters_spatial = function(
   message ("Posting data ", params_as_json)
 
   req <- httr2::request(target_url)
-  req %>% httr2::req_body_json(params_as_json)
+  req <- httr2::req_body_raw(req, params_as_json)
   response <- httr2::req_perform(req)
   call_results <- httr2::resp_body_json(response)
 
