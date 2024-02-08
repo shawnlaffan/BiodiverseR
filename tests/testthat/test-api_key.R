@@ -21,13 +21,12 @@ test_that("Test when wrong server api key is passed", {
   # Call the server
   target_url <- paste0(server$server_url, "/valid_cluster_linkage_functions")
   body_as_json <- rjson::toJSON(params)
-  response <- httr::GET(
-    url = target_url,
-    body = body_as_json,
-    encode = "json",
-  )
+  req <- httr2::request(target_url)
+  req <- httr2::req_body_raw(req, body_as_json)
+  req <- httr2::req_method(req, "GET")
+  response <- httr2::req_perform(req)
+  call_results <- httr2::resp_body_json(response)
 
-  call_results <- httr::content(response, "parsed")
   result = call_results[['error']]
   #exp = "Stored api_key does not match api_key passed in"
 
