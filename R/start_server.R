@@ -146,15 +146,10 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
   # Sends api key to the mojolicious server
   target_url <- paste0(config$server_url, "/api_key")
-  response <- httr::GET(
-    url = target_url,
-    encode = "json",
-  )
-  api_key_received <- httr::content(response, "parsed")
-
+  req <- httr2::request(target_url)
+  response <- httr2::req_perform(req)
+  api_key_received <- httr2::resp_body_json(response)
   config <- c(config, server_api_key=api_key_received)
-
-
 
   #  hopefully redundant now but leaving just in case
   server_running = 0

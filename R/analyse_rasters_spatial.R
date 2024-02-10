@@ -63,15 +63,11 @@ analyse_rasters_spatial = function(
 
   message (target_url)
   message ("Posting data ", params_as_json)
-  response = httr::POST(
-    url = target_url,
-    # config = ...,
-    body = params_as_json,
-    encode = "json",
-  )
-  httr::stop_for_status(response)
 
-  call_results = httr::content(response, "parsed")
+  req <- httr2::request(target_url)
+  req <- httr2::req_body_raw(req, params_as_json)
+  response <- httr2::req_perform(req)
+  call_results <- httr2::resp_body_json(response)
 
   #  terminate the server - don't wait for garbage collection
   config$server_object$kill()
