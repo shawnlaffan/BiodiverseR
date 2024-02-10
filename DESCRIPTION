@@ -30,7 +30,6 @@ Imports:
     fs,
     processx,
     httpuv,
-    httr,
     httr2,
     rjson,
     tools,
