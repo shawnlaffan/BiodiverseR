@@ -104,7 +104,6 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
 
       # print(head(temp4, 10))
       # print(str(temp4))
-      # temp4 = transform(temp4, count = as.numeric(count))
       # This below hard converts column 3 and 4 to numeric from character. Not sure if this is going to always be the case. Passes R tests for now
       if (csv) {
         temp4[, c(3,4)] <- sapply(temp4[, c(3,4)], as.numeric)
