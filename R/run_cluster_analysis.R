@@ -1,18 +1,36 @@
-#' Load data onto the server associated with
-#' a BiodiverseR::basedata object
+#' Runs a cluster analysis with the given parameters
+#' Uses the given basedata object to call the server
 #'
 #'
-#' @param bd list
-#' @param r_data list
-#' @param raster_params list
-#' @param spreadsheet_params list
-#' @param delimited_text_params list
-#' @param shapefile_params list
+#' @param bd class R6 basedata
+#' @param index character
+#' @param linkage_function character
+#' @param calculations character
+#' @param spatial_conditions character
+#' @param def_query character
+#' @param name character
+#' @param tree class phylo
+#' @param cluster_tie_breakers
+#'
+#' @return The processed results of the cluster analysis 
 #'
 #' @export
 #' @examples
 #' if(interactive()) {
-#'   b = BiodiverseR::basedata$new(name = "trial")
+#'   bd = BiodiverseR::basedata$new(cellsizes=c(500,500))
+#'
+#'   r_data = list(
+#'                 '250:250' = list (r1 = 13, r2 = 13),
+#'                 '250:750' = list (r2 = 11),
+#'                )
+#'
+#'   params = list (bd_params = r_data, raster_params = NULL)
+#'   result = bd$load_data(params)
+#'
+#'   results = bd$run_cluster_analysis (
+#'     # calculations = calculations,
+#'     # tree = tree
+#'   )
 #' }
 run_cluster_analysis = function (
     bd,

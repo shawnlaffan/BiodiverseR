@@ -1,18 +1,32 @@
 #' Use the Biodiverse server to load a set of rasters and then analyse them
 #'
 #' @param raster_files character
+#' @param r_data list
+#' @param spreadsheet_data list
+#' @param delimited_text_file_data list
+#' @param shapefile_data list
 #' @param cellsizes numeric
 #' @param calculations character
 #' @param tree class phylo
 #' @param ... passed on to start_server call
 #'
+#' @return The results of the analysis as an R list
+#'
 #' @export
 #' @examples
 #' if(interactive()) {
-#'   analyse_oneshot_spatial (
-#'     raster_files = c("r1.tif", "r2.tif"),
-#'     calculations = c("calc_endemism_central", "calc_richness", "calc_pd"),
-#'     tree = some_phylo_tree
+#'   analysis_results = analyse_oneshot_spatial (
+#'     raster_files             = c("r1.tif", "r2.tif"),
+#'     r_data                   = list(
+#'                                     '250:250' = list (r1 = 13758, r2 = 13860),
+#'                                     '250:750' = list (r1 = 11003, r2 = 11134),
+#'                                    )
+#'     spreadsheet_data         = c("r1.xlsx", "r2.xlsx"),
+#'     delimited_text_file_data = c("r1.csv", "r2.csv"),
+#'     shapefile_data           = c("r1.shp", "r2.shp"),
+#'     cellsizes                = c(500, 500),
+#'     calculations             = c("calc_endemism_central", "calc_richness", "calc_pd"),
+#'     tree                     = some_phylo_tree
 #'   )
 #' }
 #format for data is list(list(files), list(group_columns), list(label_columns), list(sample_count_columns)) # nolint
