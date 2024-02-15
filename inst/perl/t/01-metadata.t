@@ -21,7 +21,7 @@ $t->json_has ('/result/calc_phylo_rpe2/indices/PHYLO_RPE_DIFF2/description');
 $t->get_ok('/valid_cluster_linkage_functions' => @common_args)->status_is(200);
 my $res = $t->tx->res->json;
 my %linkages;
-@linkages{@{$res->{result}}} = (1..4);
+@linkages{@{$res->{result}}} = (1..5);
 foreach my $fn (qw/average recalculate average_unweighted minimum maximum/) {
     my $linkage_fn = "link_$fn";
     ok exists ($linkages{$linkage_fn}), "Got $linkage_fn";

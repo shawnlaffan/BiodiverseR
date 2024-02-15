@@ -295,7 +295,7 @@ $log->debug("Called startup");
         return $c->render(json => {error => $e, result => defined $result});
     });
 
-    # Store the api_key
+    # Sends the api key to the R server
     $r->get ('/api_key' => sub ($c) {
         state $already_checked = 0;
         return $c->render(json => undef)
