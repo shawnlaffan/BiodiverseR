@@ -16,8 +16,7 @@ use BiodiverseR::IndicesMetadata;
 my $t = Test::Mojo->new('BiodiverseR');
 $t->get_ok('/api_key');
 my $api_key = $t->tx->res->json;
-my @api_args = (json => {api_key => $api_key});
-$t->get_ok('/' => @api_args)->status_is(200)->content_like(qr/Mojolicious/i);
+$t->get_ok('/' => {"api_key" => $api_key})->status_is(200)->content_like(qr/Mojolicious/i);
 
 my $bd = BiodiverseR::IndicesMetadata::_get_dummy_basedata();
 my $indices = Biodiverse::Indices->new(BASEDATA_REF => $bd);
@@ -28,7 +27,7 @@ my $expected_cluster_indices = {
     result => $cluster_indices,
 };
 
-$t->get_ok('/valid_cluster_indices' => @api_args)
+$t->get_ok('/valid_cluster_indices' => {"api_key" => $api_key})
     ->status_is(200, "status valid cluster indices")
     ->json_is('' => $expected_cluster_indices, "results valid cluster indices");
 
@@ -40,7 +39,7 @@ my $exp_linkages = {
         'link_minimum', 'link_recalculate',
     ],
 };
-$t->get_ok('/valid_cluster_linkage_functions' => @api_args)
+$t->get_ok('/valid_cluster_linkage_functions' => {"api_key" => $api_key})
     ->status_is(200, "status valid cluster linkage functions")
     ->json_is('' => $exp_linkages, "json results valid cluster linkage functions");
 # use Data::Dumper::Compact qw/ddc/;
@@ -54,7 +53,6 @@ my $tree = JSON::MaybeXS::decode_json ($json_tree);
 my %bd_setup_params = (
     name      => 'blognorb',
     cellsizes => [ 500, 500 ],
-    api_key   => $api_key,
 );
 
 my %analysis_args = (
@@ -74,25 +72,24 @@ my $gp_lb = {
 };
 
 my %data_params = (
-    api_key   => $api_key,
     bd_params => {
         data => $gp_lb
     },
 );
 
 my $t_msg_suffix = "cluster analysis";
-$t->post_ok('/init_basedata' => json => \%bd_setup_params)
+$t->post_ok('/init_basedata'  => {"api_key" => $api_key} => json => \%bd_setup_params)
     ->status_is(200, "status init, $t_msg_suffix")
     ->json_is('' => {result => 1, error => undef}, "basedata init, $t_msg_suffix");
 
-$t->post_ok('/bd_load_data' => json => \%data_params)
+$t->post_ok('/bd_load_data'  => {"api_key" => $api_key} => json => \%data_params)
     ->status_is(200, "status load data, $t_msg_suffix")
     ->json_is('' => {result => 1, error => undef}, "basedata load, $t_msg_suffix");
 
-$t->post_ok('/bd_get_group_count' => @api_args)
+$t->post_ok('/bd_get_group_count' => {"api_key" => $api_key})
     ->status_is(200, "status gp count, $t_msg_suffix")
     ->json_is('' => {result => 4, error => undef}, "group count, $t_msg_suffix");
-$t->post_ok('/bd_get_label_count' => @api_args)
+$t->post_ok('/bd_get_label_count' => {"api_key" => $api_key})
     ->status_is(200, "status lb count, $t_msg_suffix")
     ->json_is('' => {result => 4, error => undef}, "label count, $t_msg_suffix");
 
@@ -128,11 +125,11 @@ my $exp = {
 };
 
 my $cl_name = "cl_" . time();
-$t->post_ok('/bd_run_cluster_analysis' => json => {%analysis_args, name => $cl_name, api_key => $api_key})
+$t->post_ok('/bd_run_cluster_analysis' => {"api_key" => $api_key} => json => {%analysis_args, name => $cl_name})
     ->status_is(200, "status run cluster, $t_msg_suffix")
     ->json_is('' => $exp, "results, $t_msg_suffix");
 
-$t->post_ok('/bd_get_analysis_results' => json => {%analysis_args, name => $cl_name, api_key => $api_key})
+$t->post_ok('/bd_get_analysis_results' => {"api_key" => $api_key} => json => {%analysis_args, name => $cl_name})
     ->status_is(200, "status get cluster results, $t_msg_suffix")
     ->json_is('' => $exp, "results posthoc, $t_msg_suffix");
 

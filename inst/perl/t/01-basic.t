@@ -7,8 +7,7 @@ use Data::Printer;
 my $t = Test::Mojo->new('BiodiverseR');
 $t->get_ok('/api_key');
 my $api_key = $t->tx->res->json;
-my @api_args = (json => {api_key => $api_key});
-$t->get_ok('/' => @api_args)->status_is(200)->content_like(qr/Mojolicious/i);
+$t->get_ok('/' => {"api_key" => $api_key})->status_is(200)->content_like(qr/Mojolicious/i);
 
 #  empty response if already called /api_key
 $t->get_ok('/api_key')->status_is(200)->json_is(undef);
@@ -39,14 +38,14 @@ my $exp = {
   ],
 };
 my $t_msg_suffix = 'default config';
-$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+$t->post_ok ('/analysis_spatial_oneshot' => {"api_key" => $api_key} => json => $oneshot_data)
   ->status_is(200, "status, $t_msg_suffix")
   ->json_is ('' => $exp, "json results, $t_msg_suffix");
 
 $oneshot_data->{analysis_config}{spatial_conditions}
   = ['sp_self_only()'];
 $t_msg_suffix = 'spatial conditions set';
-$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+$t->post_ok ('/analysis_spatial_oneshot' => {"api_key" => $api_key} => json => $oneshot_data)
   ->status_is(200, "status, $t_msg_suffix")
   ->json_is ('' => $exp, "json results, $t_msg_suffix");
 
@@ -60,7 +59,7 @@ $exp = {
   ]
 };
 $t_msg_suffix = 'calculation set';
-$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+$t->post_ok ('/analysis_spatial_oneshot' => {"api_key" => $api_key} => json => $oneshot_data)
   ->status_is(200, "status, $t_msg_suffix")
   ->json_is ('' => $exp, "json results, $t_msg_suffix");
 
@@ -77,7 +76,7 @@ $exp = {
   ]
 };
 $t_msg_suffix = 'result_lists=SPATIAL_RESULTS, calculations=calc_elements_used';
-$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+$t->post_ok ('/analysis_spatial_oneshot' => {"api_key" => $api_key} => json => $oneshot_data)
   ->status_is(200, "status, $t_msg_suffix")
   ->json_is ('' => $exp, "json results, $t_msg_suffix");
 
@@ -101,7 +100,7 @@ $exp = {
 
 };
 $t_msg_suffix = 'results_list='.(join ',',keys %$exp).', calculations=calc_endemism,calc_element_lists_used';
-$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+$t->post_ok ('/analysis_spatial_oneshot' => {"api_key" => $api_key} => json => $oneshot_data)
   ->status_is(200, "status, $t_msg_suffix")
   ->json_is ('' => $exp, "json results, $t_msg_suffix");
 
@@ -111,7 +110,7 @@ $t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
 $oneshot_data->{analysis_config}{calculations}
   = {'calc_elements_used' => 0};
 $t_msg_suffix = 'calculations not an array ref';
-$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+$t->post_ok ('/analysis_spatial_oneshot' => {"api_key" => $api_key} => json => $oneshot_data)
   ->status_is(500, "status 500, $t_msg_suffix");
   
 $oneshot_data->{analysis_config}{calculations}
@@ -119,7 +118,7 @@ $oneshot_data->{analysis_config}{calculations}
 $oneshot_data->{analysis_config}{result_lists}
   = 'SPATIAL_RESULTS';
 $t_msg_suffix = 'result_lists is not a ref';
-$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+$t->post_ok ('/analysis_spatial_oneshot' => {"api_key" => $api_key} => json => $oneshot_data)
   ->status_is(500, "status 500, $t_msg_suffix");
 
 $oneshot_data->{analysis_config}{calculations}
@@ -129,7 +128,7 @@ $oneshot_data->{analysis_config}{result_lists}
 $oneshot_data->{analysis_config}{spatial_conditions}
   = {'sp_self_only()' => ''};
 $t_msg_suffix = 'spatial_conditions ref is not an array';
-$t->post_ok ('/analysis_spatial_oneshot' => json => $oneshot_data)
+$t->post_ok ('/analysis_spatial_oneshot' => {"api_key" => $api_key} => json => $oneshot_data)
   ->status_is(500, "status 500, $t_msg_suffix");
 
 #p $c;
