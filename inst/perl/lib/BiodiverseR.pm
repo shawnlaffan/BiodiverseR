@@ -295,7 +295,7 @@ $log->debug("Called startup");
         return $c->render(json => {error => $e, result => defined $result});
     });
 
-    # Store the api_key
+    # Sends the api key to the R server
     $r->get ('/api_key' => sub ($c) {
         state $already_checked = 0;
         return $c->render(json => undef)
@@ -326,8 +326,7 @@ $log->debug("Called startup");
     # Check if the api_key sent with the call is the same as api_key stored.
     #  Returns true on match.
     sub is_valid_api_key ($c, @rest) {
-        my $body_params = $c->req->json;
-        my $sent_api_key = $body_params->{api_key} // 1;
+        my $sent_api_key = $c->req->headers->header('api_key') // 1;
 
         return $sent_api_key eq ($api_key // 2);
     }

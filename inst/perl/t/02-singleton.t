@@ -15,8 +15,7 @@ my $data_dir = curfile->dirname->dirname->sibling('extdata')->to_string;
 my $t = Test::Mojo->new('BiodiverseR');
 $t->get_ok('/api_key');
 my $api_key = $t->tx->res->json;
-my @api_args = (json => {api_key => $api_key});
-$t->get_ok('/' => @api_args)->status_is(200)->content_like(qr/Mojolicious/i);
+$t->get_ok('/' => {"api_key" => $api_key})->status_is(200)->content_like(qr/Mojolicious/i);
 
 my $exp = {
     result => {
@@ -36,7 +35,6 @@ my $json_tree = '{"edge":[4,5,5,4,5,1,2,3],"edge.length":["NaN",1,1,2],"Nnode":2
 my $tree = JSON::MaybeXS::decode_json ($json_tree);
 # p $tree;
 my %bd_setup_params = (
-    api_key => $api_key,
     name => 'blognorb',
     cellsizes => [ 500, 500 ],
 );
@@ -88,40 +86,39 @@ foreach my $file_type (@file_arg_keys) {
     my $bd_params = \%bd_setup_params;
     my $data_params = {
         $file_type => $file_type_args{$file_type},
-        api_key    => $api_key,
     };
     my $t_msg_suffix = "default config, $file_type";
-    $t->post_ok('/init_basedata' => json => $bd_params)
+    $t->post_ok('/init_basedata' => {"api_key" => $api_key} => json => $bd_params)
         ->status_is(200, "status init, $t_msg_suffix")
         ->json_is('' => {result => 1, error => undef}, "json results, $t_msg_suffix");
 
-    $t->post_ok('/bd_load_data' => json => $data_params)
+    $t->post_ok('/bd_load_data' => {"api_key" => $api_key} => json => $data_params)
         ->status_is(200, "status load data, $t_msg_suffix")
         ->json_is('' => {result => 1, error => undef}, "json results, $t_msg_suffix");
 
-    $t->post_ok('/bd_get_group_count' => @api_args)
+    $t->post_ok('/bd_get_group_count' => {"api_key" => $api_key})
         ->status_is(200, "status gp count, $t_msg_suffix")
         ->json_is('' => {result => 4, error => undef}, "group count, $t_msg_suffix");
-    $t->post_ok('/bd_get_label_count' => @api_args)
+    $t->post_ok('/bd_get_label_count' => {"api_key" => $api_key})
         ->status_is(200, "status lb count, $t_msg_suffix")
         ->json_is('' => {result => 3, error => undef}, "label count, $t_msg_suffix");
 
 
     my $sp_name = "sp_" . time();
-    $t->post_ok('/bd_run_spatial_analysis' => json => {%analysis_args, name => $sp_name, api_key => $api_key})
+    $t->post_ok('/bd_run_spatial_analysis' => {"api_key" => $api_key} => json => {%analysis_args, name => $sp_name})
         ->status_is(200, "status run spatial, $t_msg_suffix")
         ->json_is('' => $exp, "json results, $t_msg_suffix");
 
     #  no need to test these more than once
     if ($file_type =~ /bd_params/) {
         my $sp_res = $t->tx->res->json;
-        $t->post_ok('/bd_get_analysis_results' => json => {name => $sp_name, api_key => $api_key})
+        $t->post_ok('/bd_get_analysis_results' => {"api_key" => $api_key} => json => {name => $sp_name})
             ->status_is(200, "status get_analysis_results from already run sp analysis")
             ->json_is('' => $sp_res, "json results, get precalculated sp results");
 
         my $dir = tempdir();
         my $filename = Mojo::File->new($dir, "$file_type.bds");
-        $t->post_ok('/bd_save_to_bds' => json => {filename => $filename, api_key => $api_key})
+        $t->post_ok('/bd_save_to_bds' => {"api_key" => $api_key} => json => {filename => $filename})
             ->status_is(200, "status save basedata, $t_msg_suffix")
             ->json_is('' => {result => 1, error => ''}, "json results, $t_msg_suffix");
         ok -e $filename, "$filename exists";
@@ -130,13 +127,13 @@ foreach my $file_type (@file_arg_keys) {
         is $bd->get_label_count, 3, "saved basedata has expected label count";
 
         #  try a reload
-        $t->post_ok('/init_basedata' => json => {filename => $filename, api_key => $api_key})
+        $t->post_ok('/init_basedata' => {"api_key" => $api_key} => json => {filename => $filename})
             ->status_is(200, "status load basedata from file, $t_msg_suffix")
             ->json_is('' => {result => 1, error => undef}, "results basedata file exists, $t_msg_suffix");
 
         my $err_fname = "$filename.zorb";
         my $exp_error = "Cannot initialise basedata, Unable to load basedata file $err_fname";
-        $t->post_ok('/init_basedata' => json => {filename => $err_fname, api_key => $api_key})
+        $t->post_ok('/init_basedata' => {"api_key" => $api_key} => json => {filename => $err_fname})
             ->status_is(200, "status load basedata from file that does not exist, $t_msg_suffix");
             #->json_like('' => {result => 0, error => qr/$exp_error/}, "results basedata file does not exist, $t_msg_suffix");
         my $res = $t->tx->res->json;
@@ -147,39 +144,38 @@ foreach my $file_type (@file_arg_keys) {
         my %aargs = %analysis_args;
         $aargs{definition_query} = '$x <= 250';
         $aargs{name} = 'with def query';
-        $aargs{api_key} = $api_key;
         local $exp->{result}{SPATIAL_RESULTS}[3] = ['750:250', '750', '250', (undef) x 10];
         local $exp->{result}{SPATIAL_RESULTS}[4] = ['750:750', '750', '750', (undef) x 10];
-        $t->post_ok('/bd_run_spatial_analysis' => json => \%aargs)
+        $t->post_ok('/bd_run_spatial_analysis' => {"api_key" => $api_key} => json => \%aargs)
             ->status_is(200, "status run spatial with def query, $t_msg_suffix")
             ->json_is('' => $exp, "json results, $t_msg_suffix");
         # p $t->tx->res->json;
 
         my $exp_output_count = {error => undef, result => 2};
-        $t->post_ok('/bd_get_analysis_count' => @api_args)
+        $t->post_ok('/bd_get_analysis_count' => {"api_key" => $api_key})
             ->status_is(200, "number of outputs in basedata")
             ->json_is('' => $exp_output_count, "json results: number of outputs before deletion");
 
         my $exp_delete = {error => undef, result => 1};
-        $t->post_ok('/bd_delete_analysis' => json => {name => $aargs{name}, api_key => $api_key})
+        $t->post_ok('/bd_delete_analysis' => {"api_key" => $api_key} => json => {name => $aargs{name}})
             ->status_is(200, "status delete spatial analysis")
             ->json_is('' => $exp_delete, "json results from output deletion");
         # p $t->tx->res->json;
 
         $exp_output_count = {error => undef, result => 1};
-        $t->post_ok('/bd_get_analysis_count' => @api_args)
+        $t->post_ok('/bd_get_analysis_count' => {"api_key" => $api_key})
             ->status_is(200, "number of outputs in basedata")
             ->json_is('' => $exp_output_count, "json results: number of outputs after deletion");
         # p $t->tx->res->json;
 
         $exp_delete = {error => undef, result => 1};
-        $t->post_ok('/bd_delete_all_analyses' => @api_args)
+        $t->post_ok('/bd_delete_all_analyses' => {"api_key" => $api_key})
             ->status_is(200, "status delete all analyses")
             ->json_is('' => $exp_delete, "json results from output deletion");
         # p $t->tx->res->json;
 
         $exp_output_count = {error => undef, result => 0};
-        $t->post_ok('/bd_get_analysis_count' => @api_args)
+        $t->post_ok('/bd_get_analysis_count' => {"api_key" => $api_key})
             ->status_is(200, "number of outputs in basedata")
             ->json_is('' => $exp_output_count, "json results: number of outputs after delete all");
         # p $t->tx->res->json;

@@ -144,7 +144,7 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     server_url = server_url
   )
 
-  # Sends api key to the mojolicious server
+  # Grabs the api key from the mojolicious server
   target_url <- paste0(config$server_url, "/api_key")
   req <- httr2::request(target_url)
   response <- httr2::req_perform(req)
