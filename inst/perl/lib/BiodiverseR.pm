@@ -25,6 +25,9 @@ use Time::HiRes qw /time/;
 
 use Digest::SHA qw(sha256_base64);
 
+use File::stat;
+use Time::localtime;
+
 local $| = 1;
 
 #  maybe should save mac logs to ~/Library/BiodiverseR
@@ -53,7 +56,21 @@ my $log = Mojo::Log->new(path => $logname, level => 'trace');
 # This method will run once at server start
 sub startup ($self) {
 
-$log->debug("Called startup");
+  $log->debug("Called startup");
+
+  # Removing old log files
+  opendir my $newVar, $logdir or die "Cannot open directory $logdir";
+  my @allLogFiles = readdir $newVar;
+  shift @allLogFiles for 1..2;
+  closedir $newVar;
+  foreach(@allLogFiles){
+	$log->debug($_);
+    
+    # my $epoch_timestamp = (stat($_))[9];
+    # my $time_stamp = localtime($epoch_timestamp);
+    # $time_stamp = ctime($time_stamp); 
+    # $log->debug($time_stamp);
+  }
 
   # Load configuration from config filesecrets
   #my $config = $self->plugin('NotYAMLConfig');
