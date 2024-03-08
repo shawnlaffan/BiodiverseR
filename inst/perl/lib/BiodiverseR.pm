@@ -66,6 +66,10 @@ sub startup ($self) {
   shift @allLogFiles for 1..2;
   closedir $newVar;
   foreach(@allLogFiles){
+    # If the length of the file is less than 24 then its not a file we need to check for
+    if (length($_) < 24) {
+        next;
+    }
     my $timestr = substr($_, 16, 8);
     my $currTime = POSIX::strftime("%Y%m%d", gmtime());
     # Find the difference in days between the date of the file creation and the current date
