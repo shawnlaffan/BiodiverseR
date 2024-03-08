@@ -28,6 +28,8 @@ use Digest::SHA qw(sha256_base64);
 use File::stat;
 use Time::localtime;
 
+use Date::Calc qw(Delta_Days);
+
 local $| = 1;
 
 #  maybe should save mac logs to ~/Library/BiodiverseR
@@ -64,12 +66,16 @@ sub startup ($self) {
   shift @allLogFiles for 1..2;
   closedir $newVar;
   foreach(@allLogFiles){
-	$log->debug($_);
-    
-    # my $epoch_timestamp = (stat($_))[9];
-    # my $time_stamp = localtime($epoch_timestamp);
-    # $time_stamp = ctime($time_stamp); 
-    # $log->debug($time_stamp);
+    my $timestr = substr($_, 16, 8);
+    my $currTime = POSIX::strftime("%Y%m%d", gmtime());
+    # Find the difference in days between the date of the file creation and the current date
+    my $days = Delta_Days(substr($timestr, 0, 4), substr($timestr, 4, 2), substr($timestr, 6, 2), 
+        substr($currTime, 0, 4), substr($currTime, 4, 2), substr($currTime, 6, 2));
+    my $pathOfCurFile = $logdir.'/'.$_;
+    # If days difference is greater than 7, the file gets removed.
+    if ($days > 7) {
+        unlink $pathOfCurFile;
+    }
   }
 
   # Load configuration from config filesecrets
