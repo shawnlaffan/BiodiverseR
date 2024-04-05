@@ -10,7 +10,9 @@ use Data::Printer;
 my $data_dir = curfile->dirname->dirname->sibling('extdata')->to_string;
 
 my $t = Test::Mojo->new('BiodiverseR');
-$t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
+$t->get_ok('/api_key');
+my $api_key = $t->tx->res->json;
+$t->get_ok('/' => {"api_key" => $api_key})->status_is(200)->content_like(qr/Mojolicious/i);
 
 my $json_tree = '{"edge":[4,5,5,4,5,1,2,3],"edge.length":["NaN",1,1,2],"Nnode":2,"tip.label":["r1","r2","r3"]}';
 my $tree = JSON::MaybeXS::decode_json ($json_tree);
@@ -140,7 +142,7 @@ foreach my $n (2..4) {
         };
         # diag $expected;
         my $t_msg_suffix = "file types: $ftypes";
-        $t->post_ok('/analysis_spatial_oneshot' => json => $oneshot_data)
+        $t->post_ok('/analysis_spatial_oneshot' => {"api_key" => $api_key} => json => $oneshot_data)
             ->status_is(200, "status, $t_msg_suffix")
             ->json_is('' => $expected, "numeric results, $t_msg_suffix");
         # use Data::Printer;

@@ -13,7 +13,9 @@ use Test::TempDir::Tiny;
 my $data_dir = curfile->dirname->dirname->sibling('extdata')->to_string;
 
 my $t = Test::Mojo->new('BiodiverseR');
-$t->get_ok('/')->status_is(200)->content_like(qr/Mojolicious/i);
+$t->get_ok('/api_key');
+my $api_key = $t->tx->res->json;
+$t->get_ok('/' => {"api_key" => $api_key})->status_is(200)->content_like(qr/Mojolicious/i);
 
 my $exp = {
     result => {
@@ -53,35 +55,35 @@ my $data_params = {
 };
 
 my $t_msg_suffix = "default config";
-$t->post_ok('/init_basedata' => json => $bd_params)
+$t->post_ok('/init_basedata' => {"api_key" => $api_key} => json => $bd_params)
     ->status_is(200, "status init, $t_msg_suffix")
     ->json_is('' => {result => 1, error => undef}, "json results, $t_msg_suffix");
 
-$t->post_ok('/bd_load_data' => json => $data_params)
+$t->post_ok('/bd_load_data' => {"api_key" => $api_key} => json => $data_params)
     ->status_is(200, "status load data, $t_msg_suffix")
     ->json_is('' => {result => 1, error => undef}, "json results, $t_msg_suffix");
 
-$t->post_ok('/bd_get_group_count')
+$t->post_ok('/bd_get_group_count' => {"api_key" => $api_key})
     ->status_is(200, "status gp count, $t_msg_suffix")
     ->json_is('' => {result => 4, error => undef}, "group count, $t_msg_suffix");
-$t->post_ok('/bd_get_label_count')
+$t->post_ok('/bd_get_label_count' => {"api_key" => $api_key})
     ->status_is(200, "status lb count, $t_msg_suffix")
     ->json_is('' => {result => 3, error => undef}, "label count, $t_msg_suffix");
 
 
 my $sp_name = "sp_" . time();
-$t->post_ok('/bd_run_spatial_analysis' => json => {%analysis_args, name => $sp_name})
+$t->post_ok('/bd_run_spatial_analysis' => {"api_key" => $api_key} => json => {%analysis_args, name => $sp_name})
     ->status_is(200, "status run spatial, $t_msg_suffix")
     ->json_is('' => $exp, "json results, $t_msg_suffix");
 
 #  now we actually test the randomisations
 my $rand_name = "rand_" . time();
 my %rand_args = (function => 'rand_structured', iterations => 9, prng_seed => 1234);
-$t->post_ok('/bd_run_randomisation_analysis' => json => {%rand_args, name => $rand_name})
+$t->post_ok('/bd_run_randomisation_analysis' => {"api_key" => $api_key} => json => {%rand_args, name => $rand_name})
     ->status_is(200, "status run randomisation, $t_msg_suffix")
     ->json_is('' => {result => 1, error => undef}, "json results, $t_msg_suffix");
 
-$t->post_ok('/bd_get_analysis_results' => json => {name => $sp_name})
+$t->post_ok('/bd_get_analysis_results' => {"api_key" => $api_key} => json => {name => $sp_name})
     ->status_is(200, "status get_analysis_results from already run sp analysis");
 
 my $sp_res = $t->tx->res->json;

@@ -30,11 +30,13 @@ Imports:
     fs,
     processx,
     httpuv,
-    httr,
+    httr2,
     rjson,
     tools,
     ape,
     utils,
     R6,
-    checkmate
+    checkmate,
+    openssl,
+    stringi
 License: GPL (>= 3)

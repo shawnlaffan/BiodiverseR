@@ -22,6 +22,7 @@ dummy_r6 <- function() R6::R6Class
 #'   start_server(port=3001, use_exe=FALSE)
 #' }
 
+
 start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
   process = NULL  #  silence some check warnings
@@ -143,6 +144,13 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
     server_url = server_url
   )
 
+  # Grabs the api key from the mojolicious server
+  target_url <- paste0(config$server_url, "/api_key")
+  req <- httr2::request(target_url)
+  response <- httr2::req_perform(req)
+  api_key_received <- httr2::resp_body_json(response)
+  config <- c(config, server_api_key=api_key_received)
+
   #  hopefully redundant now but leaving just in case
   server_running = 0
   max_tries = 10
@@ -175,3 +183,5 @@ start_server = function(port=0, use_exe=FALSE, perl_path="") {
 
   return(config)
 }
+
+# start_server()
