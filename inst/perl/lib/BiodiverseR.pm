@@ -99,7 +99,7 @@ $log->debug("Called startup");
         my $method = $metadata_route_factory{$route}{method}
           // "get_${route}";
 
-        $r->get("/$route" => sub ($c) {
+        $r->post ("/$route" => sub ($c) {
             #  drop calls with invalid api key
             return $c->render(json => undef)
                 if !is_valid_api_key($c);
