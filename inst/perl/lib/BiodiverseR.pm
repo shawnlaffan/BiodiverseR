@@ -61,24 +61,10 @@ sub startup ($self) {
   $log->debug("Called startup");
 
   # Removing old log files
-  opendir my $newVar, $logdir or die "Cannot open directory $logdir";
-  my @allLogFiles = readdir $newVar;
-  shift @allLogFiles for 1..2;
-  closedir $newVar;
+  my @allLogFiles = glob($logdir . "/*.txt");
   foreach(@allLogFiles){
-    # If the length of the file is less than 24 then its not a file we need to check for
-    if (length($_) < 24) {
-        next;
-    }
-    my $timestr = substr($_, 16, 8);
-    my $currTime = POSIX::strftime("%Y%m%d", gmtime());
-    # Find the difference in days between the date of the file creation and the current date
-    my $days = Delta_Days(substr($timestr, 0, 4), substr($timestr, 4, 2), substr($timestr, 6, 2), 
-        substr($currTime, 0, 4), substr($currTime, 4, 2), substr($currTime, 6, 2));
-    my $pathOfCurFile = $logdir.'/'.$_;
-    # If days difference is greater than 7, the file gets removed.
-    if ($days > 7) {
-        unlink $pathOfCurFile;
+    if (-M $_ > 7) {
+     unlink $_;
     }
   }
 
