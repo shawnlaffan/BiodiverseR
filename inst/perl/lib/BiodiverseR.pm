@@ -61,10 +61,10 @@ sub startup ($self) {
   $log->debug("Called startup");
 
   # Removing old log files
-  my @allLogFiles = glob($logdir . "/*.txt");
-  foreach(@allLogFiles){
-    if (-M $_ > 7) {
-     unlink $_;
+  my @all_log_files = glob($logdir . "/*.txt");
+  foreach my $file (@all_log_files){
+    if (-M $file > 7) {
+     unlink $file;
     }
   }
 
