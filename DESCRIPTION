@@ -39,4 +39,5 @@ Imports:
     checkmate,
     openssl,
     stringi
+Remotes: kiwiroy/perlbrewr
 License: GPL (>= 3)
