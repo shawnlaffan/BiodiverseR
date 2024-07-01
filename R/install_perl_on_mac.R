@@ -1,4 +1,4 @@
-#' Set Perl up on macOS
+#' Set Perl up on non-Windows Machine
 #'
 #' @param perl_version character string specifying version of perl needed
 #' @importFrom perlbrewr perlbrew
