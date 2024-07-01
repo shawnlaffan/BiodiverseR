@@ -1,6 +1,7 @@
 #' Set Perl up on macOS
 #'
-#' @param perl_version
+#' @param perl_version character string specifying version of perl needed
+#' @importFrom perlbrewr perlbrew
 #' @export
 
 install_perlbrewr <- function(perl_version = "5.36.1"){

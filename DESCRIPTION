@@ -39,6 +39,7 @@ Imports:
     R6,
     checkmate,
     openssl,
-    stringi
-Remotes: kiwiroy/perlbrewr
+    stringi,
+    perlbrewr
+Remotes: github::kiwiroy/perlbrewr
 License: GPL (>= 3)
