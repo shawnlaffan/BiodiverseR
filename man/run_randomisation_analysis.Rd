@@ -57,13 +57,12 @@ if(interactive()) {
   )
 
   bd$run_randomisation_analysis (
-    bd                 = bd
-    rand_function      = 'some_rand_function'
-    iterations         = integer
+    bd                 = bd,
+    rand_function      = 'some_rand_function',
+    iterations         = integer,
     name               = 'some_name',
     spatial_conditions = c("calc_endemism_central", "calc_richness", "calc_pd"),
     def_query          = 'some_def_query'
-    ...
   )
 }
 }

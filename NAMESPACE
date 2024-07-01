@@ -3,6 +3,7 @@
 export(analyse_oneshot_spatial)
 export(analyse_rasters_spatial)
 export(basedata)
+export(install_perlbrewr)
 export(load_data_)
 export(process_tabular_results)
 export(run_cluster_analysis)

@@ -1,3 +1,8 @@
+#' Set Perl up on macOS
+#'
+#' @param perl_version
+#' @export
+
 install_perlbrewr <- function(perl_version = "5.36.1"){
   # Perlbrewr function to tell R to use perlbrew
 
