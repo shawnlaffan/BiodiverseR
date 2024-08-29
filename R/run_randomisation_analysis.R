@@ -12,7 +12,6 @@
 #'
 #' @return Returns the results from calling the server
 #'
-#' @export
 #' @examples
 #' if(interactive()) {
 #'   bd = basedata$new(cellsizes=c(500,500))

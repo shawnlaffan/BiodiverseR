@@ -12,7 +12,6 @@
 #'
 #' @return The results of the analysis as an R list
 #'
-#' @export
 #' @examples
 #' if(interactive()) {
 #'   analysis_results = analyse_oneshot_spatial (
