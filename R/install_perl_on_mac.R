@@ -24,12 +24,16 @@ init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
   
   
   # Check if root path exists in environment, if not set it
-  # TODO:Currently not working
-  # if(Sys.getenv("PERLBREW_ROOT") == "")
-  # result <- perlbrewr::perlbrew(root = "~/perl5/perlbrew/bin/perlbrew", version = perl_version)
-  #else
+  #  perlbrew call will fail if the path does not exist or is not defined
+  perlbrew_root = Sys.getenv("PERLBREW_ROOT")
+  if(perlbrew_root == "") {
+      path = fs::path (fs::path_home, "perl5/perlbrew/bin/perlbrew")
+      if (fs::dir_exists (path)) {
+          perlbrew_root = path
+      }
+  }
 
-    result <- perlbrewr::perlbrew(root = Sys.getenv("PERLBREW_ROOT"), version = perl_version, lib = locallib)
+    result <- perlbrewr::perlbrew(root = perlbrew_root, version = perl_version, lib = locallib)
 
     if (missing(locallib)) {
         locallib = "BiodiverseR"
