@@ -4,9 +4,17 @@
 #' @importFrom perlbrewr perlbrew
 #' @export
 
-install_perlbrewr <- function(perl_version = "5.36.1"){
+install_perlbrewr <- function(perl_version){
   # Perlbrewr function to tell R to use perlbrew
 
+  if (perl_version == NULL) {
+    available = perlbrewr::perlbrew_list()
+    perl_version = attr(available, "active")
+    if (perl_version == NULL) {
+        perl_version = available[1]
+    }
+  }
+  
   # Check if root path exists in environment, if not set it
   # TODO:Currently not working
   # if(Sys.getenv("PERLBREW_ROOT") == "")
