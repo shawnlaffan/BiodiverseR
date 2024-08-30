@@ -28,9 +28,6 @@ init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
     result <- perlbrewr::perlbrew(root = Sys.getenv("PERLBREW_ROOT"), version = perl_version, lib = locallib)
 
     if (missing(locallib)) {
-        #  should use ~/Library on Macs
-        #basepath = fs::path_home()
-        #locallib  = fs::path (basepath, 'BiodiverseR', 'perl5')
         locallib = "BiodiverseR"
         success = perlbrewr::perlbrew_lib_create(
           lib = locallib, 
@@ -53,22 +50,22 @@ init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
 #' @param cpanfile Path to cpanfile or a directory to find one, defaults to the BiodiverseR cpanfile
 #' @export
 #' @rdname install_perl_deps
-install_perl_deps <- function(cpanfile = NULL, installdeps = TRUE, bd_git_path = NULL, verbose = TRUE, ...) {
+install_perl_deps <- function(cpanfile = NULL, installdeps = TRUE, bd_git_path = NULL, quiet = FALSE, ...) {
     if (missing(cpanfile)) {
-        cpanfile = paste (system.file("perl", package ="BiodiverseR"), "cpanfile", sep="/")
+        cpanfile = fs::path (system.file("perl", package ="BiodiverseR"), "cpanfile")
     }
     
     #  This should be conditional on not having been run already
     #  init_perlbrewr(perl_version)
 
-    os = get_os()
+    os = BiodiverseR:::get_os()
     
-    if (os =="windows") {
+    if (os == "windows") {
         return (BiodiverseR::install_strawberry_perl())
     }
     
     #  should use ~/Library on Macs
-    basepath = fs::path_home
+    basepath = fs::path_home()
     bd_path  = fs::path (basepath, 'BiodiverseR')
     
     if (missing (bd_git_path)) {
@@ -87,19 +84,28 @@ install_perl_deps <- function(cpanfile = NULL, installdeps = TRUE, bd_git_path =
         }
     }
 
-    #old_wd = getwd()
-    #setwd (bd_git_path)
-    system2 ("git", "-C", bd__git_path, "pull")  #  run regardless
- #   system ("cpanm --verbose --installdeps .")
- #   system ("cpanm --verbose .")
-    #setwd(old_wd)
+    #  should we always update?
+    #  should also check it is a git path
+    system2 (
+        "git", 
+        args = c(
+          "-C", 
+          bd_git_path, 
+          "pull"
+        )
+    )
+    
     bd_cpanfile = fs::path (bd_git_path)
-    perlbrewr::cpanm(installdeps = installdeps, dist = bd_cpanfile, verbose = verbose, ...)
+    message ("Installing dependencies for ", bd_cpanfile)
+    perlbrewr::cpanm(installdeps = installdeps, dist = bd_cpanfile, quiet = quiet, ...)
+    path = fs::path(bd_git_path, '.')
+    message ("Installing dependencies for ", path)
+    perlbrewr::cpanm(dist = path, quiet = quiet, ...)
     
     if(basename(cpanfile) == "cpanfile") {
         cpanfile <- dirname(cpanfile) 
     }
-    perlbrewr::cpanm(installdeps = installdeps, dist = cpanfile, verbose = verbose, ...)
+    perlbrewr::cpanm(installdeps = installdeps, dist = cpanfile, quiet = quiet, ...)
 }
 
 # https://www.r-bloggers.com/2015/06/identifying-the-os-from-r/
