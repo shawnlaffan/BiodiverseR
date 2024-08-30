@@ -69,7 +69,7 @@ install_perl_deps <- function(cpanfile = NULL, installdeps = TRUE, bd_git_path =
     os = BiodiverseR:::get_os()
     
     if (os == "windows") {
-        return (BiodiverseR::install_strawberry_perl())
+        return (BiodiverseR:::install_strawberry_perl())
     }
     
     #  should use ~/Library on Macs
