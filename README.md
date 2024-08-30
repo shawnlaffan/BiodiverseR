@@ -19,25 +19,23 @@ page](https://github.com/shawnlaffan/biodiverse).
 
 ## Installation
 
-This is a two step process. First, install the Biodiverse engine.
-Second, install the R package.
+This is a two step process. First, install Perl so the Biodiverse engine
+can run. Second, install the BiodiverseR R package.
 
-1.  Install the Biodiverse engine.
+1.  Install Perl
 
-This currently requires a working perl interpreter in your path. (Future
-versions will provide self contained executables).
+BiodiverseR currently requires a working perl interpreter in your path.
+(Future versions will provide self contained executables).
 
 On Windows a perl interpreter can be obtained through the [Strawberry
 perl project](https://strawberryperl.com/releases.html). This will be
 downloaded automatically when using the commands below.
 
-Most unix-derived systems provide a perl interpreter but it is best to
-avoid this and install [perlbrew](https://perlbrew.pl/) so you have a
-separate installation.  
+Most unix-derived systems such as Linux and Mac provide a perl
+interpreter but it is best to avoid this and install
+[perlbrew](https://perlbrew.pl/) so you have a separate installation.  
 When you install perlbrew be sure to also install the cpanm utility (see
-perlbrew site for details).
-
-Use perlbrew to install a recent version of perl.
+the perlbrew site for details).
 
 You also need to have git installed on your system and in the path.
 
@@ -50,7 +48,9 @@ library("devtools")
 devtools::install_github("shawnlaffan/BiodiverseR")
 ```
 
-However, it is currently best to work within the git repo.  
+However, it is currently best to work within the git repo given ongoing
+development updates.
+
 Set your working directory to be the top of the git repo and then run
 this:
 
@@ -59,9 +59,9 @@ library("devtools")
 devtools::load_all()
 ```
 
-To install the perl dependencies, run these commands.  
-The first one does nothing on Windows but there is no harm in running
-it.
+These next commands will install the Biodiverse engine and its perl
+dependencies. The first one does nothing on Windows but there is no harm
+in running it.
 
 ``` r
 init_perlbrewr()
@@ -76,16 +76,16 @@ system changes).
 
 ## Quick demo
 
-Check that the Biodiverse service can be accessed. The analytical
-functions call this internally so this is just a check that the server
-can be started.
+Check that a Biodiverse server can be started. The analytical functions
+call this internally so if it does not work then neither will be rest of
+the system.
 
 ``` r
-# It is critical that this be set to wherever you have downloaded the package 
-#  as otherwise the system will not find the server code.  
-#  It is an ugly and temporary hack and will not be needed in the future.
-#  This version assumes you are at the top level of the BiodiverseR repository.  
-Sys.setenv("Biodiverse_basepath" = getwd())
+#  If you have not used the perlbrewr() or strawberry perl options then this 
+#  next (commented out) command is needed so the system can find wherever you 
+#  have downloaded the package and thus the server code. 
+#  This assumes you are already at the top level of the BiodiverseR repository.  
+#  Sys.setenv("Biodiverse_basepath" = getwd())
 
 #  library(BiodiverseR)
 devtools::load_all()  #  for during development 
@@ -94,5 +94,5 @@ cs$server_object$is_alive()
 
 #  cleanup
 rm(cs)
-gc()  #  server is not deleted until garbage collected
+gc()  #  server is not deleted until garbage collection is run
 ```
