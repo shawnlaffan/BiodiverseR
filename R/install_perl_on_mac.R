@@ -1,11 +1,15 @@
-#' Set Perl up on non-Windows Machine
+#' Set Perl up on non-Windows machines
 #'
 #' @param perl_version character string specifying version of perl needed
 #' @importFrom perlbrewr perlbrew
 #' @export
 
 init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
-  # Perlbrewr function to tell R to use perlbrew
+    # Perlbrewr function to tell R to use perlbrew
+  
+    if (BiodiverseR:::get_os() == "windows") {
+        return ()
+    }
 
   if (missing(perl_version)) {
     available = perlbrewr::perlbrew_list()
