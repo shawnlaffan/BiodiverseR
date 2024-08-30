@@ -10,7 +10,7 @@
 [![R-CMD-check](https://github.com/shawnlaffan/Biodiverse-R/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/shawnlaffan/Biodiverse-R/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-Provides an R interface to the spatial analyses available in Biodiverse.
+Provides an R interface to the analyses available in Biodiverse.
 Biodiverse is a tool for the spatial analysis of diversity using indices
 based on taxonomic, phylogenetic, trait and matrix-based (e.g. genetic
 distance) relationships, as well as related environmental and temporal
@@ -27,36 +27,45 @@ Second, install the R package.
 This currently requires a working perl interpreter in your path. (Future
 versions will provide self contained executables).
 
-### Windows
-
 On Windows a perl interpreter can be obtained through the [Strawberry
-perl project](https://strawberryperl.com/releases.html), and there is
-a function to do this for you. Note that this will take a while and
-send large amounts of text to the console.  
+perl project](https://strawberryperl.com/releases.html). This will be
+downloaded automatically when using the commands below.
 
+Most unix-derived systems provide a perl interpreter but it is best to
+avoid this and install [perlbrew](https://perlbrew.pl/) so you have a
+separate installation.  
+When you install perlbrew be sure to also install the cpanm utility (see
+perlbrew site for details).
+
+Use perlbrew to install a recent version of perl.
+
+You also need to have git installed on your system and in the path.
+
+2.  Install the R code
+
+You can install the R code like so:
+
+``` r
+library("devtools")
+devtools::install_github("shawnlaffan/BiodiverseR")
 ```
+
+However, it is currently best to work within the git repo.  
+Set your working directory to be the top of the git repo and then run
+this:
+
+``` r
+library("devtools")
 devtools::load_all()
-BiodiverseR::install_strawberry_perl()
 ```
 
-### Unix/Mac
+To install the perl dependencies, run these commands.  
+The first one does nothing on Windows but there is no harm in running
+it.
 
-Most unix-derived systems provide a perl interpreter but it is best to avoid
-this and use a system like [perlbrew](https://perlbrew.pl/). Be sure to
-also install the cpanm utility (see perlbrew site for details).
-
-Once you have a perl installed and in your path you can install the perl
-dependencies using cpanm at the command line. (Make sure to update the
-below code to use the correct path separator on Windows). Note that this
-requires that you have git installed on your system and in the path.
-
-This code also assumes you have run a git clone of this repo and are at
-the top level of this repo.
-
-``` bash
-cpanm https://github.com/shawnlaffan/biodiverse.git
-cd inst/perl
-cpanm --installdeps .
+``` r
+init_perlbrewr()
+install_perl_deps()
 ```
 
 Note that the above will take a while if you do not already have the
@@ -64,25 +73,6 @@ GDAL development package installed on your system. This is because it
 will compile its own version if it is unable to find one on the system
 (but maybe this is not such a bad thing as then it will be isolated from
 system changes).
-
-If you want to see things as they happen then add the verbose flag to
-the cpanm calls (`cpanm --verbose ...`).
-
-2.  Install the R code
-
-(You might already have done this in one of the steps above).
-
-You can install the R code like so:
-
-``` r
-devtools::install_github("shawnlaffan/BiodiverseR")
-```
-
-However, it is currently best to work within the git repo.
-
-``` r
-devtools::load_all()
-```
 
 ## Quick demo
 
