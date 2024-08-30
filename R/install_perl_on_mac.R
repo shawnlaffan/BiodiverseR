@@ -4,7 +4,7 @@
 #' @importFrom perlbrewr perlbrew
 #' @export
 
-install_perlbrewr <- function(perl_version){
+init_perlbrewr <- function(perl_version){
   # Perlbrewr function to tell R to use perlbrew
 
   if (perl_version == NULL) {
