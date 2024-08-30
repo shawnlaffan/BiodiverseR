@@ -60,3 +60,7 @@ BiodiverseR_log*.txt
 
 #  arcgis sidecar files
 *.aux.xml
+
+#  R build files
+_build
+.build
