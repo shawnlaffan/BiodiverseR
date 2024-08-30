@@ -85,15 +85,15 @@ it will be isolated from system changes).
 
 ## Quick demo
 
-Check that the Biodiverse service can be accessed.  The analytical functions
-call this internally so this is just a check that the server can be started.
+Check that a Biodiverse server can be started.  The analytical functions call 
+this internally so if it does not work then neither will be rest of the system.
 
 ```{r}
-# It is critical that this be set to wherever you have downloaded the package 
-#  as otherwise the system will not find the server code.  
-#  It is an ugly and temporary hack and will not be needed in the future.
-#  This version assumes you are at the top level of the BiodiverseR repository.  
-Sys.setenv("Biodiverse_basepath" = getwd())
+#  If you have not used the perlbrewr() or strawberry perl options then this 
+#  next (commented out) command is needed so the system can find wherever you 
+#  have downloaded the package and thus the server code. 
+#  This assumes you are already at the top level of the BiodiverseR repository.  
+#  Sys.setenv("Biodiverse_basepath" = getwd())
 
 #  library(BiodiverseR)
 devtools::load_all()  #  for during development 
