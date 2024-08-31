@@ -11,7 +11,7 @@ init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
         return ()
     }
 
-  if (missing(perl_version)) {
+    if (missing(perl_version)) {
     available = perlbrewr::perlbrew_list()
     perl_version = attr(available, "active")
     #message ("bbbbb ", perl_version)
@@ -20,18 +20,18 @@ init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
     }
     perl_version <- trimws(perl_version)
     message (paste0 ("Using system perlbrew version ", perl_version))
-  }
-  
-  
-  # Check if root path exists in environment, if not set it
-  #  perlbrew call will fail if the path does not exist or is not defined
-  perlbrew_root = Sys.getenv("PERLBREW_ROOT")
-  if(perlbrew_root == "") {
-      path = fs::path (fs::path_home, "perl5/perlbrew/bin/perlbrew")
-      if (fs::dir_exists (path)) {
-          perlbrew_root = path
-      }
-  }
+    }
+
+
+    # Check if root path exists in environment, if not set it
+    #  perlbrew call will fail if the path does not exist or is not defined
+    perlbrew_root = Sys.getenv("PERLBREW_ROOT")
+    if(perlbrew_root == "") {
+        path = fs::path (fs::path_home, "perl5/perlbrew/bin/perlbrew")
+        if (fs::dir_exists (path)) {
+            perlbrew_root = path
+        }
+    }
 
     result <- perlbrewr::perlbrew(root = perlbrew_root, version = perl_version, lib = locallib)
 
@@ -45,7 +45,7 @@ init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
         message (paste0 ("Setting locallib result was ", success))
     }
   
-  return(result)
+    return(result)
 }
 
 
@@ -59,9 +59,6 @@ init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
 #' @export
 #' @rdname install_perl_deps
 install_perl_deps <- function(cpanfile = NULL, installdeps = TRUE, bd_git_path = NULL, quiet = FALSE, ...) {
-    if (missing(cpanfile)) {
-        cpanfile = fs::path (system.file("perl", package ="BiodiverseR"), "cpanfile")
-    }
     
     #  This should be conditional on not having been run already
     #  init_perlbrewr(perl_version)
@@ -70,6 +67,10 @@ install_perl_deps <- function(cpanfile = NULL, installdeps = TRUE, bd_git_path =
     
     if (os == "windows") {
         return (BiodiverseR:::install_strawberry_perl())
+    }
+    
+    if (missing(cpanfile)) {
+        cpanfile = fs::path (system.file("perl", package ="BiodiverseR"), "cpanfile")
     }
     
     #  should use ~/Library on Macs
