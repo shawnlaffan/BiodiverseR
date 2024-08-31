@@ -7,7 +7,7 @@
 init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
     # Perlbrewr function to tell R to use perlbrew
   
-    if (BiodiverseR:::get_os() == "windows") {
+    if (get_os() == "windows") {
         return ()
     }
 
@@ -63,10 +63,10 @@ install_perl_deps <- function(cpanfile = NULL, installdeps = TRUE, bd_git_path =
     #  This should be conditional on not having been run already
     #  init_perlbrewr(perl_version)
 
-    os = BiodiverseR:::get_os()
+    os = get_os()
     
     if (os == "windows") {
-        return (BiodiverseR:::install_strawberry_perl())
+        return (init_strawberry_perl())
     }
     
     if (missing(cpanfile)) {
