@@ -12,14 +12,14 @@ init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
     }
 
     if (missing(perl_version)) {
-    available = perlbrewr::perlbrew_list()
-    perl_version = attr(available, "active")
-    #message ("bbbbb ", perl_version)
-    if (missing (perl_version)) {
-        perl_version = available[1]
-    }
-    perl_version <- trimws(perl_version)
-    message (paste0 ("Using system perlbrew version ", perl_version))
+        available = perlbrewr::perlbrew_list()
+        perl_version = attr(available, "active")
+        #message ("bbbbb ", perl_version)
+        if (missing (perl_version)) {
+            perl_version = available[1]
+        }
+        perl_version <- trimws(perl_version)
+        message (paste0 ("Using system perlbrew version ", perl_version))
     }
 
 
@@ -46,7 +46,7 @@ init_perlbrewr <- function(perl_version = NULL, locallib = NULL){
     }
   
     return(result)
-}
+    }
 
 
 #  should be a wrapper to handle platform differences
