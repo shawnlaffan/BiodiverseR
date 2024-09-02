@@ -92,7 +92,7 @@ is not such a bad thing as then it will be isolated from system changes).
 ## Quick demo
 
 Check that a Biodiverse server can be started.  The analytical functions call 
-this internally so if it does not work then neither will be rest of the system.
+this internally so if it does not work then neither will rest of the system.
 
 ```{r}
 #  If you have not used the perlbrewr() or strawberry perl options then this 

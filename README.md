@@ -80,7 +80,7 @@ system changes).
 ## Quick demo
 
 Check that a Biodiverse server can be started. The analytical functions
-call this internally so if it does not work then neither will be rest of
+call this internally so if it does not work then neither will rest of
 the system.
 
 ``` r
