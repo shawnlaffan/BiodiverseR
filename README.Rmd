@@ -58,6 +58,7 @@ You also need to have git installed on your system and in the path.
 You can install the R code like so:
 
 ``` r
+# install.packages("devtools")
 library("devtools")
 devtools::install_github("shawnlaffan/BiodiverseR")
 ```
