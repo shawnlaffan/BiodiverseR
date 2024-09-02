@@ -1,4 +1,4 @@
-#' Iniktialise a version of strawberry perl to run the server
+#' Initialise a version of strawberry perl to run the server
 #'
 #' @examples
 #' if(interactive()) {
