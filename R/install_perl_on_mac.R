@@ -95,6 +95,7 @@ install_perl_deps <- function(cpanfile = NULL, installdeps = TRUE, bd_git_path =
 
     #  should we always update?
     #  should also check it is a git path
+    message ("Updating internal Biodiverse git repo in ", bd_git_path)
     system2 (
         "git", 
         args = c(
@@ -105,16 +106,27 @@ install_perl_deps <- function(cpanfile = NULL, installdeps = TRUE, bd_git_path =
     )
     
     bd_cpanfile = fs::path (bd_git_path)
-    message ("Installing dependencies for ", bd_cpanfile)
-    perlbrewr::cpanm(installdeps = installdeps, dist = bd_cpanfile, quiet = quiet, ...)
+    message ("Installing Biodiverse perl dependencies defined at ", bd_cpanfile)
+    res = perlbrewr::cpanm(installdeps = installdeps, dist = bd_cpanfile, quiet = quiet, ...)
+    if (res == FALSE) {
+        stop ("Error when installing Biodiverse perl dependencies")
+    }
+    
     path = fs::path(bd_git_path, '.')
-    message ("Installing dependencies for ", path)
-    perlbrewr::cpanm(dist = path, quiet = quiet, ...)
+    message ("Installing Biodiverse perl libs from ", path)
+    res = perlbrewr::cpanm(dist = path, quiet = quiet, ...)
+    if (res == FALSE) {
+        stop ("Error when installing Biodiverse")
+    }
     
     if(basename(cpanfile) == "cpanfile") {
-        cpanfile <- dirname(cpanfile) 
+        cpanfile <- dirname(cpanfile)
     }
-    perlbrewr::cpanm(installdeps = installdeps, dist = cpanfile, quiet = quiet, ...)
+    message ("Installing BiodiverseR perl dependencies from ", path)
+    res = perlbrewr::cpanm(installdeps = installdeps, dist = cpanfile, quiet = quiet, ...)
+    if (res == FALSE) {
+        stop ("Error when installing BiodiverseR perl dependencies")
+    }
 }
 
 # https://www.r-bloggers.com/2015/06/identifying-the-os-from-r/
