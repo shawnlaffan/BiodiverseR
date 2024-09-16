@@ -13,15 +13,6 @@
 #' be generated using the current time.
 #'
 #'
-#' @param name character
-#' @param filename character
-#' @param cellsizes numeric
-#' @param cellorigins numeric
-#' @param name character
-#' @param port integer
-#' @param use_exe boolean
-#' @param perl_path character
-#'
 #' @export
 #' @examples
 #' if(interactive()) {
@@ -30,10 +21,27 @@
 basedata = R6::R6Class("basedata",
    cloneable = FALSE, #  we need to dup the server for this to work
    public = list(
+
+    #' @field name character
     name   = NULL,
+
+    #' @field server character
     server = NULL,
+
+    #' @field cellsizes numeric
     cellsizes   = NULL,
+
+    #' @field cellorigins numeric
     cellorigins = NULL,
+
+    #' @description
+    #' Initialises BiodiverseR server
+    #' @param name character
+    #' @param filename character optional
+    #' @param cellorigins numeric
+    #' @param port integer
+    #' @param use_exe boolean
+    #' @param perl_path character
     initialize = function(
         name = paste("BiodiverseR::basedata", date()),
         cellsizes,
@@ -83,9 +91,16 @@ basedata = R6::R6Class("basedata",
 
       return (self)
     },
+
+    #' @description
+    #' Sets name
+    #' @param val value for name
     set_name = function(val) {
       self$name = val
     },
+
+    #' @description
+    #' Stops the server
     stop_server = function () {
       s = self$server$server_object
       tryCatch({
@@ -143,18 +158,37 @@ basedata = R6::R6Class("basedata",
 
       call_results[['result']]
     },
+
+    #' @description
+    #' Loads data to server
     load_data = function (params) {
       load_data_(self, params = params)
     },
+
+    #' @description
+    #' Run a spatial analysis
+    #' @param ... arguments passed
     run_spatial_analysis = function (...) {
       run_spatial_analysis(self, ...)
     },
+
+    #' @description
+    #' Run a cluster analysis
+    #' @param ... arguments passed
     run_cluster_analysis = function (...) {
       run_cluster_analysis(self, ...)
     },
+
+    #' @description
+    #' Run a cluster analysis
+    #' @param ... arguments passed
     run_randomisation_analysis = function (...) {
       run_randomisation_analysis(self, ...)
     },
+
+    #' @description
+    #' Retrieve results
+    #' @param name name of analysis
     get_analysis_results = function (name) {
       #  needs to do more than spatial...
       params = list (name = name)
@@ -169,27 +203,50 @@ basedata = R6::R6Class("basedata",
       }
       return (processed)
     },
+
+    #' @description
+    #' Count analysis
     #  we need to use factory generation of methods
     get_analysis_count = function () {
       self$call_server("bd_get_analysis_count")
     },
+
+    #' @description
+    #' Delete analysis
+    #' @param name name of analysis
     delete_analysis = function (name) {
       params = list (name = name)
       self$call_server("bd_delete_analysis", params)
     },
+
+    #' @description
+    #' Delete all analyses
     delete_all_analyses = function () {
       self$call_server("bd_delete_all_analyses")
     },
+
+    #' @description
+    #' Save to basedata/biodiverse?
+    #' @param filename name of file
     save_to_bds = function (filename) {
       params = list (filename = filename)
       self$call_server("bd_save_to_bds", params)
     },
+
+    #' @description
+    #' Compute group count
     get_group_count = function () {
       self$call_server("bd_get_group_count")
     },
+
+    #' @description
+    #' Compute label count
     get_label_count = function () {
       self$call_server("bd_get_label_count")
     },
+
+    #' @description
+    #' Kill the server
     finalize = function () {
       # message("Finalise called for ", self$name)
       self$stop_server()
