@@ -34,7 +34,7 @@ run_cluster_analysis(
 
 \item{tree}{class phylo}
 
-\item{cluster_tie_breakers}{}
+\item{cluster_tie_breakers}{character to handle tie breakers}
 }
 \value{
 The processed results of the cluster analysis

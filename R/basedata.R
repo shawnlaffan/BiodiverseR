@@ -39,6 +39,7 @@ basedata = R6::R6Class("basedata",
     #' @param name character
     #' @param filename character optional
     #' @param cellorigins numeric
+    #' @param cellsizes numeric
     #' @param port integer
     #' @param use_exe boolean
     #' @param perl_path character
@@ -110,6 +111,9 @@ basedata = R6::R6Class("basedata",
       )
       self$server = NULL
     },
+
+    #' @description
+    #' Check server status
     server_status = function () {
       s = self$server$server_object
       result = tryCatch ({
@@ -119,6 +123,11 @@ basedata = R6::R6Class("basedata",
       )
       return (result)
     },
+
+    #' @description
+    #' Call server
+    #' @param call_path path to call
+    #' @param params parameters to call
     call_server = function (call_path, params=NULL) {
       target_url <- paste(self$server$server_url, call_path, sep = "/")
 
@@ -161,6 +170,7 @@ basedata = R6::R6Class("basedata",
 
     #' @description
     #' Loads data to server
+    #' @param params parameters
     load_data = function (params) {
       load_data_(self, params = params)
     },
