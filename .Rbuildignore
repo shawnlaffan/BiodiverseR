@@ -14,4 +14,4 @@ nyt\d
 nytprof
 BiodiverseR.[.]Rproj[.]user
 ^\.Rproj\.user$
-
+^dev\.R$

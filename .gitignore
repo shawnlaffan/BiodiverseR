@@ -61,6 +61,6 @@ BiodiverseR_log*.txt
 #  arcgis sidecar files
 *.aux.xml
 
-R/dev.R
+dev.R
 
 
