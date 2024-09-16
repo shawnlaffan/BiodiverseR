@@ -8,7 +8,7 @@
 #' @param name character
 #' @param spatial_conditions character
 #' @param def_query character
-#' @param ...
+#' @param ... arguments passed to params in call_server
 #'
 #' @return Returns the results from calling the server
 #'
@@ -17,11 +17,8 @@
 #'   bd = basedata$new(cellsizes=c(500,500))
 #'   r_data = list(
 #'                 '250:250' = list (r1 = 13758, r2 = 13860),
-#'                 '250:750' = list (r1 = 11003, r2 = 11134),
+#'                 '250:750' = list (r1 = 11003, r2 = 11134)
 #'                )
-#'
-#'   params = list (bd_params = r_data, raster_params = NULL)
-#'   bd$load_data(params)
 #'
 #'   params = list (bd_params = r_data, raster_params = NULL)
 #'   bd$load_data(params)
