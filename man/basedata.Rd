@@ -5,10 +5,16 @@
 \title{Create a new BiodiverseR::basedata object
 and its associated server object.}
 \description{
-Data can then be loaded onto the server,
-analyses run and results returned.
+Create a new BiodiverseR::basedata object
+and its associated server object.
+
+Create a new BiodiverseR::basedata object
+and its associated server object.
 }
 \details{
+Data can then be loaded onto the server,
+analyses run and results returned.
+
 The filename argument is optional and can be used to load
 a pre-generated basedata file, for example one created using
 the Biodiverse GUI.
@@ -21,6 +27,19 @@ be generated using the current time.
 if(interactive()) {
   b = BiodiverseR::basedata$new(name = "trial")
 }
+}
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{name}}{character}
+
+\item{\code{server}}{character}
+
+\item{\code{cellsizes}}{numeric}
+
+\item{\code{cellorigins}}{numeric}
+}
+\if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
@@ -48,6 +67,7 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-new"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-new}{}}}
 \subsection{Method \code{new()}}{
+Initialises BiodiverseR server
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$new(
   name = paste("BiodiverseR::basedata", date()),
@@ -65,13 +85,9 @@ if(interactive()) {
 \describe{
 \item{\code{name}}{character}
 
-\item{\code{name}}{character}
-
-\item{\code{cellsizes}}{numeric}
-
 \item{\code{cellorigins}}{numeric}
 
-\item{\code{filename}}{character}
+\item{\code{filename}}{character optional}
 
 \item{\code{port}}{integer}
 
@@ -86,15 +102,24 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-set_name"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-set_name}{}}}
 \subsection{Method \code{set_name()}}{
+Sets name
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$set_name(val)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{val}}{value for name}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-basedata-stop_server"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-stop_server}{}}}
 \subsection{Method \code{stop_server()}}{
+Stops the server
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$stop_server()}\if{html}{\out{</div>}}
 }
@@ -122,6 +147,7 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-load_data"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-load_data}{}}}
 \subsection{Method \code{load_data()}}{
+Loads data to server
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$load_data(params)}\if{html}{\out{</div>}}
 }
@@ -131,33 +157,58 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-run_spatial_analysis"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-run_spatial_analysis}{}}}
 \subsection{Method \code{run_spatial_analysis()}}{
+Run a spatial analysis
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$run_spatial_analysis(...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{arguments passed}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-basedata-run_cluster_analysis"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-run_cluster_analysis}{}}}
 \subsection{Method \code{run_cluster_analysis()}}{
+Run a cluster analysis
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$run_cluster_analysis(...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{arguments passed}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-basedata-run_randomisation_analysis"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-run_randomisation_analysis}{}}}
 \subsection{Method \code{run_randomisation_analysis()}}{
+Run a cluster analysis
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$run_randomisation_analysis(...)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{arguments passed}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-basedata-get_analysis_results"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-get_analysis_results}{}}}
 \subsection{Method \code{get_analysis_results()}}{
+Retrieve results
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$get_analysis_results(name)}\if{html}{\out{</div>}}
 }
@@ -165,9 +216,7 @@ if(interactive()) {
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{name}}{character}
-
-\item{\code{name}}{character}
+\item{\code{name}}{name of analysis}
 }
 \if{html}{\out{</div>}}
 }
@@ -176,6 +225,7 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-get_analysis_count"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-get_analysis_count}{}}}
 \subsection{Method \code{get_analysis_count()}}{
+Count analysis
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$get_analysis_count()}\if{html}{\out{</div>}}
 }
@@ -185,6 +235,7 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-delete_analysis"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-delete_analysis}{}}}
 \subsection{Method \code{delete_analysis()}}{
+Delete analysis
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$delete_analysis(name)}\if{html}{\out{</div>}}
 }
@@ -192,9 +243,7 @@ if(interactive()) {
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{name}}{character}
-
-\item{\code{name}}{character}
+\item{\code{name}}{name of analysis}
 }
 \if{html}{\out{</div>}}
 }
@@ -203,6 +252,7 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-delete_all_analyses"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-delete_all_analyses}{}}}
 \subsection{Method \code{delete_all_analyses()}}{
+Delete all analyses
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$delete_all_analyses()}\if{html}{\out{</div>}}
 }
@@ -212,6 +262,7 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-save_to_bds"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-save_to_bds}{}}}
 \subsection{Method \code{save_to_bds()}}{
+Save to basedata/biodiverse?
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$save_to_bds(filename)}\if{html}{\out{</div>}}
 }
@@ -219,7 +270,7 @@ if(interactive()) {
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{filename}}{character}
+\item{\code{filename}}{name of file}
 }
 \if{html}{\out{</div>}}
 }
@@ -228,6 +279,7 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-get_group_count"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-get_group_count}{}}}
 \subsection{Method \code{get_group_count()}}{
+Compute group count
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$get_group_count()}\if{html}{\out{</div>}}
 }
@@ -237,6 +289,7 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-get_label_count"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-get_label_count}{}}}
 \subsection{Method \code{get_label_count()}}{
+Compute label count
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$get_label_count()}\if{html}{\out{</div>}}
 }
@@ -246,6 +299,7 @@ if(interactive()) {
 \if{html}{\out{<a id="method-basedata-finalize"></a>}}
 \if{latex}{\out{\hypertarget{method-basedata-finalize}{}}}
 \subsection{Method \code{finalize()}}{
+Kill the server
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{basedata$finalize()}\if{html}{\out{</div>}}
 }

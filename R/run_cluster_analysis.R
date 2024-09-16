@@ -10,7 +10,7 @@
 #' @param def_query character
 #' @param name character
 #' @param tree class phylo
-#' @param cluster_tie_breakers
+#' @param cluster_tie_breakers character to handle tie breakers
 #'
 #' @return The processed results of the cluster analysis
 #'
