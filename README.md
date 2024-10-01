@@ -75,7 +75,8 @@ Note that the above will take a while if you do not already have the
 GDAL development package installed on your system. This is because it
 will compile its own version if it is unable to find one on the system
 (but maybe this is not such a bad thing as then it will be isolated from
-system changes).
+system changes). If you do want to install a system version then see the
+[GDAL documentation](https://gdal.org/en/latest/download.html#binaries).
 
 ## Quick demo
 
