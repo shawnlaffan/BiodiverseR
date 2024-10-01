@@ -16,6 +16,9 @@
 # User-specific files
 .Ruserdata
 
+#  build dir
+/_build
+
 # Example code in package build process
 *-Ex.R
 
