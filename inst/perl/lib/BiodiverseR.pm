@@ -219,6 +219,9 @@ sub startup ($self) {
             $log->debug(np ($analysis_params));
             $log->debug("About to call $method");
 
+            #  for debug
+            BiodiverseR::BaseData->set_logger ($log);
+
             my $result = eval {
                 BiodiverseR::BaseData->$method ($has_args ? $analysis_params : ());
                 1;
@@ -234,6 +237,10 @@ sub startup ($self) {
                 }
                 return error_as_json($c, $msg);
             }
+
+            # $log->debug("No error");
+            # my $bd = BiodiverseR::BaseData->get_basedata_ref;
+            # $log->debug(np $bd);
 
             return success_as_json ($c, $result);
         });

@@ -27,6 +27,11 @@ load_data_ = function (
     params[["bd_params"]] = params[["r_data"]]
     params[["r_data"]] = NULL
   }
+  if(!is.null(params[["bd_params"]])) {
+    # assert bd_params[["data"]] is not null
+
+  }
+  #  if we have bd_params then it must have a "data" item
 
   storage <- list()
   # Call aggregate function for spreadsheets
