@@ -41,7 +41,8 @@ agg2groups.character <- function(x, layer, coords = NULL, ...) {
     if(!"sf" %in% class(out)) out <- sf::st_as_sf(out, coords = coords, ...) # if coords not in defaults, add coords to make sf
   } else if(xls) {
     out <- sf::st_read(x, quiet = TRUE)
-    if(!is.null(coords)) out <- sf::st_as_sf(out, coords = coords)} # if coords specified, make sf
+    if(!is.null(coords)) out <- sf::st_as_sf(out, coords = coords)
+  } # if coords specified, make sf
   if(shp) out <- sf::st_read(x, layer = layer)
   if(tif) out <- terra::rast(x)
 
@@ -75,7 +76,7 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
         abund_col <- "count"
         x <- x %>% dplyr::mutate("{abund_col}" = 1)
 
-      }else{message(paste("Column ", missing[1], " not found. Missing columns are ignored."))
+      } else{message(paste("Column ", missing[1], " not found. Missing columns are ignored."))
         abund_col <- abund_col[abund_col %in% names(x)]
       }
 
@@ -88,32 +89,41 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
 
   # code for aggregating point data
   if(all(sf::st_geometry_type(x) == "POINT")){
-    # add XY if not present
+    # add XY if not present - need to handle Z and M
     if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, sf::st_coordinates(x))
-    # aggregate and summarise
+
     if(length(cellsize) == 1){cellsize <- rep_len(cellsize, length(group_col))}
     if(length(cellsize) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
-    if(length(cellsize) == length(group_col)){
-      x <- sf::st_drop_geometry(x)
-      out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
-      }else{x[,group_col[.x]]}) 
-      temp1 = purrr::reduce(out, cbind) 
-      temp2 = data.frame(temp1) 
-      temp3 = setNames(temp2, group_col) # Originally group_col was tidyselect::all_of(group_col) but this raised a deprecated warning.
-      temp4 = data.frame(temp3, x %>% dplyr::select(-tidyselect::all_of(group_col)))
+    if(length(cellsize) != length(group_col)) {
+      stop("The number of cellsize dimensions must match the number of grouping dimensions.")
+    }
 
-      # print(head(temp4, 10))
-      # print(str(temp4))
-      # This below hard converts column 3 and 4 to numeric from character. Not sure if this is going to always be the case. Passes R tests for now
-      if (csv) {
-        temp4[, c(3,4)] <- sapply(temp4[, c(3,4)], as.numeric)
+    # aggregate and summarise
+    x <- sf::st_drop_geometry(x)
+    out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {
+        round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
+      } else {
+        x[,group_col[.x]]
       }
+    )
+    temp1 = purrr::reduce(out, cbind)
+    temp2 = data.frame(temp1)
+    temp3 = setNames(temp2, group_col) # Originally group_col was tidyselect::all_of(group_col) but this raised a deprecated warning.
+    temp4 = data.frame(temp3, x %>% dplyr::select(-tidyselect::all_of(group_col)))
 
-      temp5 = dplyr::group_by(temp4, dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col))))
-      temp6 = dplyr::summarise(temp5, value := dplyr::across(tidyselect::all_of(abund_col), fun), .groups = "keep")
-      out = temp6
+    # print(head(temp4, 10))
+    # print(str(temp4))
+    # This below hard converts column 3 and 4 to numeric from character. Not sure if this is going to always be the case. Passes R tests for now
+    ## FIXME - this is not user proof
+    if (csv) {
+      temp4[, c(3,4)] <- sapply(temp4[, c(3,4)], as.numeric)
+    }
 
-    }else stop("The number of cellsize dimensions must match the number of grouping dimensions.")
+    temp5 = dplyr::group_by(temp4, dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col))))
+    temp6 = dplyr::summarise(temp5, value := dplyr::across(tidyselect::all_of(abund_col), fun), .groups = "keep")
+    out = temp6
+
+
 
     # Old Code for above
     # if(length(cellsize) == length(group_col)){
@@ -138,7 +148,7 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
   }else{
     # This function dosen't even exist. Commented out for now but originally uncommented.
     # support line and polygon inputs.
-    # agg2group.sfpoly(x, ID_col, cellsize, origin) 
+    # agg2group.sfpoly(x, ID_col, cellsize, origin)
   }
 
 }
