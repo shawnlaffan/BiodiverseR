@@ -25,6 +25,11 @@ use Time::HiRes qw /time/;
 
 use Digest::SHA qw(sha256_base64);
 
+use File::stat;
+use Time::localtime;
+
+use Date::Calc qw(Delta_Days);
+
 local $| = 1;
 
 #  maybe should save mac logs to ~/Library/BiodiverseR
@@ -53,7 +58,15 @@ my $log = Mojo::Log->new(path => $logname, level => 'trace');
 # This method will run once at server start
 sub startup ($self) {
 
-$log->debug("Called startup");
+  $log->debug("Called startup");
+
+  # Removing old log files
+  my @all_log_files = glob($logdir . "/*.txt");
+  foreach my $file (@all_log_files){
+    if (-M $file > 7) {
+     unlink $file;
+    }
+  }
 
   # Load configuration from config filesecrets
   #my $config = $self->plugin('NotYAMLConfig');
@@ -295,7 +308,7 @@ $log->debug("Called startup");
         return $c->render(json => {error => $e, result => defined $result});
     });
 
-    # Store the api_key
+    # Sends the api key to the R server
     $r->get ('/api_key' => sub ($c) {
         state $already_checked = 0;
         return $c->render(json => undef)
@@ -326,8 +339,7 @@ $log->debug("Called startup");
     # Check if the api_key sent with the call is the same as api_key stored.
     #  Returns true on match.
     sub is_valid_api_key ($c, @rest) {
-        my $body_params = $c->req->json;
-        my $sent_api_key = $body_params->{api_key} // 1;
+        my $sent_api_key = $c->req->headers->header('api_key') // 1;
 
         return $sent_api_key eq ($api_key // 2);
     }

@@ -1,6 +1,3 @@
-library("R6")
-
-
 #' Create a new BiodiverseR::basedata object
 #' and its associated server object.
 #'
@@ -30,7 +27,7 @@ library("R6")
 #' if(interactive()) {
 #'   b = BiodiverseR::basedata$new(name = "trial")
 #' }
-basedata = R6Class("basedata",
+basedata = R6::R6Class("basedata",
    cloneable = FALSE, #  we need to dup the server for this to work
    public = list(
     name   = NULL,
@@ -115,9 +112,6 @@ basedata = R6Class("basedata",
       if (!is.null(params)) {
         params[sapply(params, is.null)] <- NULL
       }
-      
-      # Attaches api key to params
-      params[["api_key"]] = self$server$server_api_key
       params_as_json <- rjson::toJSON(params)
 
 # message ("about to run call, params are:")
@@ -131,9 +125,9 @@ basedata = R6Class("basedata",
       # # httr::stop_for_status(response)
       # call_results <- httr::content(response, "parsed")
 
-
       req <- httr2::request(target_url)
       req <- httr2::req_body_raw(req, params_as_json)
+      req <- httr2::req_headers(req, api_key = self$server$server_api_key)
       response <- httr2::req_perform(req)
       call_results <- httr2::resp_body_json(response)
 
