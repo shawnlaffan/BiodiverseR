@@ -104,9 +104,12 @@ sub load_data ($class, $args) {
 
     if (my $bd_data = $args->{bd_params}) {
         my $data = $bd_data->{data};
-        croak "bd_params does not contain a 'data' entry"
-            if !defined $data;
+
         # $log->debug (np $bd_data);
+
+        croak "bd_params does not contain a valid 'data' entry"
+            if !defined $data || !is_hashref ($data);
+
         # say STDERR "Loading bd_data";
         # p $bd_data;
         #  needs to be a more general call
