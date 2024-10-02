@@ -98,18 +98,28 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
       stop("The number of cellsize dimensions must match the number of grouping dimensions.")
     }
 
-    # aggregate and summarise
+    #  remove geometry field since we have them as columns now
     x <- sf::st_drop_geometry(x)
+
+    #  aggregate if cell size > 0, otherwise leave as-is
     out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {
         round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
       } else {
         x[,group_col[.x]]
       }
     )
+    #names <- out %>% dplyr::select(dplyr::group_cols()) %>% apply(1, paste, collapse = ":")
     temp1 = purrr::reduce(out, cbind)
     temp2 = data.frame(temp1)
     temp3 = setNames(temp2, group_col) # Originally group_col was tidyselect::all_of(group_col) but this raised a deprecated warning.
     temp4 = data.frame(temp3, x %>% dplyr::select(-tidyselect::all_of(group_col)))
+
+    gp_id_colname = ":GROUP_ID:"
+    group_ids = temp3 %>%
+      tidyr::unite(x, group_col, sep = ":", remove = TRUE)
+    names(group_ids) = gp_id_colname
+    temp4 = cbind (temp4, group_ids)
+
 
     # print(head(temp4, 10))
     # print(str(temp4))
@@ -119,10 +129,13 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
       temp4[, c(3,4)] <- sapply(temp4[, c(3,4)], as.numeric)
     }
 
-    temp5 = dplyr::group_by(temp4, dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col))))
+    # temp5 = dplyr::group_by(temp4, dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col))))
+    temp5 = dplyr::group_by(temp4, dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(gp_id_colname))))
     temp6 = dplyr::summarise(temp5, value := dplyr::across(tidyselect::all_of(abund_col), fun), .groups = "keep")
-    out = temp6
-
+    out = as.data.frame(temp6)  #  clear the tibble stuff
+    names(out) = c("lb_id", "gp_id", "count")
+    #out["lb_id"] = as.character (out["lb_id"])
+    #out["gp_id"] = as.character (out["gp_id"])
 
 
     # Old Code for above
@@ -139,15 +152,24 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
 
     # change to format required by json
     #names <- paste(out$x, out$y, sep = ":")
-    names <- out %>% dplyr::select(dplyr::group_cols()) %>% apply(1, paste, collapse = ":")
-    out <- out %>% split(names) %>%
-      purrr::map(~dplyr::pull(.x, value) %>% unlist())
-    return(out)
+    # names <- out %>% dplyr::select(dplyr::group_cols()) %>% apply(1, paste, collapse = ":")
+    # out <- out %>% split(names) %>%
+    #   purrr::map(~dplyr::pull(.x, value) %>% unlist())
 
+    #  should use an apply - fix later
+    #  should also do outside this function as it can simplify some looping
+    result = list()
+    for (i in 1:nrow(out)) {
+      row = out[i,]
+      lb = as.character(row[1])
+      gp = as.character(row[2])
+      result[[lb]][[gp]] = row[3]+0
+    }
 
-  }else{
-    # This function dosen't even exist. Commented out for now but originally uncommented.
-    # support line and polygon inputs.
+    return(result)
+
+  } else {
+    # support line and polygon inputs when agg2group.sfpoly exists.
     # agg2group.sfpoly(x, ID_col, cellsize, origin)
   }
 
