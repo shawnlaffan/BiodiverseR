@@ -9,8 +9,8 @@
 #' @param abund_col character vector containing the name of column(s) with abundances; defaults to "count" and is assumed to be 1 for all records if no column specified and count column is absent
 #' @param ID_col character vector containing the name of column(s) with data labels or species names. Defaults to "label"
 #' @param group_col character vector containing the name of column(s) by which to group observations; may be numeric or categorical.  Defaults to XY coordinates if no group_col is specified.
-#' @param cellsize numeric vector indicating the size of desired groups; length must be 1 or same length as group_col. If length is 1, then its value is recycled over all grouping columns. If value <= 0 exact matches are aggregated, including categorical variables.
-#' @param origin numeric vector of numbers specifying the dimensions of the spatial groups into which data needs to be aggregated. Length must match length of cellsize. Units should be the same as the data projection, usually metres.
+#' @param cellsizes numeric vector indicating the size of desired groups; length must be 1 or same length as group_col. If length is 1, then its value is recycled over all grouping columns. If value <= 0 exact matches are aggregated, including categorical variables.
+#' @param cellorigins numeric vector of numbers specifying the dimensions of the spatial groups into which data needs to be aggregated. Length must match length of cellsize. Units should be the same as the data projection, usually metres.
 #' @param fun name of aggregation function to be used. Defaults to sum.
 #' @param ... passed on to agg2groups.sf call.
 #'
@@ -66,7 +66,7 @@ agg2groups.data.frame <- function(x, coords, ...) {
 }
 
 # spatial aggregation, count and label columns specified with convenient defaults
-agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), group_col = c("X", "Y"), cellsize = 100, origin = c(0,0), fun = sum) {
+agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), group_col = c("X", "Y"), cellsizes = 100, cellorigins = c(0,0), fun = sum) {
   # check for existence of abund_col names
   if(!all(abund_col %in% names(x))){
     missing <- abund_col[!abund_col %in% names(x)]
@@ -92,9 +92,9 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
     # add XY if not present - need to handle Z and M
     if(!all(c("X", "Y") %in% names(x))) x <- data.frame(x, sf::st_coordinates(x))
 
-    if(length(cellsize) == 1){cellsize <- rep_len(cellsize, length(group_col))}
-    if(length(cellsize) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
-    if(length(cellsize) != length(group_col)) {
+    if(length(cellsizes) == 1){cellsizes <- rep_len(cellsizes, length(group_col))}
+    if(length(cellsizes) == length(group_col)+2) group_col <- c("X", "Y", group_col) # add XY by default if 2 grouping dims missing.
+    if(length(cellsizes) != length(group_col)) {
       stop("The number of cellsize dimensions must match the number of grouping dimensions.")
     }
 
@@ -102,8 +102,8 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
     x <- sf::st_drop_geometry(x)
 
     #  aggregate if cell size > 0, otherwise leave as-is
-    out <- purrr::map(1:length(cellsize), ~if(cellsize[.x] > 0) {
-        round_any(x[,group_col[.x]], accuracy = cellsize[.x], origin = origin[.x])
+    out <- purrr::map(1:length(cellsizes), ~if(cellsizes[.x] > 0) {
+        round_any(x[,group_col[.x]], accuracy = cellsizes[.x], origin = cellorigins[.x])
       } else {
         x[,group_col[.x]]
       }
@@ -116,7 +116,7 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
 
     gp_id_colname = ":GROUP_ID:"
     group_ids = temp3 %>%
-      tidyr::unite(x, group_col, sep = ":", remove = TRUE)
+      tidyr::unite(x, tidyselect::all_of(group_col), sep = ":", remove = TRUE)
     names(group_ids) = gp_id_colname
     temp4 = cbind (temp4, group_ids)
 
@@ -132,10 +132,8 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
     # temp5 = dplyr::group_by(temp4, dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(group_col))))
     temp5 = dplyr::group_by(temp4, dplyr::across(c(tidyselect::all_of(ID_col), tidyselect::all_of(gp_id_colname))))
     temp6 = dplyr::summarise(temp5, value := dplyr::across(tidyselect::all_of(abund_col), fun), .groups = "keep")
-    out = as.data.frame(temp6)  #  clear the tibble stuff
-    names(out) = c("lb_id", "gp_id", "count")
-    #out["lb_id"] = as.character (out["lb_id"])
-    #out["gp_id"] = as.character (out["gp_id"])
+    #  messy but as.data.frame() does not work properly due to the grouping or something
+    df = data.frame(lb_id = temp6[[1]], gp_id = temp6[[2]], count = temp6$value$count)
 
 
     # Old Code for above
@@ -159,11 +157,11 @@ agg2groups.sf <- function(x, csv, abund_col = c("count"), ID_col = c("label"), g
     #  should use an apply - fix later
     #  should also do outside this function as it can simplify some looping
     result = list()
-    for (i in 1:nrow(out)) {
-      row = out[i,]
+    for (i in 1:nrow(df)) {
+      row = df[i,]
       lb = as.character(row[1])
       gp = as.character(row[2])
-      result[[lb]][[gp]] = row[3]+0
+      result[[gp]][[lb]] = row[3]+0
     }
 
     return(result)
@@ -190,6 +188,6 @@ agg2groups.SpatRaster <- function(x, cellsize = 100, ...) {
 
 
 round_any <- function(number, accuracy = 100, origin = 0, f = floor){
-  (f((number-origin)/accuracy) * accuracy) + origin
+  (f((number-origin)/accuracy) * accuracy) + origin + 0.5 * accuracy
 }
 
